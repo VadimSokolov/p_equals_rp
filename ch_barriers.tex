@@ -1,0 +1,48 @@
+\chapter{The Three Barriers}
+\label{ch:barriers}
+
+Three theorems explain why $\Pc$ versus $\NP$ has resisted every known technique. Each identifies a property shared by a class of proof methods and shows that no proof with that property can resolve the question. This chapter states the three, sketches why they hold, and asks which side of each the Monte Carlo program of Part IV falls on.
+
+\section{Relativization}
+
+A proof relativiz\index{relativization}es if it goes through unchanged when every machine in it is given access to the same oracle. The diagonalisation proofs of the time hierarchy theorem and of the undecidability of halting relativize: nothing in them depends on what the machines compute, only on how they can be enumerated and simulated.
+
+\begin{theorem}[Baker, Gill and Solovay]
+There are oracles $A$ and $B$ such that $\Pc^A = \NP^A$ and $\Pc^B \neq \NP^B$.
+\end{theorem}
+
+For $A$ take any $\mathrm{PSPACE}$ complete language. Then $\Pc^A \supseteq \mathrm{PSPACE}$, since the oracle answers $\mathrm{PSPACE}$ questions, and $\NP^A \subseteq \mathrm{NPSPACE} = \mathrm{PSPACE}$ by Savitch's theorem, so both equal $\mathrm{PSPACE}$. For $B$ one constructs by diagonalisation a sparse oracle such that the language $L_B = \{ 1^n : B \text{ contains a string of length } n \}$ is in $\NP^B$, since a nondeterministic machine can guess the string and query it, but not in $\Pc^B$, since a deterministic machine making polynomially many queries can be fooled on infinitely many lengths by placing the string where it did not look.
+
+The consequence is that any proof of $\Pc \neq \NP$ or of $\Pc = \NP$ must use some property of computation that is not preserved under oracles. Diagonalisation alone cannot do it. Nor can the simulation arguments that give $\NP \subseteq \mathrm{PSPACE}$ and the like. The known non relativizing results are few and are all connected to arithmetization: the proof that $\mathrm{IP} = \mathrm{PSPACE}$ by Shamir, the PCP theorem, and the derandomization results that go through low degree polynomials. These exploit the fact that a computation can be encoded as a polynomial, and the encoding does not survive an oracle that is given as a black box.
+
+\section{Natural proofs}
+
+Razborov\index{Razborov, Alexander} and Rudich looked at the lower bound proofs of the 1980s and extracted their common form. A proof shows that a function $f$ is hard by exhibiting a property $\mathcal{C}$ of Boolean functions such that $f$ has $\mathcal{C}$ and no function computed by a small circuit has $\mathcal{C}$. The property is natural if it is constructive, meaning that membership in $\mathcal{C}$ can be decided in time polynomial in the truth table of the function, that is $2^{O(n)}$, and large, meaning that a random function has $\mathcal{C}$ with probability at least $2^{-O(n)}$. The random restriction and approximation methods are natural: the property they use is roughly that the function is not well approximated by a low degree polynomial, which is easy to test and which a random function has.
+
+\begin{theorem}[Razborov and Rudich]
+If there is a natural property useful against circuits of size $s(n)$, then there is no pseudorandom function family computable by circuits of size at most $s(n)$ that is secure against adversaries running in time $2^{O(n)}$.
+\end{theorem}
+
+The proof is short. A pseudorandom function family is a collection of functions $\{ f_k \}$, indexed by a short key, each computable by a small circuit, such that no efficient adversary can distinguish $f_k$ for random $k$ from a truly random function. A natural property gives a distinguisher: test whether the function has $\mathcal{C}$. A random function has it with nonnegligible probability; no $f_k$ has it, since each has a small circuit. So the property breaks the family.
+
+Pseudorandom function families exist if one way functions exist, by the theorems of H{\aa}stad, Impagliazzo\index{Impagliazzo, Russell}, Levin and Luby and of Goldreich, Goldwasser and Micali, and one way functions are believed to exist for the same reasons that factoring is believed hard. So natural proofs cannot prove lower bounds against general circuits unless cryptography is impossible, and a proof that worked would then have shown more than $\Pc \neq \NP$.
+
+\section{Algebrization}
+
+The classical non relativizing results, the interactive proof theorems and the PCP theorem, all arithmetize (the hardness versus randomness results of Chapter~\ref{ch:pcp} are a different case). Aaronson and Wigderson asked whether arithmetization itself could resolve $\Pc$ versus $\NP$, and showed it could not. A proof algebrizes if it goes through when the machines are given an oracle $A$ and also access to a low degree polynomial extension $\tilde A$ of $A$ over a finite field; this models the ability to arithmetize the oracle, which is what the known non relativizing proofs do.
+
+\begin{theorem}[Aaronson and Wigderson]
+There are oracles $A$ with extension $\tilde A$ such that $\NP^{\tilde A} \subseteq \Pc^{A}$, and oracles $B$ with extension $\tilde B$ such that $\NP^{B} \not\subseteq \Pc^{\tilde B}$. Hence no algebrizing proof shows $\Pc = \NP$ or $\Pc \neq \NP$.
+\end{theorem}
+
+The proof uses the fact that a low degree extension of a sparse oracle can be queried at few points without learning much, by a communication complexity argument. The theorem concerns $\Pc$ versus $\NP$ only, and we do not claim that it settles what algebrizing arguments can do for $\Pc$ versus $\RP$.
+
+\section{Where the Monte Carlo program stands}
+
+The Monte Carlo program of Part IV asks whether $\NP \subseteq \RP$ by seeking a polynomial level set sampler for the queens, and gives as a sufficient condition for $\Pc = \RP$ the existence of a deterministic hitting set\index{hitting set} for the dense level set of an $\RP$ algorithm. Where do these stand against the barriers?
+
+The first half, if it could be done, would be a mixing time\index{mixing time} bound for a specific Markov chain. Mixing time bounds do not relativize in any obvious sense, since the chain is a concrete object and not a machine with an oracle, and they are not natural proofs, since they do not exhibit a property of hard functions. They are, however, bounds that go the wrong way: a mixing bound shows that something is easy, and we believe the queens chain is not easy. The barriers do apply to $\NP = \RP$: relative to a PSPACE complete oracle $\NP^A = \RP^A = \Pc^A$, and relative to a random oracle $\NP^A \not\subseteq \BPP^A$ (Bennett and Gill~\cite{BennettGill} 1981), so any proof of $\NP \subseteq \RP$ must be non relativizing. An analysis of a specific chain is the kind of argument that is not ruled out by them, since it is non relativizing automatically. If the queens chain mixed rapidly, the barriers would not stop one from proving it.
+
+The second half, a deterministic hitting set, is a derandomization and hence by Kabanets\index{Kabanets and Impagliazzo} and Impagliazzo a circuit lower bound, and the barriers apply in full. A proof that the single draw of the $\RP$ walk can be made deterministic would have to be non relativizing and non natural. The vertical view does not supply such a proof. What it supplies is the object to be hit, and a clear statement that hitting it would suffice.
+
+So the program, honestly stated, is this. Its Monte Carlo half must be non relativizing, which a bound for a concrete chain is, and is obstructed, we believe, by the truth. Its derandomization half is obstructed by the barriers in full and, we believe, not obstructed by the truth. Neither half is a proof, and the book claims neither. The book claims that the two halves are the same staircase at different heights, and that seeing them so is clarifying.

@@ -1,0 +1,110 @@
+\chapter{Rigorous Theorems on P, NP and RP}
+\label{ch:theorems}
+
+This chapter collects, with statements and proofs or citations, every rigorous theorem about $\Pc$, $\NP$ and $\RP$ that the vertical approach yields. The theorems are of three kinds: equivalences that place the polynomial samplability of the queens level sets at the same level as $\NP = \RP$; coordinate change theorems that restate derandomization on the quantile axis; and conditional results that say what follows if the chain mixes. None of them resolves $\Pc$ versus $\NP$. Together they are the content of the book's thesis, with the caveat that several steps are cited rather than reproved and that the derandomization half is a restatement of known results.
+
+\section{The main equivalence}
+
+\begin{theorem}
+\label{thm:mainequiv}
+The following are equivalent.
+\begin{enumerate}
+\item $\NP = \RP$.
+\item There is a fully polynomial almost uniform sampler for the completions of a partial queens placement: a randomized algorithm which, given $(N, X_0)$ and $\delta > 0$, outputs in time polynomial in $N$ and $\log(1/\delta)$ a placement whose law is within total variation $\delta$ of uniform on the set of completions, or reports correctly that there are none.
+\item There is a fully polynomial almost uniform sampler which, given $(N, X_0, m)$ and $\delta > 0$, samples the level set $\{ x : S(x) \le m, \, x \supseteq X_0 \}$ of the queens energy on partial boards, in time polynomial in $N$ and $\log(1/\delta)$, uniformly in $m$.
+\item There is a fully polynomial randomized approximation scheme for the number of completions $\#\mathrm{QUEENS}(N, X_0)$.
+\end{enumerate}
+\end{theorem}
+
+The vertical walk of Chapter~\ref{ch:program} is deliberately not among the equivalent statements. Its running time bound assumes a ladder of at most $2K$ rungs with consecutive ratios at least $\tfrac12$ and $N(0) > 0$, and statement $(3)$ supplies only a level set sampler, with no control of the ratios between consecutive integer energy levels. What holds is the sufficient direction: if $(3)$ holds and the walk's ladder hypothesis holds on every partial board, then the walk run with the sampler of $(3)$ is a fully polynomial randomized approximation scheme, hence gives $(4)$. Rapid mixing of the swap chain on every partial board would give $(3)$ but the theorem does not show that it mixes.
+
+\begin{proof}
+$(4) \Rightarrow (1)$: an FPRAS\index{FPRAS} errs on both sides, since it succeeds only with probability $\tfrac34$ and so may output a positive number when the count is zero; by itself it therefore puts the decision problem in $\BPP$ and not in $\RP$. The extra step is self reducibility: the completion problem is self reducible (fix one queen at a time), so by Jerrum, Valiant and Vazirani \cite{JVV} an FPRAS for the counts on partial boards yields an almost uniform sampler for the completions. To decide $\mathrm{QUEENS}$, run the sampler and check the output, which is a polynomial time test; accept only if a valid completion was found. This never accepts when there are no completions, and accepts with probability at least a half when there are some (after constant repetition), so $\mathrm{QUEENS} \in \RP$. By Gent, Jefferson and Nightingale \cite{GJN} (2017) $\mathrm{QUEENS}$ is $\NP$ complete, so $\NP \subseteq \RP$, and $\RP \subseteq \NP$ always.
+
+$(1) \Rightarrow (2)$: Bellare\index{Bellare, Goldreich and Petrank}, Goldreich and Petrank \cite{BGP} proved in 2000 that for every $\NP$ relation there is a probabilistic algorithm with an $\NP$ oracle, running in strict polynomial time on every path, which outputs either a witness that is exactly uniform conditioned on not failing or a failure symbol, the failure having probability at most a half, and which reports that no witness exists only when none does. If $\NP = \RP$ the oracle calls can be replaced by $\RP$ computations. The replacement needs care because the generator's queries are adaptive: each query depends on the answers to earlier ones, and an error in one answer changes all subsequent queries. Because the running time is strict, the generator makes at most $q(n)$ queries on every path. Repeat the generator $s = \lceil \log_2 (2/\delta) \rceil$ times independently, stopping at the first run that does not fail, so that failure of all $s$ runs has probability at most $\delta / 2$. In each run replace each oracle call by $r = \lceil \log_2 (2 s\, q(n) / \delta) \rceil$ independent runs of the $\RP$ algorithm for the queried language, accepting if any run accepts; each replaced call then errs with probability at most $\delta / (2 s\, q(n))$, and by a union bound over the at most $s\, q(n)$ calls, every run follows the path the true oracle would have followed with probability at least $1 - \delta/2$. Outside the two bad events of total probability at most $\delta$ the output is exactly uniform, so the output law is within total variation $\delta$ of uniform, and the running time is polynomial in $n$ and $\log(1/\delta)$ as required. The one sided error of $\RP$ matters here: a replaced call never accepts a string outside the language, so the only errors are missed acceptances, and these are what the union bound controls. Apply this to the relation whose witnesses are completions of $X_0$.
+
+$(2) \Rightarrow (3)$: first $(2) \Rightarrow (4)$ by Jerrum, Valiant\index{Valiant, Leslie} and Vazirani\index{Jerrum, Valiant and Vazirani} \cite{JVV} (1986), since the completion problem is self reducible\index{self reducibility}; then $(4) \Rightarrow (1)$ as above; then $(1) \Rightarrow (3)$ by the Bellare, Goldreich and Petrank argument applied to the relation with instances $(N, X_0, m)$ whose witnesses are placements extending $X_0$ with at most $m$ attacking pairs. That relation is an $\NP$ relation, indeed a $\Pc$ relation, and the generator of $(1) \Rightarrow (2)$ works for any $\NP$ relation, so one sampler serves all $m$ at once.
+
+$(3) \Rightarrow (2)$: run the sampler of $(3)$ with $m = 0$ and check its output, which is a polynomial time test; report that there are no completions if the output is not a completion. When completions exist the level set is the set of completions and the output is a completion with probability at least $1 - \delta$; replacing each output that is not a completion by the report is a fixed map, which does not increase total variation and leaves the uniform law on the completions unchanged, so the law of the result is within total variation $\delta$ of uniform on them; when none exist no output passes the check and the report is correct. Hence $(1)$, $(2)$ and $(4)$ are equivalent by the implications above, and $(3)$ is equivalent to them by $(1) \Rightarrow (3)$ and $(3) \Rightarrow (2)$.
+\end{proof}
+
+The theorem is the rigorous form of the thesis for the queens. Every link is a published theorem or an elementary reduction (the walk is not a link), and the conclusion is that the question whether the queens level sets can be sampled, which is a question about Markov chains or about any other sampler, is equivalent in the following sense: the existence of some polynomial time level set sampler (no particular chain) is implied by, and implies, $\NP = \RP$ by the chain of reductions above, and no specific Markov chain is thereby shown to mix. Neither implies $\Pc = \NP$ without a derandomization hypothesis.
+
+\section{The derandomization half}
+
+\begin{theorem}
+\label{thm:derandequiv}
+Let $\mathrm{prRP}$ and $\mathrm{prP}$ denote the promise versions of $\RP$ and $\Pc$, in which an algorithm is required to be correct only on inputs satisfying the promise. The following are equivalent.
+\begin{enumerate}
+\item $\mathrm{prRP} = \mathrm{prP}$.
+\item For every polynomial time computable $f : \{0,1\}^* \times \{0,1\}^{m(n)} \to \{0, 1\}$ there is a deterministic polynomial time algorithm which, on input $x$ with $|x| = n$, outputs a point $r$ with $f(x, r) = 1$ whenever $\PP_r(f(x, r) = 1) \ge \tfrac12$.
+\item For every such $f$ the median of $f(x, \cdot)$ over $r$, defined as $1$ if $\PP_r(f(x,r) = 1) \ge \tfrac12$ and $0$ otherwise, is computable in deterministic polynomial time on the promise that either $f(x, \cdot) \equiv 0$ or $\PP_r(f(x,r) = 1) \ge \tfrac12$.
+\end{enumerate}
+Moreover $(3)$ restricted to the pairs $(f, x)$ arising from $\RP$ languages is equivalent to $\Pc = \RP$.
+\end{theorem}
+
+\begin{proof}
+$(2) \Rightarrow (3)$: compute $r$ and output $f(x, r)$; under the promise this is the median. $(3) \Rightarrow (1)$: a promise problem in $\mathrm{prRP}$ with algorithm $A$ has $\Ind_{\text{yes}}(x)$ equal to the median of $A(x, \cdot)$ on the promise, so it is in $\mathrm{prP}$. $(1) \Rightarrow (2)$: consider the promise problem whose instances are pairs $(x, p)$ with $p$ a binary prefix, whose yes instances are those with $\PP_r( f(x, r) = 1 \mid r \text{ extends } p ) \ge \tfrac12$, and whose no instances are those with this conditional probability zero. It is in $\mathrm{prRP}$: sample extensions of $p$ and accept if $f$ accepts. By $(1)$ it is in $\mathrm{prP}$, decided by some deterministic $D$. A bit by bit search that appends a bit accepted by $D$ is not enough: $D$ is correct only on the promise, and a prefix of density strictly between $0$ and $\tfrac12$ may be accepted, after which the induction has no guaranteed child. The standard repair goes through $\mathrm{prBPP}$. It is known that $\mathrm{prRP} = \mathrm{prP}$ implies $\mathrm{prBPP} = \mathrm{prP}$ (Buhrman and Fortnow \cite{BF}, STACS 1999, prove the language version; we assume that the argument extends to promise problems and do not reproduce it, so $(1) \Rightarrow (2)$ is proved here modulo that extension). With $\mathrm{prBPP} = \mathrm{prP}$, the conditional density of a prefix can be estimated deterministically to within an additive $\eta = 1/(8m)$ by deciding the gap problems ``density at least $t + \eta/2$ versus at most $t - \eta/2$'' on the grid of thresholds $t$ in steps of $\eta/2$ (the largest accepted threshold then locates the density in an interval $(t - \eta/2, t + \eta)$). Build $r$ bit by bit, appending the child with the larger estimated density. The larger child density is at least the parent density, so each step loses at most $2\eta$, and after $m$ steps the density of the full string is at least $\tfrac12 - 2 \eta m = \tfrac14 > 0$; a full string has density $0$ or $1$, so $f(x, r) = 1$. The final claim restricts the same argument to the $\RP$ promise.
+\end{proof}
+
+Statement $(2)$ is the vertical form: the level set $\{ r : f(x, r) = 1 \}$ of density at least a half must be hit deterministically. Statement $(3)$ is the median form. Both are the single rung of the walk made deterministic.
+
+\begin{theorem}[Impagliazzo and Wigderson 1997, hitting set form]
+If there is a language in $\mathrm{E}$ with circuit complexity $2^{\Omega(n)}$, then statement $(2)$ above holds, and hence $\mathrm{prRP} = \mathrm{prP}$, $\Pc = \RP$ and $\Pc = \BPP$.
+\end{theorem}
+
+This is cited \cite{IW} (1997), not proved. Together with the main equivalence it gives:
+
+\begin{corollary}
+Under the Impagliazzo\index{Impagliazzo and Wigderson} Wigderson hypothesis, the following are equivalent: $\Pc = \NP$; the queens level sets admit a polynomial sampler.
+\end{corollary}
+
+\begin{proof}
+Under the hypothesis $\Pc = \RP$, and the main equivalence gives $\NP = \RP$ if and only if the level sets admit a polynomial sampler.
+\end{proof}
+
+\section{What Monte Carlo cannot do}
+
+\begin{theorem}
+\label{thm:limitsmc}
+No randomized algorithm decides $\mathrm{QUEENS}$ with one sided error in polynomial time unless $\NP = \RP$. No randomized algorithm approximates $\#\mathrm{QUEENS}$ to within any polynomial factor in polynomial time unless $\NP = \RP$. No randomized algorithm samples the completions of a partial board to within any constant total variation distance in polynomial time unless $\NP = \RP$.
+\end{theorem}
+
+\begin{proof}
+The first is the definition of $\RP$ and $\NP$ completeness. The second: an approximation to within a factor $N^c$ still distinguishes zero from positive, but with two sided error, so it puts the decision problem in $\BPP$, and $\NP \subseteq \BPP$ implies $\NP = \RP$ by Ko \cite{Ko} (1982). The third: a sampler within total variation $\delta < 1$ of uniform on the completions outputs a completion with probability at least $1 - \delta$ when one exists and never when none does, since it can be checked, which is an $\RP$ algorithm after amplification.
+\end{proof}
+
+This is the limit of the program stated as a theorem. Monte Carlo methods, however ingenious, cannot do better on the queens completion problem than the class $\RP$ permits, and if $\NP \neq \RP$ then every one of them is superpolynomial on infinitely many boards. The vertical walk is not exempt. What it has over other methods is that its superpolynomial cost, if there is one, is located exactly: in the cost of sampling a level set, which for the walk run with a Markov chain is the mixing time\index{mixing time} of that chain, and nowhere else.
+
+\section{The conditional FPRAS with explicit rates}
+
+\begin{theorem}
+\label{thm:condfpras_rates}
+Let $S$ be an energy on a finite $\cX$ with $|\cX|$ known and at most $K + 1$ levels, and let the level set chain at level $m$ be a reversible lazy chain whose stationary law is uniform on the level set, with relaxation time $t_{rel}(m)$. Let $t^* = \max_m t_{rel}(m)$, and assume that the successive ratios $\theta_t$ of the product estimator are bounded below by a constant $\theta_0 > 0$ (the bound below assumes this and covers nothing else). Then the stratified\index{stratified sampling} vertical walk estimates $N(0)$ to relative error $\epsilon$ with probability $\tfrac34$ using at most
+\[
+O\Big( \frac{K^2}{\epsilon^2} \cdot t^* \cdot \big( \log |\cX| + \log(K / \epsilon) \big) \Big)
+\]
+chain steps, and the quadrature contribution to the root mean squared error is at most $\lambda_1 \sqrt{K} / (2n)$ for $n$ stratified nodes per rung, where $\lambda_1$ is the largest step value of the quantile staircase.
+\end{theorem}
+
+\begin{proof}
+A sample within total variation $\delta$ of stationarity costs a number of chain steps equal to $t_{rel}$ times $\log|\cX| + \log(1/\delta)$, by the relaxation time bound of Chapter~\ref{ch:mixing}, which holds for reversible lazy chains and is why those are assumed; the walk needs $O(K / \epsilon^2)$ samples at each of $O(K)$ rungs with $\delta = \epsilon / (4K)$; the constant number of samples per rung rests on the ratios being bounded below, and the stratified bound, which is a root mean square bound, is Chapter~\ref{ch:beyond}.
+\end{proof}
+
+For the unconditioned queens, the exponent $1.8$ measured in Chapter~\ref{ch:experiments2} (fit $1.76$) is the integrated autocorrelation time of one observable and is not the relaxation time $t^*$; the relaxation time measured in this book grows like $N^{3}$ (Chapter~\ref{ch:otherhyp}, $N = 8$ to $12$, log log slope about $3.1$). The theorem counts all $K + 1$ energy levels, at most $\binom N2 + 1$, so with $t^* \approx N^3$ and $\log|\cX| \approx N \log N$ it gives $O(N^{8} \log N / \epsilon^2)$ chain steps; if only about $2N$ rungs are needed, as in the empirical walk (an assumption the theorem does not cover), it gives $O(N^{6} \log N / \epsilon^2)$. Neither is claimed to match the empirical cost of Chapter~\ref{ch:experiments2}, which counts elementary operations rather than chain steps. These are bounds conditional on the measured, not proved, relaxation time.
+
+\section{The vertical hitting set lemma}
+
+\begin{lemma}
+Let $A \subseteq \{0,1\}^m$ have density $|A| / 2^m \ge \tfrac12$, and let $H$ be the set of points visited by the nested sampling\index{nested sampling} walk with $n$ live points on the likelihood $\Ind_A$ under the uniform distribution, run for $k$ steps, where we assume that each conditioned draw is an exact uniform draw from $\{ \Ind_A > y \}$ and that the walk is stopped before saturation, that is, while some live point lies outside $A$ (when all live points lie in $A$ the set $\{ \Ind_A > 1 \}$ is empty and the walk is undefined). Then the initial $n$ live points all miss $A$ with probability at most $2^{-n}$, and once any live point is in $A$ every subsequent conditioned draw is in $A$; so $H \cap A = \emptyset$ has probability at most $2^{-n}$ if $k = 0$ and probability $0$ if $k \ge 1$.
+\end{lemma}
+
+\begin{proof}
+The initial points are independent uniforms, each in $A$ with probability at least a half. Before saturation some live point lies outside $A$, so the discarded level is $y = 0$ and a conditioned draw from $\{ \Ind_A > 0 \}$ is a draw from $A$.
+\end{proof}
+
+The lemma is trivial and is included to fix the sense in which the vertical walk is a hitting set\index{hitting set} generator: it hits every dense set with $n$ random points. The content of $\Pc = \RP$ is that the $n$ random points can be replaced by $\mathrm{poly}(m)$ fixed ones, but the lemma does not show that this derandomizes the walk: the conditioned draws it assumes are exact samples from $A$, which is already a procedure that hits $A$.
+
+\section{Summary of the rigorous position}
+
+Rigorously, the book establishes the main equivalence, which is new in its assembly though every part is known; the derandomization equivalence, which is a coordinate change (modulo the promise version of the Buhrman and Fortnow theorem, which we assume); the conditional FPRAS with explicit rates, which adapts the Jerrum Valiant Vazirani argument to energies with few levels; and the Yakowitz\index{Yakowitz, Krimmel and Szidarovszky}, stratified and Rao Blackwell\index{Rao Blackwellisation} bounds on the analytic part of the walk. It cites Impagliazzo and Wigderson \cite{IW} for the implication from circuit lower bounds to $\Pc = \RP$ and Gent, Jefferson and Nightingale\index{Gent, Jefferson and Nightingale} \cite{GJN} for the completeness of the queens. It conjectures that the queens chain mixes torpid\index{torpid mixing}ly on hard boards and that the dense rung can be hit deterministically, and it has evidence for neither beyond the consensus of the field. The honest one line summary is: under the standard hardness hypothesis, $\Pc = \NP$ if and only if the queens level sets admit a polynomial sampler, and rapid mixing of a swap chain on every partial board would be one such sampler; we think the swap chain does not mix rapidly; we cannot prove it; and we have said exactly what a proof would need.

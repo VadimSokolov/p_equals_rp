@@ -1,0 +1,214 @@
+\chapter{Open Problems: Status and Approaches}
+\label{ch:open}
+
+This chapter is the working document of the program. For each open problem it gives the statement, what is known, what we have computed in the course of writing, the approaches that seem promising, and the bearing on the thesis. The problems are numbered for reference. Several have moved since the first draft of this book, and the computations reported here, on near solutions, on connectivity, and on the finite size correction to Simkin\index{Simkin's theorem}, are new.
+
+\section{Problems on the structure of the queens landscape}
+
+\begin{problem}[The low energy ratio]
+Compute or prove the existence of $\lim_{N \to \infty} N(0) / N(1)$, the ratio of solutions to placements with exactly one attacking pair.
+\end{problem}
+
+Status. We have computed $N(1)$ exactly for $N \le 13$ by backtracking over permutations with at most one conflict. The values and the ratio are in Table~\ref{tab:n1}. The ratio is irregular for small $N$, with $N(1) = 0$ at $N = 5$, and settles from $N = 10$ onwards near $0.04$: $0.050, 0.040, 0.041, 0.039$ for $N = 10$ to $13$. The chain estimates of Chapter~\ref{ch:experiments2} give $N(0)/(N(0) + N(1))$ of about $0.018$ at $N = 32$, which is a ratio $N(0)/N(1)$ near $0.018$, suggesting a slow decrease from $0.04$ at $N = 13$. A heuristic: a solution has $N$ queens and $\binom{N}{2}$ pairs, and a placement with one attack is obtained from a solution by moving one queen so as to create exactly one attack, which can be done in about $cN$ ways for a constant $c$, with the same near solution reachable from about $c'$ solutions; this predicts $N(1) / N(0) \approx (c/c') N$ and a ratio decreasing like $1/N$, which is consistent with $0.04$ at $N = 13$ and $0.018$ at $N = 32$ if $c/c' \approx 2$. Whether the ratio goes to zero like $1/N$ or to a positive constant is the question, and the data to $N = 32$ favour $1/N$.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Exact counts of solutions $N(0)$ and of placements with exactly one attacking pair $N(1)$, the ratio, and the swap connectivity of the level set $\{ S \le 1 \}$: the number of connected components under swaps, the number of components containing a solution, the size of the largest solution containing component, and the number of solutions from which no single swap reaches another solution.}
+\label{tab:n1}
+\begin{tabular}{rrrrrrrr}
+\toprule
+$N$ & $N(0)$ & $N(1)$ & ratio & comps & with sol & largest & isolated \\
+\midrule
+4 & 2 & 8 & 0.250 & 2 & 2 & 1 & 2 \\
+5 & 10 & 0 & & 10 & 10 & 1 & 10 \\
+6 & 4 & 60 & 0.067 & 10 & 4 & 1 & 4 \\
+7 & 40 & 152 & 0.263 & 22 & 6 & 16 & 32 \\
+8 & 92 & 888 & 0.104 & 1 & 1 & 92 & 76 \\
+9 & 352 & 3376 & 0.104 & 69 & 5 & 348 & 264 \\
+10 & 724 & 14404 & 0.050 & 253 & 1 & 724 & 532 \\
+11 & 2680 & 67656 & 0.040 & 1121 & 1 & 2680 & 1776 \\
+12 & 14200 & 346088 & 0.041 & 4021 & 5 & 14196 & 8668 \\
+13 & 73712 & 1910080 & 0.039 & 13257 & 57 & 73656 & 37704 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{problem}[Connectivity of solutions under swaps]
+Characterise the connected components of $\{ S \le 1 \}$ under swaps of two queens, and in particular whether the solutions lie in one component.
+\end{problem}
+
+Status. Resolved for $N \le 13$ by exact computation, with a surprising answer. Table~\ref{tab:n1} shows that although most solutions are isolated under direct swaps, in the sense that no single swap of a solution yields another solution, with $8668$ of $14200$ isolated at $N = 12$ and $37704$ of $73712$ at $N = 13$, almost all solutions lie in a single connected component of $\{ S \le 1 \}$ when swaps are allowed to pass through placements with one attacking pair. At $N = 8$, $10$ and $11$ every solution is in one component. At $N = 12$ all but four of the $14200$ solutions are in one component, and at $N = 13$ all but $56$ of the $73712$. The level set $\{ S \le 1 \}$ has thousands of components, but almost all of them contain no solution; they are small clusters of near solutions that cannot be repaired by a swap. The solutions themselves, bridged by near solutions, form one giant component\index{giant component} with a handful of stragglers.
+
+Conditioned boards. Since the first draft we have also run the connectivity computation on conditioned boards, the case that matters. For $N = 13$ to $17$ we fixed $k = 2$ to $5$ queens of a random solution, enumerated every completion with at most one attacking pair by backtracking, and found the components of this conditioned level set under swaps of the free rows. Table~\ref{tab:conditioned} gives the averages over random instances. The giant component persists: on every instance at every $N$ the largest solution containing component holds at least $96\%$ of the completions, and on most instances all of them. At $N = 13$ with heavier conditioning, $k = 4$ to $8$ fixed queens, the number of completions drops to a handful and the question degenerates, with instances having two completions in separate components; this is the small count regime, not shattering. Random conditioning by queens of a solution does not break the giant component at these sizes, and the ratio $N(0)/N(1)$ on conditioned boards, about $0.03$, matches the unconditioned value. Random conditioning not derived from a solution is another matter, and Section~\ref{sec:depth} shows that such boards have more than one solution component on about half of the boards with two to four fixed queens at $N = 12$, with the giant fraction falling to $11$ to $20$ percent on the worst, against a minimum giant fraction of $0.96$ for solution derived conditioning.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Conditioned boards: $k$ queens of a random solution fixed, the remaining rows free. Averages over random instances of the number of completions $N(0)$, near completions $N(1)$, components containing a completion, and the fraction of completions in the largest such component (mean and minimum over instances).}
+\label{tab:conditioned}
+\begin{tabular}{rrrrrrrr}
+\toprule
+$N$ & $k$ & instances & $N(0)$ & $N(1)$ & comps & giant mean & giant min \\
+\midrule
+13 & 2 & 12 & 510 & & 2.5 & 0.996 & 0.964 \\
+14 & 2 & 8 & 2322 & 71574 & 1.25 & 1.000 & 1.000 \\
+15 & 3 & 8 & 1163 & 36061 & 2.12 & 0.998 & 0.988 \\
+16 & 4 & 6 & 900 & 26658 & 1.17 & 1.000 & 0.999 \\
+17 & 5 & 6 & 488 & 14901 & 1.33 & 0.999 & 0.997 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The giant component of the unconditioned level set is the structural fact behind the polynomial mixing observed in Chapter~\ref{ch:experiments2}, and it is a strong result for the unconditioned problem: the bottom rung of the ladder is connected, with the exceptions being a vanishing fraction, and the chain can in principle reach every solution from every other. The stragglers, the solutions outside the giant component, cannot be reached by the chain at all, and the sampler is biased by their fraction, which is $4 / 14200$ at $N = 12$ and $56 / 73712$ at $N = 13$; whether this fraction stays negligible is the next question. The conjecture of Chapter~\ref{ch:swendsen} for unconditioned boards is now supported by exact computation to $N = 13$. For conditioned boards the giant component persists under solution derived conditioning to $N = 17$, as described above, while under random conditioning at $N = 12$ about half of the boards with two to four fixed queens have more than one solution component, as described in Section~\ref{sec:depth}.
+
+\begin{problem}[The repair neighbourhood]
+Does every solution have $\Omega(N)$ swaps that create at most one attack, and what fraction of all $\binom{N}{2}$ swaps are repairable on average?
+\end{problem}
+
+Status. Computed exactly for $N = 6$ to $12$ over every solution. Table~\ref{tab:repair} gives the mean, minimum and maximum number of repairable swaps per solution and the mean as a fraction of all swaps. The fraction is remarkably stable at about $11$ to $12\%$ from $N = 9$ onward, so that the average solution has about $0.115 \binom{N}{2}$ repairable swaps, quadratic in $N$ and far more than the linear count conjectured in Chapter~\ref{ch:mixingproof}. The independence heuristic of that chapter predicted $5/16 = 31\%$; the true fraction is about a third of that, the diagonals through a swap's two new squares being positively dependent. The minimum, however, is small, between $0$ and $2$, and at $N = 12$ there are four solutions with no repairable swap at all. These are exactly the four stragglers outside the giant component in Table~\ref{tab:n1}. So the conjecture is true on average with a quadratic count and false as a statement about every solution: a vanishing fraction of solutions are totally isolated. For the mixing proof this means that lemma one of Chapter~\ref{ch:mixingproof} must be stated for all but an exceptional set, and the exceptional set is the set of stragglers.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Repairable swaps per solution: swaps of two rows that leave at most one attacking pair. Exact over all $Q(N)$ solutions.}
+\label{tab:repair}
+\begin{tabular}{rrrrrrr}
+\toprule
+$N$ & $Q(N)$ & mean & min & max & fraction of swaps & solutions with none \\
+\midrule
+6 & 4 & 0.0 & 0 & 0 & 0.000 & 4 \\
+7 & 40 & 2.0 & 1 & 4 & 0.095 & 0 \\
+8 & 92 & 3.9 & 2 & 8 & 0.140 & 0 \\
+9 & 352 & 4.0 & 2 & 7 & 0.112 & 0 \\
+10 & 724 & 5.5 & 2 & 10 & 0.123 & 0 \\
+11 & 2680 & 6.5 & 2 & 12 & 0.118 & 0 \\
+12 & 14200 & 7.5 & 0 & 16 & 0.114 & 4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{problem}[Finite size correction to Simkin]
+Determine the polynomial correction in $Q(N) / N! \sim C N^\beta e^{-(\alpha - 1) N}$.
+\end{problem}
+
+Status. We fitted $\log Q(N) - \log N!$ to $c + \beta \log N - a N$ on the exact counts for $N = 12$ to $27$. The free fit gives $a = 0.948$, hence $\alpha = 1.948$, within two of Simkin's error bars of his $1.942 \pm 0.003$, and $\beta = 0.12$. Fixing $a = 0.942$ at Simkin's value gives $\beta = 0.007$ and $c = 0.857$, so $C \approx 2.36$. The near zero value $\beta = 0.007$ is, however, an artifact of pinning $a$ at the central value: fixing $a$ at the ends of Simkin's interval, $0.939$ and $0.945$, gives $\beta = -0.049$ and $0.063$, and the free fit gives $0.12$, so the data bound $|\beta|$ only to about $0.1$. The polynomial correction is therefore not excluded, and $Q(N) \approx 2.4 \, N! \, e^{-0.942 N}$ is a fit, not a finding. The natural conjecture is $\beta = 0$ and $C$ a constant to be identified, which we do not prove; and a second order large deviations analysis around the queenon\index{queenon} would decide it.
+
+\begin{problem}[The queenon and the Lorenz curve]
+Determine the limiting normalised staircase $u \mapsto \lim_N \Lambda_N(u)^{1/N}$ and relate it to the queenon.
+\end{problem}
+
+Status. Open. The density of states\index{density of states} for $N \le 13$ gives the staircase exactly, and its logarithm divided by $N$ at the energy levels $s/N$ should converge to a rate function $I(e)$ for the energy density $e = s/N$, with $I(0) = \alpha - 1$. A fit of $-\log(N(s)/N!) / N$ against $s/N$ for $N = 10$ to $13$ shows a convex curve with minimum near $e = 2/3$. At $e = 0$ the exact values are $0.852$, $0.874$, $0.869$ and $0.873$ for $N = 10$ to $13$, not yet $0.942$; the gap is the $\log C / N$ term of the finite size problem above, so the endpoint is compatible with Simkin's $\alpha - 1$ but is not shown to reach it. The full rate function is a large deviations problem for the number of attacking pairs in a random permutation, and it should be accessible by the methods of Simkin's upper bound applied at every energy, that is, by a queenon with a prescribed attack density. We have not done this.
+
+\begin{problem}[Mixing on queens level sets]
+Determine for which $m = m(N)$ the swap chain on $\{ S \le m \}$ mixes in polynomial time.
+\end{problem}
+
+Status. For the unconditioned problem the experiments of Chapter~\ref{ch:experiments2} give autocorrelation time growing like $N^{1.8}$ on $\{ S \le 1 \}$ up to $N = 32$, and the connectivity computation above shows that the solution component is giant up to $N = 13$. A proof of polynomial mixing on $\{ S \le 1 \}$ for the unconditioned problem is plausible and would proceed by canonical path\index{canonical paths}s through the giant component, routing between any two solutions along a path of near solutions; the congestion bound would need a structural understanding of how near solutions are shared, which the $1/N$ heuristic for the ratio suggests. For conditioned boards the question is at least as hard as $\NP = \RP$ and we expect torpid\index{torpid mixing}ity.
+
+\begin{problem}[Mixing of the bottom rung on conditioned boards]
+Implement the Gent Jefferson Nightingale reduction and measure the mixing of the swap chain on the resulting boards.
+\end{problem}
+
+Status. Not done. This is the single most informative experiment available and we recommend it to anyone taking up the program. The reduction is described in Chapter~\ref{ch:npcomplete} and in the original paper; its implementation requires care with the wall gadgets but no new ideas.
+
+\begin{problem}[The random queens completion model]
+Fix $k$ queens uniformly at random subject to pairwise non attack, condition on a completion existing, and determine the satisfiability threshold in $k/N$ and the structure of the completions below it.
+\end{problem}
+
+Status. First results at $N = 12$, thirty random instances per $k$, with every completion and near completion enumerated. Table~\ref{tab:randomcompletion} gives the fraction of instances with a completion, the mean number of completions among those, the mean number of swap components containing a completion, the mean and minimum fraction of completions in the largest component, and the number of instances with more than one solution component.
+
+\begin{table}[t]
+\centering
+\small
+\caption{The random queens completion model at $N = 12$: $k$ queens fixed at random, thirty instances per $k$.}
+\label{tab:randomcompletion}
+\begin{tabular}{rrrrrrr}
+\toprule
+$k$ & satisfiable & mean $N(0)$ & comps & giant mean & giant min & multi \\
+\midrule
+1 & 30/30 & 1152 & 3.7 & 0.996 & 0.952 & 22 \\
+2 & 30/30 & 110 & 3.0 & 0.960 & 0.795 & 17 \\
+3 & 30/30 & 16.5 & 2.7 & 0.818 & 0.222 & 13 \\
+4 & 24/30 & 3.7 & 1.9 & 0.755 & 0.250 & 14 \\
+5 & 11/30 & 1.4 & 1.1 & 0.955 & 0.500 & 1 \\
+6 & 5/30 & 1.2 & 1.0 & 1.000 & 1.000 & 0 \\
+7 & 1/30 & 1.0 & 1.0 & 1.000 & 1.000 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two things appear that the solution derived conditioning of Table~\ref{tab:conditioned} did not show. There is a satisfiability threshold: with $k = 4$ random queens one instance in five has no completion, with $k = 5$ two in three, and with $k = 7$ nearly all, so that at $N = 12$ the threshold is near $k / N \approx 0.35$ to $0.4$. And below the threshold the giant component erodes as $k$ increases: at $k = 1$ it holds $99.6\%$ of completions, at $k = 3$ only $82\%$ on average with instances as low as $22\%$, and at $k = 4$ only $75\%$. Random conditioning that is not derived from a solution does fragment the completions near the threshold, in the manner of the clustering transition of random satisfiability. The counts are small and $N = 12$ is far from asymptotic, so the observation is a pointer rather than a result; the experiment at $N = 16$ to $20$ with chain based estimates where enumeration fails is the obvious continuation, and the quantity to track is the giant fraction at $k / N$ just below threshold as $N$ grows.
+
+\begin{problem}[The physics transition]
+Locate the temperature at which the energy fluctuations of the queens Boltzmann model peak.
+\end{problem}
+
+Status. Resolved for $N = 8$ to $11$ with a negative answer. From the exact density of states, $\Var_{\pi_\gamma}(S)$ as a function of the inverse temperature $1/\gamma \ge 0$ is maximal at $1/\gamma = 0$ and decreases monotonically as the temperature falls, for every $N$ from $8$ to $11$; Figure~\ref{fig:transition} shows $\Var(S)/N$, which starts near $0.65$ at infinite temperature and falls smoothly to zero. There is no peak at finite positive temperature and so no transition in the thermodynamic sense: the queens Boltzmann model on permutations is, at these sizes, paramagnetic. The difficulty of the counting problem is not a finite temperature phase transition of the kind that stops Swendsen Wang on the Potts model; it is the zero temperature structure of the ground state, its rarity and its connectivity, with no thermodynamic signal on the way down. For the choice of energy domain sampler this means that the multicanonical and $1/k$ ensembles have nothing to fix in the bulk and should be judged entirely by their behaviour at the bottom rung.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{fig_transition.pdf}
+\caption{Energy fluctuations $\Var(S)/N$ of the queens Boltzmann model against inverse temperature, from the exact density of states for $N = 8$ to $11$. The variance is monotone; there is no finite temperature peak.}
+\label{fig:transition}
+\end{figure}
+
+\section{Problems on the vertical method}
+
+\begin{problem}[The optimal vertical weight]
+Characterise the minimax weight $\Omega$ over staircases with $K$ steps and widths in a given range.
+\end{problem}
+
+Status. Partially resolved by Chapter~\ref{ch:beyond}: for staircases the stratified\index{stratified sampling} midpoint rule with uniform $\Omega$ is unbiased with mean squared error at most $K \lambda_1^2 / (4n^2)$. We conjecture that no rule can do better than order $K/n^2$ for a staircase with $K$ unknown jump locations, since each jump must be localised to $O(1/n)$ by some node, but we do not prove this lower bound. The constant is open, and the question whether a nonuniform $\Omega$ concentrated near $s = 0$ improves the constant for geometrically decreasing widths, as the queens have, is open.
+
+\begin{problem}[Rates in the quantile coordinate]
+Determine the exact dependence of the total error on $K$, $n$ and $\epsilon$ for a staircase whose widths are estimated with relative error $\epsilon$.
+\end{problem}
+
+Status. Upper bounds in order of magnitude are given by Chapters~\ref{ch:yakowitz} and~\ref{ch:beyond}, with matching lower bounds not proved: quadrature $O(\sqrt K / n)$, positional $O(\sqrt{\log(1/\rho) / n})$, sampling $O(K \delta)$, the first and third additive and the second relative, in root mean square. The constants are explicit in the stratified case and in the Rao Blackwell\index{Rao Blackwellisation}ised nested case.
+
+\begin{problem}[Two sided promises]
+Extend the vertical analysis to $\BPP$.
+\end{problem}
+
+Status. Open. The obstacle is that the search to decision reduction of Chapter~\ref{ch:theorems} uses the one sided promise to keep the prefix extension within the promise. For a two sided promise one would need to decide, from a prefix, whether the conditional density is at least $2/3$ or at most $1/3$, and this is a $\BPP$ question again. The known route from $\RP$ to $\BPP$ derandomization is through Andreev, Clementi and Rolim, who show that a hitting set\index{hitting set} generator suffices for $\BPP$ by a nontrivial argument, and the vertical analogue of their argument is not obvious.
+
+\begin{problem}[Hashing versus walking]
+Compare the sample complexity of Stockmeyer\index{Stockmeyer's theorem}'s hashing estimator with the vertical walk when both use the same level set sampler\index{level set sampler}.
+\end{problem}
+
+Status. Open. With a sampler in place of the $\NP$ oracle, the hashing estimator at hash length $k$ needs to estimate $|S \cap h^{-1}(0)|$, and sampling from $S$ and checking the hash does not do this, since for a pairwise independent $h$ a uniform draw lands in $h^{-1}(0)$ with probability about $2^{-k}$ whatever $|S|$ is, so it estimates the fraction $|S \cap h^{-1}(0)|/|S|$ and carries no information about $|S|$; near the critical length the hit rate is about $1/|S|$ and $O(1/\epsilon^2)$ samples per length do not suffice. We have therefore not completed the comparison, and an earlier estimate of $O(\log|S|/\epsilon^2)$ samples for hashing against $O(K^2/\epsilon^2)$ for the walk should not be relied on. In any case a uniform sampler on $S$ is what hashing needs, and a uniform sampler on $S$ is the bottom rung of the walk, and the walk is the method for producing it. The natural hybrid, which we do not analyse, is to walk to the bottom and hash there, which is what the Jerrum Valiant\index{Valiant, Leslie} Vazirani self reducib\index{self reducibility}ility route does in effect.
+
+\section{Problems on derandomization}
+
+\begin{problem}[Vertical hitting sets]
+Find a class of $\RP$ problems beyond $\Pc$ for which the dense level set can be hit by an explicit polynomial size set.
+\end{problem}
+
+Status. Open, and by Kabanets and Impagliazzo\index{Kabanets and Impagliazzo} (2004) a deterministic polynomial time algorithm for polynomial identity testing of general arithmetic circuits would imply either that $\mathrm{NEXP} \not\subseteq \Ppoly$ or that the permanent has no polynomial size arithmetic circuits; restricted classes carry no such implication, and explicit hitting sets are known for several (sparse polynomials, by Klivans and Spielman in 2001, and read once oblivious branching programs). One class where this is unconditional is $\mathrm{AC}^0$ by Nisan's generator; the vertical walk for an $\RP$ algorithm whose acceptance predicate is in $\mathrm{AC}^0$ can be derandomized by running it on the $n^{\mathrm{polylog}(n)}$ outputs of Nisan's generator (seed length $\mathrm{polylog}(n)$ for fixed depth), which is quasipolynomial. The polynomial case is open even for $\mathrm{AC}^0$.
+
+\begin{problem}[Deterministic level set hitting for the queens]
+Give a deterministic polynomial time procedure that outputs a permutation with at most $m$ attacking pairs for the smallest possible $m$.
+\end{problem}
+
+Status. Resolved for the unconditioned problem and open for the conditioned one. Explicit solutions, $m = 0$, are known for all $N \ge 4$: for $N$ coprime to $6$ the permutation $x_i = 2i \bmod N$ is a solution, and Pauls in 1874 and many since have given constructions for all $N$. So the unconditioned level set $\{ S = 0 \}$ is hit deterministically in $O(N)$ time, and the question has content only on conditioned boards, where it is the search version of the $\NP$ complete completion problem.
+
+\section{Problems on the broader program}
+
+\begin{problem}[The Jerrum Valiant Vazirani gap]
+Exhibit a non self reducible counting problem for which approximate counting is in $\RP$ but sampling is not known to be.
+\end{problem}
+
+Status. Open. Candidates are counting problems defined by non monotone constraints where the self reducibility tree has no uniform structure. The vertical walk counts by sampling level sets, not solutions, and so applies to such problems, but whether it gives an FPRAS\index{FPRAS} without a solution sampler at the bottom is unclear, since the bottom rung is a solution sampler.
+
+\begin{problem}[Lean and the queens]
+Formalise the Lorenz\index{Lorenz curve} identity, the product estimator variance bound, and the conditional FPRAS theorem.
+\end{problem}
+
+Status. Statements written, proofs open; see Chapter~\ref{ch:lean}, which gives Lean style statements and proof sketches that have not yet been machine checked. The statements are elementary and the main equivalence of Chapter~\ref{ch:theorems} is an assembly of cited theorems; formalising the assembly, with the cited results as axioms, would be a modest project and would produce a machine checked statement of exactly what the program claims.
+
+\input{ch_open3}
+\input{ch_open4}
+\section{What has moved}
+
+Since the first draft, ten problems have changed status. The repair neighbourhood is quadratic on average and empty for a vanishing set of stragglers. The random completion model shows a satisfiability threshold near $k/N = 0.35$ to $0.4$ at $N = 12$ and, on three hundred instances, a bottom level set that has more than one solution component on about half of the random boards with two to four fixed queens and fragments severely on the worst of them. The physics transition is absent for $N \le 11$. The connectivity problem is resolved for $N \le 13$ with the giant component result on unconditioned boards, which persists under solution derived conditioning to $N = 17$ and does not persist on about half of the boards under random conditioning at $N = 12$. The second level set $\{ S \le 2 \}$ is connected for $N \le 11$ on unconditioned boards; on shattered boards the completions reconnect in $\{ S \le 2 \}$ and the level set itself reconnects at a depth that is two to four at $N = 12$, three or four at $N = 14$, and three or four at $N = 16$ on the boards examined; the data do not yet show that the shattering depth grows with $N$, and if it does the question is whether like $\log N$ or like $N$. The spectral gap of the bottom rung chain is known exactly to $N = 12$: its relaxation time grows like $N^3$, with a nearly degenerate band of slow modes that the board symmetries do not explain. The Markov window a sequential family needs to come within a nat of the solution law is half the board. The queenon tilted proposal does not accelerate the bottom rung. The finite size correction problem has a numerical conjecture, $\beta = 0$ and $C \approx 2.4$, which the fit supports only to $|\beta| \lesssim 0.1$ given Simkin's error bar. The deterministic hitting problem is resolved trivially for unconditioned boards by the explicit constructions. The problems that remain, and that matter most, are two: the rate of growth of the shattering depth on random boards, which decides whether the walk is polynomial on average, and the depth on reduction boards, which decides whether it is polynomial in the worst case. The enumeration that measures both runs in minutes at $N = 16$, and the next sizes are $20$ and $24$.

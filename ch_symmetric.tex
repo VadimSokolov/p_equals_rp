@@ -1,0 +1,36 @@
+\chapter{Random Walks on the Symmetric Group}
+\label{ch:symmetric}
+
+The swap chain on a queens level set is the random transposition walk on the symmetric group $S_N$ restricted to a subset. The unrestricted walk is one of the best understood Markov chains in mathematics, with an exact spectrum from the representation theory of $S_N$, a sharp mixing time, and a cutoff phenomenon. This chapter presents that theory and asks what survives the restriction. The answer is that the spectrum is lost but the comparison techniques of Diaconis and Saloff Coste carry over, and give a route to mixing bounds on the giant component.
+
+\section{The random transposition walk}
+
+The walk picks two positions uniformly at random, possibly equal, and swaps them. Its transition matrix is $P = \tfrac{1}{N} I + \tfrac{N-1}{N} T$ where $T$ is the uniform average over the $\binom{N}{2}$ transpositions, acting by right multiplication. The walk is reversible with respect to the uniform distribution on $S_N$, and because it is driven by a conjugacy class, its eigenvalues are indexed by the irreducible representations of $S_N$, which are indexed by partitions $\lambda$ of $N$. The eigenvalue for $\lambda$ is the normalised character of a transposition $t_0$ in that representation,
+\[
+\mu_\lambda = \frac{1}{N} + \frac{N-1}{N} \cdot \frac{\chi_\lambda(t_0)}{d_\lambda} , \qquad \frac{\chi_\lambda(t_0)}{d_\lambda} = \frac{2}{N(N-1)} \sum_i \Big[ \binom{\lambda_i}{2} - \binom{\lambda_i'}{2} \Big] ,
+\]
+where $\lambda'$ is the conjugate partition, by a formula of Frobenius. The largest nontrivial eigenvalue comes from $\lambda = (N-1, 1)$ and equals $1 - 2/N$, so the spectral gap is $2/N$.
+
+\section{Diaconis and Shahshahani}
+
+Diaconis and Shahshahani proved in 1981 that the walk has a cutoff at $\tfrac12 N \log N$ steps: the total variation distance from uniform is near one before $\tfrac12 N \log N - cN$ steps and near zero after $\tfrac12 N \log N + cN$ steps. The proof uses the upper bound lemma, which bounds the total variation distance by a sum over nontrivial representations of $d_\lambda^2 \mu_\lambda^{2t}$, and a careful estimate of the sum, and a matching lower bound from the number of fixed points, which is not yet Poisson distributed before the cutoff. The result was the first sharp mixing time for a nontrivial walk and it opened the field.
+
+For the queens the figure to retain is $\tfrac12 N \log N$: the unrestricted walk mixes in this many swaps. The measured autocorrelation time of about $N^{1.8}$ on $\{ S \le 1 \}$ in Chapter~\ref{ch:experiments2} is the integrated autocorrelation time of one observable, which bounds the relaxation time from below up to a factor of two and is not the relaxation time itself; the relaxation time measured in this book grows like $N^3$ (Chapter~\ref{ch:otherhyp}), against $N/2$ for the free walk (spectral gap $2/N$). It is not directly comparable with the total variation mixing time $\tfrac12 N \log N$, and the question is whether the relaxation and mixing times of the restricted walk stay polynomial.
+
+\section{Restriction and comparison}
+
+The restriction of the walk to a level set $A \subseteq S_N$, with moves that leave $A$ rejected, has stationary distribution uniform on $A$ and no representation theory, since $A$ is not a group. What remains is comparison. Diaconis and Saloff Coste showed in 1993 that if two reversible chains $P$ and $\tilde P$ on the same space have stationary distributions $\pi$ and $\tilde\pi$ and if the Dirichlet forms satisfy $\mathcal{E}_{\tilde P} \le B \, \mathcal{E}_P$ and $\pi \le a \tilde\pi$, then the spectral gaps satisfy $\mathrm{gap}(P) \ge \mathrm{gap}(\tilde P) / (B a)$; the constants $B$ and $a$ are obtained by routing each move of $\tilde P$ along a path of moves of $P$ and bounding the congestion, which is the canonical path method with a reference chain.
+
+The natural reference chain for a level set is the free transposition walk, and the comparison fails as stated because the level set is a subset and not the whole group. The right comparison is between the restricted walk on $A$ and the walk on $A$ with the moves of a larger neighbourhood, for instance block permutations; if every block move within $A$ can be routed along a path of swaps within $A$ of bounded length and congestion, the swap chain inherits the gap of the block chain up to polynomial factors. This reduces the mixing of the swap chain to the mixing of the block chain plus a routing lemma on $A$, and the routing lemma is a statement about the geometry of the level set, which is what the giant component computations of Chapter~\ref{ch:open} begin to describe.
+
+\section{Fourier analysis and the energy}
+
+There is a second use of the representation theory, not for the chain but for the energy. The number of attacking pairs $S(x)$ is a function on $S_N$ and can be expanded in the Fourier basis of the group; its expansion lies in the trivial representation together with $(N-1, 1)$, $(N-2, 2)$ and $(N-2, 1, 1)$, which correspond to the first and second order statistics of a permutation, because $S$ is a sum of pairwise terms. Diaconis's book of 1988 develops this spectral analysis for statistics on permutations, and it gives a conceptual explanation of why the free swap walk, whose second eigenfunction lives in $(N-1,1)$, interacts with the energy at low order: the energy is almost a quadratic function on the group in the Fourier sense, and the swap chain is the natural dynamics for quadratic functions. This is the analogue, for the symmetric group, of the fact that single spin dynamics are natural for pairwise spin interactions, and it suggests that the swap chain is the right local chain for the queens in the same sense that Glauber dynamics is the right local chain for the Ising model.
+
+\section{Cutoff and the level sets}
+
+Does the restricted walk have a cutoff? For the free walk the cutoff at $\tfrac12 N \log N$ comes from the coupon collector structure of the walk: it mixes once every position has been touched. For the restricted walk on a connected level set the same mechanism operates on the positions, and one might hope for a cutoff at a polynomial time, though we have no argument for its location. The measured autocorrelation times of Chapter~\ref{ch:experiments2} have standard deviations across runs of about a quarter of the mean (between $0.07$ and $0.55$ of it); this is a measure of the noise in the estimates and is not evidence about cutoff, which is a property of the total variation profile of the chain, and an autocorrelation time is not a cutoff time. A cutoff for the queens chain would be a strong form of the mixing conjecture on unconditioned boards and we state it as a problem.
+
+\begin{problem}
+Determine whether the swap chain on $\{ S \le 1 \}$ for the unconditioned $N$ queens problem exhibits cutoff, and if so at what time. The autocorrelation times of Chapter~\ref{ch:experiments2} grow like $N^{1.8}$, which suggests a polynomial relaxation time but does not locate a cutoff; a proof would need the comparison technique of this chapter together with a routing lemma on the giant component.
+\end{problem}

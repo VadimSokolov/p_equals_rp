@@ -1,0 +1,105 @@
+\chapter{Weighted Monte Carlo Integration: The Yakowitz Bounds}
+\label{ch:yakowitz}
+
+Chapter~\ref{ch:rates} stated the Yakowitz\index{Yakowitz, Krimmel and Szidarovszky}, Krimmel and Szidarovszky~\cite{YKS} theorem that the trapezoidal rule on ordered uniform draws integrates a smooth function with mean squared error $O(n^{-4})$. This chapter gives the full theory: the exact moments of uniform spacings, the trapezoidal theorem with explicit constants, the extension to Lipschitz and bounded variation integrands, and the bounds for the staircases that arise in counting. It then applies the bounds to the vertical walk and shows exactly which part of the walk's error they control.
+
+\section{The setting}
+
+Let $\Lambda : [0, 1] \to \mathbb{R}$ be the integrand and $Z = \int_0^1 \Lambda(s) \, ds$ the quantity of interest. Draw $U_1, \dots, U_n$ independent uniforms, sort them to $U_{(1)} \le \dots \le U_{(n)}$, set $U_{(0)} = 0$ and $U_{(n+1)} = 1$, and let $D_i = U_{(i)} - U_{(i-1)}$ for $i = 1, \dots, n+1$. The weighted Monte Carlo estimators of Yakowitz, Krimmel and Szidarovszky are quadrature rules on this random grid:
+\[
+\begin{gathered}
+\hat Z_L = \sum_{i=1}^{n+1} \Lambda(U_{(i-1)}) D_i , \qquad
+\hat Z_R = \sum_{i=1}^{n+1} \Lambda(U_{(i)}) D_i , \\
+\hat Z_T = \sum_{i=1}^{n+1} \frac{\Lambda(U_{(i-1)}) + \Lambda(U_{(i)})}{2} D_i .
+\end{gathered}
+\]
+The naive estimator is $\hat Z_{MC} = n^{-1} \sum_i \Lambda(U_i)$, which uses the same points unordered and unweighted.
+
+\section{Moments of spacings}
+
+The spacings are exchangeable with the Dirichlet$(1, \dots, 1)$ law on the $n$ simplex, so that each $D_i \sim \mathrm{Beta}(1, n)$ and for $k \ge 1$
+\[
+\EE D_i^k = \frac{k! \, n!}{(n + k)!} = \frac{k!}{(n+1)(n+2) \cdots (n+k)} .
+\]
+In particular $\EE D_i = 1/(n+1)$, $\EE D_i^2 = 2/((n+1)(n+2))$, $\EE D_i^3 = 6/((n+1)(n+2)(n+3))$ and $\EE D_i^4 = 24/((n+1) \cdots (n+4))$. The joint moments are also explicit: $\EE D_i D_j = 1/((n+1)(n+2))$ for $i \neq j$, and in general $\EE \prod_i D_i^{k_i} = n! \prod_i k_i! / (n + \sum k_i)!$. The maximal spacing satisfies $\EE \max_i D_i = H_{n+1}/(n+1) \sim \log n / n$, where $H_m$ is the $m$th harmonic number, and $\PP( \max_i D_i > t ) \le (n+1)(1 - t)^n$.
+
+\section{The trapezoidal theorem}
+
+\begin{theorem}[Yakowitz, Krimmel and Szidarovszky]
+If $\Lambda$ is twice continuously differentiable on $[0, 1]$ with $\|\Lambda''\|_\infty \le C_2$, then
+\[
+\begin{gathered}
+\EE | \hat Z_T - Z | \le \frac{C_2}{2 (n+2)(n+3)} , \\
+\EE ( \hat Z_T - Z )^2 \le \frac{C_2^2 \, (n + 20)}{4 \, (n+2)(n+3)(n+4)(n+5)(n+6)} ,
+\end{gathered}
+\]
+so that the root mean squared error is $O(n^{-2})$.
+\end{theorem}
+
+\begin{proof}
+On the cell $[U_{(i-1)}, U_{(i)}]$ the trapezoidal error is
+\[
+e_i = -\tfrac{1}{12} \Lambda''(\xi_i) D_i^3
+\]
+for some $\xi_i$ in the cell, so that $|e_i|$ is at most $C_2 D_i^3 / 12$. Summing and using the third moment, we obtain
+\[
+\EE |\hat Z_T - Z| \le \frac{C_2}{12} \sum_{i=1}^{n+1} \EE D_i^3 = \frac{C_2}{2(n+2)(n+3)} .
+\]
+For the second moment, $(\hat Z_T - Z)^2 \le (C_2/12)^2 (\sum_i D_i^3)^2$, and
+\[
+\begin{aligned}
+\EE \Big( \sum_i D_i^3 \Big)^2 &= (n+1) \EE D_1^6 + n(n+1) \EE D_1^3 D_2^3 \\ &= \frac{ 720 (n+1) + 36 n (n+1) }{ (n+1)(n+2) \cdots (n+6) } ,
+\end{aligned}
+\]
+and $720 + 36 n = 36 (n + 20)$ gives the stated bound.
+\end{proof}
+
+The bound is sharp in order. For $\Lambda(s) = s^2$ the error is exactly $-\tfrac{1}{6} \sum_i D_i^3$, whose expectation is $-1/((n+2)(n+3))$ and whose variance is of order $n^{-5}$, so the mean squared error is dominated by the squared bias and is $n^{-4}$ to leading order. The deterministic trapezoidal rule on the regular grid has error $-C_2 / (12 n^2)$, so the random grid loses a constant factor of about six in the error and about thirty six in the mean squared error, and nothing in the order.
+
+Compare naive Monte Carlo: $\EE(\hat Z_{MC} - Z)^2 = \Var(\Lambda(U)) / n$, which for $\Lambda(s) = s^2$ is $4/(45 n)$. At $n = 100$ the naive error is about $0.03$ and the trapezoidal error about $10^{-4}$; at $n = 10^4$ they are $3 \times 10^{-3}$ and $10^{-8}$.
+
+\section{Less smooth integrands}
+
+The rate degrades gracefully with smoothness.
+
+\begin{theorem}
+\label{thm:lipbv}
+Let $\Lambda$ be Lipschitz with constant $C_1$. Then $\EE (\hat Z_T - Z)^2 \le 3 C_1^2 / (2 (n+2)^2)$. Let $\Lambda$ be of bounded variation $V$. Then $\EE (\hat Z_T - Z)^2 = O(V^2 \log^2 n / n^2)$, and for monotone $\Lambda$ the same holds with $V = |\Lambda(1) - \Lambda(0)|$.
+\end{theorem}
+
+\begin{proof}
+For Lipschitz $\Lambda$ the cell error is at most $C_1 D_i^2 / 2$, so $|\hat Z_T - Z| \le (C_1/2) \sum_i D_i^2$ and
+\[
+\begin{aligned}
+\EE \Big( \sum_i D_i^2 \Big)^2 &= (n+1) \EE D_1^4 + (n+1) n \, \EE D_1^2 D_2^2 \\ &= \frac{24 (n+1) + 4 n (n+1)}{(n+1)(n+2)(n+3)(n+4)} = \frac{4 (n+6)}{(n+2)(n+3)(n+4)} \le \frac{6}{(n+2)^2} ,
+\end{aligned}
+\]
+which gives the first bound. For bounded variation, the cell error is at most $D_i$ times the variation of $\Lambda$ on the cell, so the total error is at most $\max_i D_i \cdot V$, and $\EE (\max_i D_i)^2 = O(\log^2 n / n^2)$ by the tail bound on the maximal spacing.
+\end{proof}
+
+The summary is that the trapezoidal rule on random nodes achieves root mean squared error of order $n^{-2}$ for $C^2$ integrands, $n^{-1}$ for Lipschitz integrands, and $n^{-1} \log n$ for monotone integrands with no further regularity. The logarithm in the last rate is removed in Chapter~\ref{ch:staircase}, where the bounded variation case is shown to have mean squared error at most $V^2 / (2(n+1)(n+2))$. All beat naive Monte Carlo's $n^{-1/2}$, and the first by a wide margin.
+
+\section{Staircases}
+
+The integrands of counting are staircases: $\Lambda$ is piecewise constant with $K$ jumps at unknown locations $0 < a_1 < \dots < a_K < 1$, equal to $\lambda_j$ on $(a_{j-1}, a_j)$ with $\lambda_1 > \lambda_2 > \dots > \lambda_{K+1} \ge 0$. The $j$th step has height $\lambda_j$ and width $w_j = a_j - a_{j-1}$.
+
+\begin{theorem}
+\label{thm:staircasebracket}
+For a staircase with $K$ jumps and $\Lambda(0) = \lambda_1$, the left and right Riemann sums on the random grid bracket $Z$ and satisfy
+\[
+\EE (\hat Z_L - Z)^2 \le \EE (\hat Z_L - \hat Z_R)^2 \le \frac{6 \lambda_1^2 \, K^2}{(n+1)(n+2)} ,
+\]
+and the trapezoidal rule satisfies the same bound with the constant halved. The error is $O(K \lambda_1 / n)$ in root mean square.
+\end{theorem}
+
+\begin{proof}
+$\hat Z_L - \hat Z_R = \sum_i (\Lambda(U_{(i-1)}) - \Lambda(U_{(i)})) D_i$, and the summand is nonzero only for the at most $K$ cells containing a jump, where it is at most $\lambda_1 D_i$. Let $J$ be the set of such cells, $|J| \le K$. Then $(\hat Z_L - \hat Z_R)^2 \le \lambda_1^2 (\sum_{i \in J} D_i)^2 \le \lambda_1^2 |J| \sum_{i \in J} D_i^2$, and the cells containing jumps are not a uniformly random subset, but $\sum_{i \in J} D_i \le \sum_{i=1}^{n+1} D_i \Ind\{ \text{cell } i \text{ contains a jump} \}$, and the expected total length of the cells containing the $K$ fixed points $a_j$ is at most $K \cdot 2/(n+1)$ by the size biasing of spacings containing a fixed point, whose length is dominated by the $\mathrm{Beta}(2, n-1)$ law with mean $2/(n+1)$ and second moment $6/((n+1)(n+2))$. Hence $\EE (\sum_{i \in J} D_i)^2 \le K \sum_j \EE D_{(a_j)}^2 \le 6 K^2 / ((n+1)(n+2))$, which gives the displayed bound.
+\end{proof}
+
+The $K$ dependence in the bound proved here is linear in the root mean square (it is a feature of this proof, not a demonstrated necessity). For the queens $K$ is one less than the number of nonempty energy levels, at most $\binom{N}{2}$; the exact permutation density of states in \texttt{code/dos.json} has 21, 24, 33 and 36 nonempty levels for $N = 8, 9, 10, 11$, well above $2N$, so $K$ may well grow like $N^2$. The absolute quadrature error on a random grid of $n$ points is $O(K \lambda_1 / n)$, and $n = O(K \lambda_1 / (Z \epsilon))$ points suffice for relative error $\epsilon$, which is $O(K / \epsilon)$ on a rung whose ratio $Z / \lambda_1$ is bounded below. This is a negligible cost beside the conditioned draws. Chapter~\ref{ch:staircase} shows that the factor $K$ is an artefact of the proof: an exact representation of the error removes it, and the absolute quadrature error is $O(1/n)$ with an absolute constant; a cost in nodes for relative error $\epsilon$ needs a lower bound on $Z$ that is not proved.
+
+\section{What the bounds control}
+
+The vertical walk has three sources of error, and the Yakowitz bounds control exactly one of them. The quadrature error, from replacing $\int \Lambda$ by a sum on a random grid, is $O(n^{-2})$ for smooth staircases, which do not arise, and $O(K/n)$ for the true staircases of counting; this is the Yakowitz part. The spacing error, from not knowing where on the unit interval the walk is and replacing $U_{(i)}$ by $e^{-i/n}$ in nested sampling\index{nested sampling}, is $O(n^{-1/2})$ relative and is the subject of Chapter~\ref{ch:nested} and the improvement of Chapter~\ref{ch:beyond}. The sampling error, from the conditioned draws not being exactly uniform on their level sets, is the total variation distance of the chain times the number of rungs and is the subject of Part IV.
+
+The point of isolating the quadrature error is that it is the only part of the problem on which classical numerical analysis has purchase, and on that part it does very well. A randomized algorithm for a $\sharpP$ problem whose only error were the Yakowitz error would be an FPRAS\index{FPRAS} (on rungs whose ratio $Z / \lambda_1$ is bounded below) with sample complexity $O(K/\epsilon)$ rather than the $O(K^2/\epsilon^2)$ of the product estimator. That is the gain the quantile coordinate offers, and it is real, and it is not where the difficulty is.

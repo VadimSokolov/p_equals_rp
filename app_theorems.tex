@@ -1,0 +1,76 @@
+\chapter{List of Results and Conjectures}
+\label{app:results}
+
+What the book proves, what it cites, and what it conjectures, each in one line with the chapter where it appears.
+
+\section*{Proved in this book}
+
+\begin{description}[style=nextline]
+\item[Lorenz identity] $\EE_P[L] = \int_0^1 \Lambda(s) \, ds$ for any nonnegative $L$. Chapter~\ref{ch:vertical}.
+\item[Quantile form of RP] $x \in L$ iff the density $p(x)$ of accepting strings of an $\RP$ algorithm satisfies $p(x) > 1/2$ (equivalently the median is $1$, with the convention $p(x) > 1/2$ for the promise); the hitting set form ($\mathrm{prRP} = \mathrm{prP}$, which implies $\Pc = \RP$; the converse is not known) holds iff medians of polynomial time Boolean functions are computable on the $\RP$ promise (a restatement of the known hitting set formulation, not a proof of $\Pc = \RP$). Chapters~\ref{ch:reorder}, \ref{ch:theorems}.
+\item[Promise form] $\mathrm{prRP} = \mathrm{prP}$ iff dense level sets can be hit deterministically iff medians are computable on the promise (known, restated on the quantile axis; cf.\ Andreev, Clementi and Rolim, and Goldreich, Vadhan and Wigderson). Chapter~\ref{ch:theorems}.
+\item[Main equivalence] $\NP = \RP$ iff the queens completion level sets admit a polynomial sampler iff an FPRAS for the completion count exists. The vertical walk is not among the equivalent statements, since its running time bound needs a rung ratio hypothesis. Chapter~\ref{ch:theorems}, assembling Gent Jefferson Nightingale, Jerrum Valiant Vazirani and Bellare Goldreich Petrank.
+\item[Conditional FPRAS] With a level set sampler of cost $C(N, \delta)$ and at most $K + 1$ levels, the walk is an FPRAS of cost $O(K^2 \epsilon^{-2} C(N, \epsilon/K))$. Chapter~\ref{ch:program}.
+\item[Rung skipping] If the chains on the level sets at and above some $m \ge m_c(B)$ are irreducible and mix in time $T$ polynomial in $N$, the rung ratios $|\{S \le j\}|/|\{S \le j+1\}|$ for $j \ge m$ are at least $1/q(N)$, and $N(0)/|\{S \le m\}| \ge 1/p(N)$, the walk that estimates the bottom ratio directly is an FPRAS of cost $O((K^3 q(N) + p(N)) \epsilon^{-2} T \log (K/\delta))$. Chapter~\ref{ch:open}.
+\item[Coding theorem for the queens] $\NP = \RP$ iff every completion of every board with at least one completion can be coded, with shared randomness, in $\log_2 N(0; X_0) + O(\log N)$ bits by a polynomial time nearly injective decoder, with a common code length computable in polynomial time from the board and the shared string; equivalently iff the time bounded complexity of a completion given its board is its enumerative code length up to a logarithm. Chapter~\ref{ch:kolmogorov}.
+\item[Incompressible witnesses] For an $\RP$ algorithm with $m$ random bits, assuming the rejecting set $B_x$ has size at most $2^{m/3}$ for $x \in L$, every string with $\mathrm{CD}^t(r \mid x) \ge 2m/3 + c \log m$ is accepting on $x \in L$; $L \in \Pc$ if such a string can be constructed deterministically in polynomial time. Chapter~\ref{ch:kolmogorov}.
+\item[Sufficient statistics] The energy is minimal sufficient for the Boltzmann temperature and the family is determined by the density of states; the closure of a board is minimal sufficient for the completion law and the posterior mean matrix is sufficient, for the queens and every self reducible completion problem; approximating the matrix within $1 \pm 1/N^2$ is equivalent to $\NP = \RP$; a product form generator driven by the matrix has divergence at least the mean field gap. Chapter~\ref{ch:sufficient}.
+\item[Planted sampling] Under planted pairs the conditional law of the solution given the board is uniform on completions and the board is seen with probability $N(0; X_0) / (Q(N) \binom{N}{k})$, so the population minimiser of the squared loss under planted pairs is the sufficient statistic, and hard boards are seen least. Chapter~\ref{ch:sufficient}.
+\item[The learning problem is the problem] $\NP = \RP$ iff a uniform (polynomial time constructible) polynomial size randomized circuit family computes the posterior mean matrix of every board within $1 \pm 1/N^2$, iff a polynomial time randomized algorithm does. Chapter~\ref{ch:sufficient}.
+\item[ETH and the program] Under the circuit hypothesis of Impagliazzo and Wigderson (known) $\Pc = \RP$; with ETH as well, $\Pc = \RP \ne \NP$ and, heuristically, the walk is not polynomial on reduction boards; under randomized ETH, heuristically, every version of the walk costs $2^{\Omega(n)}$ on the boards of hard $n$ variable formulas for infinitely many $n$, and at every level the mixing time times the inverse ground state ratio is $2^{\Omega(n)}$ on such boards. Chapter~\ref{ch:eth}.
+\item[Sch\"oning walk for the queens] The repair walk with restarts finds a completion in expected time $(2f)^f \mathrm{poly}(f)$ on $f$ free rows, no better than exhaustive search. Chapter~\ref{ch:eth}.
+\item[Limits of Monte Carlo] No randomized algorithm decides, polynomially approximates, or samples queens completions in polynomial time unless $\NP = \RP$. Chapter~\ref{ch:theorems}.
+\item[Yakowitz bounds with constants] Trapezoid on sorted uniforms: mean error at most $C_2 / (2(n+2)(n+3))$, mean squared error at most $C_2^2 (n+20) / (4 (n+2) \cdots (n+6))$; Lipschitz $O(n^{-2})$; bounded variation $O(\log^2 n / n^2)$; staircase $O(K^2 / n^2)$. Chapter~\ref{ch:yakowitz}.
+\item[Higher order rules] Degree $k$ interpolation on random nodes: mean squared error $O(n^{-2k-2})$ for $C^{k+1}$ integrands. Chapter~\ref{ch:beyond}.
+\item[Error representation] The trapezoid error on sorted uniforms is $\int D(s) \, \mu(ds)$ with $\mu = -d\Lambda$ and $D(s)$ the signed distance from $s$ to the midpoint of its spacing; one step has mean squared error $h^2 (1 - (n+2) p(1-p)(p^n + (1-p)^n)) / (2(n+1)(n+2))$ exactly. Chapter~\ref{ch:staircase}.
+\item[Bounded variation without the logarithm] For any $\Lambda$ of variation $V$ the trapezoid on sorted uniforms has mean squared error at most $V^2 / (2(n+1)(n+2))$ and bias at most $V / (2(n+1))$; for separated steps the error is $\sum h_k^2 / (2n^2)$ asymptotically; for the Boltzmann staircase $\sum h_k^2 = 0.462$ whatever the number of levels. Chapter~\ref{ch:staircase}.
+\item[Stratified rule, $K$ free] $\Var(\hat Z_S) \le V^2 / (4n^2)$ for any bounded variation integrand and $\le \sum h_k^2 / (4 n^2)$ for separated steps. Chapter~\ref{ch:staircase}.
+\item[Stratified staircase bound] Unbiased, variance at most $K \lambda_1^2 / (4 n^2)$. Chapter~\ref{ch:beyond}.
+\item[Product proposals for the queens] Any product form importance proposal on $[N]^N$ has relative variance at least $e^{N \log N - d - \log Q(N)} - 1$, where $d$ is the entropy deficit of the solution marginals, so it beats crude Monte Carlo by at most $e^d$, which is at most $e^{0.68} \approx 2$ for $8 \le N \le 12$. Chapter~\ref{ch:ce}.
+\item[Rao Blackwellised nested sampling] Exact mean and variance of the evidence under the law of the latent positions, with the ordinates held fixed. Chapter~\ref{ch:beyond}.
+\item[GBC representation and amortisation] Existence and uniqueness of the vertical and level set generators; the amortised ladder bound. Chapter~\ref{ch:gbc}.
+\item[Swap neighbourhood] A swap of two rows of a solution creates at most four attacks. Chapter~\ref{ch:mixingproof}.
+\item[Mixing reduction] The swap chain on $G_N$ is reversible, irreducible and aperiodic with uniform stationary law; conductance $\Phi_N \ge N^{-c'}$ gives mixing time $O(N^{2c'} (N \log N + \log(1/\epsilon)))$, and polynomial mixing gives $\Phi_N \ge N^{-c-1}$. Chapter~\ref{ch:mixingproof}.
+\item[Block chain validity] The block chain is reversible on the level set and irreducible under block connectivity. Chapter~\ref{ch:swendsen}.
+\end{description}
+
+\section*{Computed in this book}
+
+\begin{description}[style=nextline]
+\item[Density of states] Exact for $N \le 11$; $N(1)$ exact for $N \le 13$. Chapters~\ref{ch:rare}, \ref{ch:open}.
+\item[Giant component] All but a vanishing fraction of solutions lie in one swap component of $\{ S \le 1 \}$ for $N \le 13$, and on solution derived conditioned boards to $N = 17$. Chapter~\ref{ch:open}.
+\item[Second level set] $\{ S \le 2 \}$ is swap connected for $4 \le N \le 11$, by exhaustive enumeration. Chapter~\ref{ch:open}.
+\item[Shattering under random conditioning] About half of random boards with two to four fixed queens at $N = 12$ have completions in several components of $\{ S \le 1 \}$, the worst with $42$ completions in $30$ components; on every such board examined all completions lie in one component of $\{ S \le 2 \}$, and the level set itself is connected at $m = 3$ on $75$ of $80$ random boards, at $m = 2$ on three and $m = 4$ on two. Chapter~\ref{ch:open}.
+\item[Queenon tilt] A swap proposal tilted by the one point queen density does not reduce the autocorrelation time of the bottom rung for $N \le 24$. Chapter~\ref{ch:open}.
+\item[Finite size correction] $Q(N)/N! \approx 2.4 \, e^{-0.942 N}$ with no visible power of $N$ to $N = 27$. Chapter~\ref{ch:open}.
+\item[Ladder estimates] Within a factor $1.25$ of exact to $N = 16$. Chapter~\ref{ch:experiments}.
+\item[Bottom rung mixing] Autocorrelation time growing like $N^{1.76}$ to $N = 32$. Chapter~\ref{ch:experiments2}.
+\item[Neutral genealogies] Ancestor counts are close to, and mostly below, the neutral coalescence model to $N = 22$, with exceptions at $N = 18$ and at $N = 14$ with three fixed queens. Chapter~\ref{ch:genealogy}.
+\item[Rate function] Finite size rate function of the attack count to $N = 11$. Chapter~\ref{ch:entropy}.
+\item[Repair neighbourhood] About $0.115 \binom{N}{2}$ repairable swaps per solution on average for $N \le 12$, with four isolated solutions at $N = 12$. Chapter~\ref{ch:open}.
+\item[Near solution distances] In $G_N$ only $22\%$ to $34\%$ of near solutions are one swap from a solution for $N = 8$ to $13$, the mean distance is about $2.2$ and the maximum $8$; the two step solution graph has mean degree below $1.5$. Chapter~\ref{ch:mixingproof}.
+\item[Random completion model] Satisfiability threshold near $k/N = 0.4$ at $N = 12$, with the giant component eroding to $75\%$ below it. Chapter~\ref{ch:open}.
+\item[Cross entropy collapse] The product family cross entropy method collapses to a few near solutions and fails to reach level zero for $N \ge 9$; at $N = 8$ it finds three of $92$ solutions. Chapter~\ref{ch:ce}.
+\item[Spectral gap] Relaxation time of the swap chain on $G_N$: $301, 444, 549, 875, 1033$ proposals for $N = 8$ to $12$, exponent about $3.1$; the slow modes are nearly degenerate and the symmetric subspace relaxes at the same rate. Chapter~\ref{ch:open}.
+\item[Depth growth] On random boards with two or three fixed queens the shattering depth is $3$ on $75$ of $80$ boards at $N = 12$, and $3$ on $22$ and $4$ on $18$ of $40$ boards at $N = 14$; at $N = 16$, with four or five fixed queens, it is $4$ on $12$ and $3$ on $4$ of $16$ boards. Chapter~\ref{ch:open}.
+\item[Window divergence] The divergence from the solution law to the best order $k$ Markov family grows linearly in $N$ for fixed $k$, and the window needed for one nat is about $N/2$. Chapter~\ref{ch:open}.
+\item[No thermal transition] Energy fluctuations monotone in temperature for $N \le 11$. Chapter~\ref{ch:open}.
+\end{description}
+
+\section*{Cited}
+
+Gent, Jefferson and Nightingale (queens completion $\NP$ and $\sharpP$ complete); Jerrum, Valiant and Vazirani (counting and sampling); Bellare, Goldreich and Petrank (uniform generation); Impagliazzo and Wigderson (hardness versus randomness); Kabanets and Impagliazzo (derandomization and lower bounds); Simkin (asymptotics of $Q(N)$); Yakowitz, Krimmel and Szidarovszky (weighted Monte Carlo); Chopin and Robert (nested sampling CLT); Del Moral (Feynman Kac unbiasedness); Polson and Scott (vertical likelihood, Lemma 4 and Corollary 5); Frieze, Kannan and Polson (log concave Metropolis); Dyer, Frieze and Kannan (volume); Gamarnik (overlap gap); Baker Gill Solovay, Razborov Rudich, Aaronson Wigderson (barriers).
+
+\section*{Conjectured}
+
+\begin{description}[style=nextline]
+\item[Mixing on unconditioned boards] The swap chain on the giant component of $\{ S \le 1 \}$ mixes in polynomial time. Chapters~\ref{ch:mixingproof}, \ref{ch:symmetric}.
+\item[Torpidity on hard boards] On reduction boards from hard formulas every stable chain, swap or block, mixes superpolynomially; the completions have the overlap gap property. Chapters~\ref{ch:swendsen}, \ref{ch:ogp}.
+\item[Shattering depth] $m_c(N) = 2$ for all $N \ge 9$ on unconditioned boards; on random boards we conjecture $m_c(B) = O(1)$ (the data to $N = 16$ do not exclude $O(\log N)$, which would make rung skipping quasi-polynomial); on reduction boards from hard formulas $m_c(B_N) \ge cN$ with an exponentially small ratio $N(0)/|\{S \le m_c\}|$. Chapter~\ref{ch:open}.
+\item[Expansion of the bottom level set] The swap chain on the giant component $G_N$ of $\{ S \le 1 \}$ has conductance at least $N^{-c'}$; equivalent to the mixing conjecture by the reduction theorem. Chapter~\ref{ch:mixingproof}.
+\item[Rate function] $I(e)$ exists, is convex, vanishes at $2/3$, equals $\alpha - 1$ at zero, and is given by a queenon variational problem. Chapter~\ref{ch:entropy}.
+\item[No polynomial correction] $\beta = 0$ in $Q(N)/N! \sim C N^\beta e^{-(\alpha-1)N}$. Chapter~\ref{ch:open}.
+\item[Random queens completion threshold] A shattering threshold $\kappa_c$ in the fraction of randomly fixed queens. Chapter~\ref{ch:ogp}.
+\item[Ordinate chain mixing] Under the Polson Scott weight the log ordinate chain is a reflected symmetric walk with Laplace increments; we conjecture that it mixes in $O(\log^2(1/\rho))$ steps in the reflected model from a warm start, with exact $Z$ and exact draws. We do not prove this. Chapter~\ref{ch:polsonscott}.
+\item[Hitting set form] A polynomial time hitting set generator for all small circuits (equivalently $\mathrm{prRP} = \mathrm{prP}$) implies $\Pc = \RP$; whether such a generator exists is open, and the converse implication is not known. Chapter~\ref{ch:prp}.
+\end{description}

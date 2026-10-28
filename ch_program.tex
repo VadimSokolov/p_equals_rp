@@ -1,0 +1,78 @@
+\chapter{The Monte Carlo Program for P versus NP}
+\label{ch:program}
+
+This chapter states the program of the book as a program: a sequence of steps, each either a theorem, a conjecture, or an experiment, that leads from the Lorenz\index{Lorenz curve} identity to the question whether $\Pc = \NP$. It is the chapter to read if one wants to know exactly what we are proposing, what has been done, and where the gaps are.
+
+\section{The chain of implications}
+
+The program rests on five links.
+
+Link one, a theorem. Counting the completions of a partial queens placement is $\sharpP$ complete and deciding whether a completion exists is $\NP$ complete, by Gent, Jefferson and Nightingale\index{Gent, Jefferson and Nightingale}. The problem is self reducible\index{self reducibility}.
+
+Link two, a theorem. For a self reducible problem, a fully polynomial randomized approximation scheme for the count exists if and only if a fully polynomial almost uniform sampler for the solutions exists, by Jerrum, Valiant\index{Valiant, Leslie} and Vazirani\index{Jerrum, Valiant and Vazirani}. Either implies that the decision problem is in $\RP$.
+
+Link three, a theorem. The partition function $\sum_s N(s) e^{-s}$ is $|\cX|$ times $\int_0^1 \Lambda(s) \, ds$ where $\Lambda$ is the quantile function of the Boltzmann\index{Boltzmann distribution} likelihood $e^{-S}$ under the uniform distribution on the free placements, and $\Lambda$ is a staircase with at most $\binom{N}{2} + 1$ steps; the solution count $N(0)$ is $|\cX|$ times the width of the top step of $\Lambda$. The integral is estimated by the vertical walk with quadrature error $O(\sqrt K / n)$ by the stratified\index{stratified sampling} rule of Chapter~\ref{ch:beyond}, positional error $O(\sqrt{\log(1/\rho) / n})$ by Chapter~\ref{ch:nested}, and sampling error equal to the total variation distance of the level set sampler times the number of rungs, by Chapter~\ref{ch:prp}. The first two are polynomial in $N$ and $1/\epsilon$ unconditionally.
+
+Link four, a conjecture. The level set sampler\index{level set sampler}, a Markov chain on the free placements with at most $m$ attacking pairs, mixes in time polynomial in $N$ for every $m$ at or above the shattering depth of the board, the shattering depth is bounded, and the consecutive ratios of the ladder are bounded below as in the theorem below. This is the mixing conjecture in the form Chapter~\ref{ch:open} gives it. Its first clause cannot hold below the depth, since there the level set is disconnected, and the rung skipping theorem of that chapter says the walk does not need it to; its second clause is what keeps the price of skipping polynomial. The program's Monte Carlo half succeeds if both hold on every board.
+
+Link five, a conjecture. $\Pc = \RP$, in the vertical form that the single dense level set of an $\RP$ algorithm can be hit by a deterministic polynomial size set.
+
+If links four and five both hold then $\NP \subseteq \RP = \Pc$ and $\Pc = \NP$. If link five holds and link four fails then $\Pc = \RP$ and this route to $\NP = \RP$ fails, which is the expected world. If link four holds and link five fails then $\NP = \RP \neq \Pc$, randomness is a resource, and the circuit lower bound hypothesis of Impagliazzo and Wigderson fails. If both fail then $\Pc \neq \RP$ and this route to $\NP = \RP$ fails.
+
+\section{What is proved}
+
+Links one through three are theorems and the book proves or cites them. The content of link three, which is ours, is the following statement, assembled from Chapters~\ref{ch:vertical}, \ref{ch:rates}, \ref{ch:yakowitz} and \ref{ch:beyond}.
+
+\begin{theorem}
+\label{thm:condfpras}
+Let $S$ be an energy on a finite set $\cX$ of known size, taking at most $K + 1$ values with $N(0) > 0$, and suppose a level set sampler is available that produces, in time $C(N, \delta)$, a sample within total variation $\delta$ of uniform on $\{ S \le m \}$ for any $m$. Suppose also that the ladder of level sets used by the walk has at most $2K$ rungs and that consecutive rungs have size ratio at least $\tfrac12$ (without a lower bound on the ratios the number of samples per rung is not controlled). Then for any $\epsilon \in (0, 1)$ the vertical walk with stratified quadrature produces an estimate $\hat N(0)$ of the ground state count with $\PP( |\hat N(0) / N(0) - 1| > \epsilon ) \le \tfrac14$, in time
+\[
+O\Big( \frac{K^2}{\epsilon^2} \cdot C\big(N, \epsilon / K\big) \Big) ,
+\]
+and for estimators that estimate each rung ratio separately the dependence on $K$ and $\epsilon$ cannot be improved by more than logarithmic factors (we do not prove a lower bound for arbitrary estimators).
+\end{theorem}
+
+\begin{proof}
+The walk uses at most $2K$ rungs by hypothesis, each estimated from $M = O(K / \epsilon^2)$ conditioned samples by the product estimator\index{product estimator} variance bound; the quadrature and positional errors are of lower order; the bias from imperfect samples is at most $2K \delta$ and is absorbed by $\delta = \epsilon / (4K)$. The lower bound, for estimators that treat the rung ratios separately, follows from the fact that any such estimator of a product of $K$ ratios each in $[\tfrac12, 1]$ from Bernoulli samples needs $\Omega(K / \epsilon^2)$ samples per ratio to achieve relative error $\epsilon / \sqrt K$ per ratio, which is what relative error $\epsilon$ in the product requires; we have assumed this per ratio accuracy rather than proved it for all estimators.
+\end{proof}
+
+The theorem is unconditional about everything except $C(N, \delta)$ and the ladder hypothesis (at most $2K$ rungs, consecutive ratios at least $\tfrac12$). If $K$ is polynomial in $N$ and $C$ is polynomial in $N$ and $\log(1/\delta)$ then the walk is an FPRAS\index{FPRAS}. The theorem is, in this sense, a reduction of approximate counting to level set sampling under the ratio hypothesis, and it is the sharpest statement of the Jerrum Valiant Vazirani correspondence that we know for problems with a polynomial number of energy levels.
+
+\section{What is conjectured}
+
+Link four is the whole question. We believe it false, for the reasons set out in Chapters~\ref{ch:mixing}, \ref{ch:phase} and \ref{ch:labs}: the low energy level sets of an $\NP$ complete energy should shatter into exponentially many components under local moves, the shattering should persist to a depth growing with $N$, and cluster moves should not connect the components in polynomial time. The computations of Chapter~\ref{ch:open} say that the bottom level set does shatter, with more than one solution component on about half of the boards with two to four fixed queens at $N = 12$, but that the shattering is shallow, repaired two to four attacks up at a price of a factor of thirty to forty in the bottom ratio; the conjecture that matters is that on reduction boards it is deep. The experimental evidence of Chapter~\ref{ch:experiments2} is consistent with polynomial mixing on unconditioned boards up to $N = 32$, with an autocorrelation time growing like $N^{1.8}$; the hardness, if it is there, lives in the growth of that depth on reduction boards. The conjecture could be confirmed by a rigorous mixing bound on hard instances, which, under the ratio hypothesis, would show $\NP = \RP$, or refuted by a rigorous torpid\index{torpid mixing}ity bound on a family of instances, which would show that this particular chain does not work and would leave the possibility of a better chain open.
+
+Link five is the derandomization conjecture, believed by nearly everyone, implied by the Impagliazzo\index{Impagliazzo and Wigderson} Wigderson\index{Wigderson, Avi} hypothesis, and blocked by the barriers of Chapter~\ref{ch:barriers}. The vertical view restates it, through promise $\RP$ equal to promise $\Pc$ (which implies it), as a hitting set\index{hitting set} problem and offers no new route to it.
+
+\section{The honest position}
+
+We do not claim to have solved $\Pc = \NP$ by Monte Carlo. We claim the following, and we think it is worth claiming.
+
+First, the question whether $\NP = \RP$ is, for the queens and for every problem with a polynomial number of energy levels, connected, through the theorem above, to the question whether a specific Markov chain on specific level sets mixes in polynomial time: if the chain mixes in polynomial time (under the ratio hypothesis) then the walk is polynomial. The converse is not proved, and a better chain may exist even if this one fails.
+
+Second, the chain in question is as concrete as any object in mathematics: a swap of two queens on a chessboard, accepted if the number of attacks does not exceed a threshold. The question of its mixing is a question in the spectral theory of a finite graph, the Cayley graph of the symmetric group under transpositions restricted to a level set, and it can be studied by every tool of that theory and by computer.
+
+Third, the question whether $\Pc = \RP$ is, in the same coordinates, the question whether the one rung of the walk that has density at least a half can be hit without a coin, and this is, for the promise form $\mathrm{prRP} = \mathrm{prP}$ that implies $\Pc = \RP$, the hitting set formulation that the derandomization literature already uses. The vertical view puts the two questions on one axis.
+
+Fourth, the parts of the walk that are not the chain are controlled by the Yakowitz\index{Yakowitz, Krimmel and Szidarovszky} bounds and their improvements, and the quadrature error is better than Monte Carlo (on a staircase with $K$ steps it is $O(\sqrt K / n)$, and for a smooth integrand the rates of Chapters~\ref{ch:rates} and~\ref{ch:yakowitz} improve on it, cf.\ \cite{YKS}), although the positional error is not. The quantile coordinate is the right one for this numerical analysis. What is not finished is the probability.
+
+\section{The realistic prize}
+
+One consequence of the program deserves its own statement, because it is a statement within reach (we give only a sketch) and not a conjecture about the world. The unconditioned count $Q(N)$ is a function of the single number $N$, given in unary or in $\log N$ bits, and the question whether it can be computed in time polynomial in $N$ is open: it is not known to be hard, since $\sharpP$ completeness needs an input with structure and the unconditioned problem has none, and it is not known to be easy, since no formula or recurrence for $Q(N)$ is known and the exact values stop at $N = 27$. The same is true of a randomized approximation. An FPRAS for $Q(N)$, a randomized algorithm producing a $(1 \pm \epsilon)$ estimate in time polynomial in $N$ and $1/\epsilon$, would be the first efficient algorithm of any kind for the queens count, and nothing in complexity theory stands in its way.
+
+\begin{proposition}[sketch]
+\label{prop:fpras_unconditioned}
+Suppose that for the unconditioned $N$ queens problem the level set $\{ S \le 2 \}$ is connected under swaps, that the swap chain on $\{ S \le m \}$ has polynomial mixing time for every $m \ge 2$, that consecutive ratios $|\{ S \le m-1 \}| / |\{ S \le m \}|$ on the integer ladder are at least inverse polynomial in $N$, and that the swap chain on the giant component $G$ of $\{ S \le 1 \}$ has polynomial mixing time, with a membership test for $G$ and with $G$ holding a $1 - O(N^{-c})$ fraction of the solutions for some $c > 0$ (small $N$ being handled by enumeration). Then there is an FPRAS for $Q(N)$. The last hypothesis can be dropped at the cost of replacing the bottom rung by the direct Bernoulli estimate of $Q(N) / |\{ S \le 2 \}|$, which is polynomial if that ratio is at least inverse polynomial.
+\end{proposition}
+
+\begin{proof}
+The vertical walk with the integer ladder has polynomial rungs. Connectivity of $\{ S \le 2 \}$ is a hypothesis, not a consequence of the nesting of the level sets: a larger level set can be disconnected while a smaller one is connected, since the added placements may form islands. Above $m = 2$ connectivity is again part of the mixing hypothesis. The bottom rung is estimated on the giant component with the stated bias, or skipped by the rung skipping theorem of Chapter~\ref{ch:open}, whose hypotheses we have not rechecked here; the conditional FPRAS theorem above gives the rest, but only after two gaps are closed that we do not close here: that theorem assumes consecutive ratios at least $\tfrac12$ and at most $2K$ rungs, whereas the hypothesis above allows ratios that are only inverse polynomial, which raises the per rung sample count in proportion to the inverse ratio; and nothing in the hypotheses bounds $|G| / |\{ S \le 1 \}|$ from below, which the bottom rung on $G$ needs. We regard this as a sketch, and the statement as a conjecture-level target rather than a proved theorem.
+\end{proof}
+
+The hypotheses are the mixing conjecture of Chapter~\ref{ch:mixingproof}, the ratio bound, the giant component clause, and the connectivity of $\{ S \le 2 \}$, which Chapter~\ref{ch:open} verifies by exhaustive enumeration for $N \le 11$ and conjectures for all $N$. These are supported by the measurements and computations in the book and obstructed by no barrier we know of. This is the statement the program can realistically hope to deliver, and we regard it as the proper first target: not $\NP = \RP$, which we expect to be false, and not $\Pc = \RP$, which we cannot touch, but a polynomial time Monte Carlo algorithm for a count that has resisted every other method since Gauss.
+
+\section{The next steps}
+
+The program's next steps are the open problems of Chapter~\ref{ch:open}, and in order of priority they are: the shattering depth of a reduction board, which the enumeration of Section~\ref{sec:depth} measures in seconds at $N = 12$; the divergence of the solution law from the best Markov sequential family of each order, which is the cross entropy form of the depth by Chapter~\ref{ch:ce}; a cluster chain for the queens with provable properties; and, on the derandomization side, any explicit family of $\RP$ problems whose dense level sets can be hit by an explicit polynomial size set, which would be a derandomization result in its own right whatever its bearing on the queens.
+
+We do not expect the program to end with $\Pc = \NP$. We expect it to end, if it ends, with a torpidity theorem for the queens chain that names the components it cannot cross and the depth to which they persist, and with the recognition that the same components, in other clothing, are what every Monte Carlo method for every $\NP$ complete problem runs into. That would not be $\Pc \neq \NP$, which is a statement about all algorithms and not about chains. It would be a precise statement of why the most natural algorithm fails, and that is the kind of statement from which, historically, the theory of the general case has grown.

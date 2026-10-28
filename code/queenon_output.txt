@@ -1,0 +1,7 @@
+solutions at 13: 73712 secs 2.4
+{'middle_row': [np.float64(1.423), np.float64(1.148), np.float64(1.005), np.float64(0.912), np.float64(0.814), np.float64(0.804), np.float64(0.786), np.float64(0.804), np.float64(0.814), np.float64(0.912), np.float64(1.005), np.float64(1.148), np.float64(1.423)], 'corner_row': [np.float64(0.487), np.float64(0.67), np.float64(0.971), np.float64(1.062), np.float64(1.296), np.float64(1.302), np.float64(1.423), np.float64(1.302), np.float64(1.296), np.float64(1.062), np.float64(0.971), np.float64(0.67), np.float64(0.487)]}
+12 {'iat_uniform': 245.8609290346032, 'sd_uniform': 57.73035546457745, 'acc_uniform': 0.0609111111111111, 'iat_tilted': 312.4524176649452, 'sd_tilted': 66.54723803145842, 'acc_tilted': 0.05242777777777778, 'secs': 1.537550926208496}
+16 {'iat_uniform': 401.73344258074553, 'sd_uniform': 125.764772614382, 'acc_uniform': 0.04555, 'iat_tilted': 488.7864992442037, 'sd_tilted': 169.8331762855843, 'acc_tilted': 0.040341666666666665, 'secs': 2.5940632820129395}
+20 {'iat_uniform': 774.6169475640368, 'sd_uniform': 230.2618033809303, 'acc_uniform': 0.03648333333333333, 'iat_tilted': 955.8658662957239, 'sd_tilted': 457.9370146655821, 'acc_tilted': 0.033113333333333335, 'secs': 4.115047931671143}
+24 {'iat_uniform': 715.6418470566185, 'sd_uniform': 152.71036403730454, 'acc_uniform': 0.0316, 'iat_tilted': 761.0654553740718, 'sd_tilted': 121.85114246254678, 'acc_tilted': 0.028508333333333337, 'secs': 6.999308109283447}
+done

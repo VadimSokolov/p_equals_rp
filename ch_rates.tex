@@ -1,0 +1,71 @@
+\chapter{Rates of Convergence in the Quantile Coordinate}
+\label{ch:rates}
+
+Chapter~\ref{ch:vertical} claimed that integration on the quantile axis converges faster than naive Monte Carlo, with mean squared error $O(n^{-4})$ for smooth integrands and $O(n^{-2})$ for staircases, against $O(n^{-1})$ in the original coordinate. This chapter proves those claims in the forms stated below ($n^{-4}$ for $C^2$ integrands, $O(\log^2 n / n^2)$ for monotone ones). The proofs are elementary, resting on the distribution of uniform spacings, but they are the quantitative reason that the vertical coordinate is the right one, and they show exactly how the rate depends on the number and heights of the steps.
+
+\section{Uniform spacings}
+
+Let $U_1, \dots, U_n$ be independent uniforms on $[0,1]$ and $U_{(1)} \le \dots \le U_{(n)}$ their order statistics, with $U_{(0)} = 0$ and $U_{(n+1)} = 1$. The spacings $D_i = U_{(i)} - U_{(i-1)}$, $i = 1, \dots, n+1$, are exchangeable, each with the Beta$(1, n)$ law, so that
+\[
+\begin{gathered}
+\EE D_i = \frac{1}{n+1} , \qquad \EE D_i^2 = \frac{2}{(n+1)(n+2)} , \\
+\EE D_i^3 = \frac{6}{(n+1)(n+2)(n+3)} ,
+\end{gathered}
+\]
+and the vector $(D_1, \dots, D_{n+1})$ has the flat Dirichlet law on the simplex, equivalently the law of $(E_1, \dots, E_{n+1}) / \sum E_j$ for independent standard exponentials. These are the only facts needed.
+
+\section{Riemann sums on random grids}
+
+Let $\Lambda$ be a nonincreasing function on $[0, 1]$ with $\Lambda(0) < \infty$, and consider the left Riemann sum on the random grid,
+\[
+\hat Z_L = \sum_{i=1}^{n+1} \Lambda(U_{(i-1)}) \, D_i ,
+\]
+and the right sum $\hat Z_R = \sum_{i=1}^{n+1} \Lambda(U_{(i)}) D_i$. Since $\Lambda$ is nonincreasing, $\hat Z_R \le Z \le \hat Z_L$ pathwise, and
+\[
+\begin{aligned}
+0 \le \hat Z_L - \hat Z_R &= \sum_{i=1}^{n+1} \big( \Lambda(U_{(i-1)}) - \Lambda(U_{(i)}) \big) D_i \\ &\le \max_i D_i \cdot \big( \Lambda(0) - \Lambda(1) \big) .
+\end{aligned}
+\]
+The maximal spacing has $\EE \max_i D_i = H_{n+1} / (n+1) \approx \log n / n$ and $\EE (\max_i D_i)^2 = O(\log^2 n / n^2)$. So both Riemann sums have mean squared error $O(\log^2 n / n^2)$ for any monotone $\Lambda$, with no smoothness at all. This is already better than naive Monte Carlo, whose error is $O(n^{-1})$, and it holds for the staircases of counting.
+
+\begin{theorem}
+\label{thm:riemannmono}
+For any nonincreasing $\Lambda$ on $[0,1]$ with $\Lambda(0) < \infty$, the left and right Riemann sums on $n$ ordered uniforms satisfy
+\[
+\EE \big( \hat Z - Z \big)^2 \le \big( \Lambda(0) - \Lambda(1) \big)^2 \, \EE \Big( \max_i D_i \Big)^2 = O\Big( \frac{\log^2 n}{n^2} \Big) .
+\]
+\end{theorem}
+
+For a staircase with $K$ steps the bound can be sharpened by noting that $\hat Z_L - \hat Z_R$ is a sum over the $K$ spacings that contain a jump, each of expected size at most $2/(n+1)$ (a spacing containing a fixed point is size biased), giving $\EE(\hat Z_L - \hat Z_R) \le 2 K \Lambda(0) / (n+1)$ and mean squared error $O(K^2 / n^2)$. The number of steps enters quadratically in this bound, which is an artefact of the proof (Chapter~\ref{ch:staircase} removes it); for the queens $K = O(N^2)$ in the worst case, and the exact density of states for $N = 8$ to $11$ has more than $2N$ nonempty levels.
+
+\section{The trapezoidal rule and the $n^{-4}$ rate}
+
+For smooth $\Lambda$ the trapezoidal rule
+\[
+\hat Z_T = \sum_{i=1}^{n+1} \frac{\Lambda(U_{(i-1)}) + \Lambda(U_{(i)})}{2} \, D_i
+\]
+does better. On a cell $[U_{(i-1)}, U_{(i)}]$ of width $D_i$ the trapezoidal error for a twice differentiable integrand is $-\tfrac{1}{12} \Lambda''(\xi_i) D_i^3$ for some $\xi_i$ in the cell. Summing,
+\[
+Z - \hat Z_T = -\frac{1}{12} \sum_{i=1}^{n+1} \Lambda''(\xi_i) D_i^3 ,
+\]
+and with $\|\Lambda''\|_\infty = C$,
+\[
+\EE | \hat Z_T - Z | \le \frac{C}{12} \sum_i \EE D_i^3 = \frac{C}{12} \cdot \frac{6 (n+1)}{(n+1)(n+2)(n+3)} = O(n^{-2}) ,
+\]
+and squaring $\sum_i D_i^3$ (Chapter~\ref{ch:yakowitz}) gives mean squared error $O(n^{-4})$. This is the theorem of Yakowitz\index{Yakowitz, Krimmel and Szidarovszky}, Krimmel and Szidarovszky, and it is the rate of the deterministic trapezoidal rule on a regular grid of $n$ points, which is $O(n^{-2})$ in error. The random grid costs only a constant: the third moment of a spacing is $6/n^3$ against $1/n^3$ for the regular grid. The randomness in the nodes is harmless because the error is a sum of many small independent like terms, and the law of large numbers applies to it.
+
+Masry and Cambanis \cite{MasryCambanis} extended the analysis to integrands with less smoothness and to nodes that are not independent uniforms; we do not reproduce their rates here, and the bounds for Lipschitz and bounded variation integrands used in this book are those proved in Chapter~\ref{ch:yakowitz}.
+
+\section{Why the original coordinate cannot do this}
+
+In the original coordinate the estimator is $\hat Z = n^{-1} \sum_i L(X_i)$ with $X_i \sim P$, and its variance is $\Var(L(X)) / n$, which is $O(n^{-1})$ and cannot be improved without changing the estimator. The reason is that the $X_i$ are unordered: there is no notion of a cell between consecutive draws on a space of dimension $N$, and no trapezoid to form. Ordering by the likelihood value, which is what the quantile coordinate does, restores the one dimensional structure, and the vertical estimator is the trapezoidal rule on the ordered likelihoods. One pays for the ordering with a sort, $O(n \log n)$, which is negligible.
+
+The catch is that the ordered likelihoods $\Lambda(U_{(i)})$ are not available: one has the likelihoods $L(X_i)$, whose order statistics are distributed as $\Lambda(U_{(i)})$, but one does not know the $U_{(i)}$ themselves. The trapezoidal rule needs the spacings $D_i$. Nested sampling supplies them by the trick of the geometric grid: with $n$ live points the prior mass above the current level shrinks by a factor whose logarithm has mean $-1/n$ at each step, so that $s_k \approx e^{-k/n}$ and $D_k \approx e^{-k/n} / n$. The spacings are replaced by their expectations and the trapezoidal rule becomes deterministic in the grid. The error of this replacement is analysed by Skilling\index{Skilling, John} \cite{Skilling} and by Chopin and Robert\index{Chopin and Robert} \cite{ChopinRobert}: the log prior mass after $k$ steps is a sum of $k$ independent Exp$(n)$ variables, with mean $k/n$ and standard deviation $\sqrt{k}/n$, so the relative error in $s_k$ is $O(\sqrt{k}/n)$, and since the walk needs $k = O(n \log(1/Z))$ steps the relative error in $\hat Z$ is $O(\sqrt{\log(1/Z) / n})$. This is the rate of nested sampling, $O(n^{-1/2})$ in the number of live points, and it comes entirely from not knowing the spacings. The $O(n^{-4})$ rate is what one would get if the spacings were known.
+
+\section{Rates for the staircase}
+
+Put the two analyses together for a staircase with $K$ steps, as in counting. The error has three sources. The quadrature error from the random grid is $O(K / n)$ in absolute terms, from the theorem above. The error from not knowing the spacings, in nested sampling\index{nested sampling}, is $O(\sqrt{\log(1/Z) / n})$ relative, as computed above. And the error from the conditioned draws not being exactly stationary is the total variation distance of the sampler times the number of steps. The first two are polynomial in $K$ and $\log(1/Z)$ and inverse polynomial in $n$; the third is where the complexity lives. There is no analytic rate in the quantile coordinate that can be spoiled by anything except the sampler, which is the quantitative form of the thesis.
+
+\section{A remark on quasi Monte Carlo}
+
+The reader familiar with quasi Monte Carlo will have recognised the pattern. In one dimension a low discrepancy sequence integrates a function of bounded variation with error $O(\log n / n)$, by the Koksma inequality, and the ordered uniforms are, with high probability, a sequence of discrepancy $O(\sqrt{\log \log n / n})$ by the law of the iterated logarithm, which is worse. The vertical estimator beats Koksma by using the monotonicity of $\Lambda$, which bounds the variation by $\Lambda(0)$ and lets the Riemann sum bracket the integral pathwise. In dimension $N$ quasi Monte Carlo loses to Monte Carlo through the curse of dimensionality, with discrepancy bounds of order $\log^N n / n$. The quantile reordering removes the dimension before quasi Monte Carlo is applied, and the one dimensional rates then hold for the quadrature, provided the quantile positions are known. It is in this sense that the vertical approach is a quasi Monte Carlo method for problems in which quasi Monte Carlo would otherwise be useless.

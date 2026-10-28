@@ -1,0 +1,95 @@
+\chapter{Rubinstein's Cross Entropy Method for Counting}
+\label{ch:ce}
+
+Reuven Rubinstein\index{Rubinstein, Reuven} spent the last fifteen years of his life on exactly the problem of this book: counting the solutions of $\sharpP$ complete problems by Monte Carlo. His 2006 paper \cite{Rubinstein2006}, How many needles are in a haystack, or how to solve $\sharpP$ complete counting problems fast, proposed the cross entropy\index{cross entropy method} method for the purpose; his 2009 paper on the Gibbs cloner \cite{Rubinstein2009} replaced the likelihood ratios of the cross entropy method by a population of clones moving between nested level sets; his 2013 paper on stochastic enumeration \cite{Rubinstein2013} revived Knuth's estimator of the size of a backtracking tree; and the 2013 book with Ridder and Vaisman, Fast Sequential Monte Carlo Methods for Counting and Optimization \cite{RRV}, collected the programme. The queens appear in his work from the start, embedded in the rooks problem, and the 2016 edition of Simulation and the Monte Carlo Method with Kroese \cite{RubinsteinKroese} treats them by a Gibbs sampler on the threat count. This chapter sets Rubinstein's methods beside the vertical walk, proves what can be proved about the cross entropy method on the queens, and answers the question whether any of it bears on $\Pc = \RP$.
+
+\section{Counting as a rare event}
+
+Rubinstein's starting point is the identity that opened Chapter~\ref{ch:rareevent}: if $\cX^*$ is the set of solutions inside a space $\cX$ of known size, then
+\[
+|\cX^*| = |\cX| \cdot \PP_f( X \in \cX^* ), \qquad f = \text{uniform on } \cX ,
+\]
+and counting is estimating a rare event probability. The crude estimator draws from $f$ and counts hits, with relative variance $|\cX| / |\cX^*| - 1$, which for the queens on $[N]^N$ is
+\[
+N^N / Q(N) - 1 \approx e^{\alpha N}, \qquad \alpha \approx 1.94 ,
+\]
+and on permutations $N! / Q(N) - 1 \approx e^{(\alpha - 1) N}$. Importance sampling\index{importance sampling} replaces $f$ by a proposal $g$ and the hit indicator by $\Ind_{\{X \in \cX^*\}} f(X) / g(X)$. The zero variance proposal is $g^* = $ uniform on $\cX^*$, which is the thing being counted, and every importance sampling method for counting is a way of approximating $g^*$ from a family one can sample.
+
+\section{The cross entropy method}
+
+The cross entropy method \cite{RubinsteinKroeseCE} approximates $g^*$ within a parametric family $\{ g_v \}$ by minimising the Kullback Leibler divergence $D(g^* \,\|\, g_v)$, and because $g^*$ cannot be sampled it does so adaptively through a sequence of level sets. With a performance $S$ whose zero set is $\cX^*$, the algorithm is: draw $M$ samples from $g_{v_t}$; set $\gamma_t$ to the $\kappa$ quantile of their performances, so that a fraction $\kappa$ of the sample, the elite, has $S \le \gamma_t$; set $v_{t+1}$ to the maximiser of the elite log likelihood $\sum_{\text{elite}} \log g_v(X)$, which is the sample version of $\arg\min_v D( g_{v_t}(\cdot \mid S \le \gamma_t) \,\|\, g_v )$; and stop when $\gamma_t = 0$. The final $g_{v}$ is used as the importance proposal. For an exponential family the update matches sufficient statistics on the elite; for the product family on $[N]^N$,
+\[
+g_v(x) = \prod_{i=1}^N v_{i, x_i}, \qquad v_{i, c} \ge 0, \quad \sum_c v_{i,c} = 1 ,
+\]
+which Rubinstein uses for assignment type problems, the update is the elite frequency $v_{i,c} = $ fraction of elite samples with the queen of row $i$ in column $c$, smoothed with the previous $v$ to avoid premature zeros. The levels $\gamma_t$ are the integer ladder of the vertical walk chosen by elite quantiles, which is the adaptive quantile ladder of Chapter~\ref{ch:experiments} with the elite fraction $\kappa$ in place of our $0.3$. The two methods differ in what they do at each rung: the vertical walk runs a Markov chain on $\{ S \le \gamma_t \}$ and estimates the ratio to the next level; the cross entropy method projects $\{ S \le \gamma_t \}$ onto the family and samples the projection. The chain has a mixing time to pay; the projection has a divergence.
+
+\section{What the product family cannot do}
+
+The divergence can be computed, and for the queens it is fatal. Write $\pi^*$ for the uniform distribution on the solutions, $H(\pi^*) = \log Q(N)$ for its entropy, and $H_i$ for the entropy of its $i$th marginal, the distribution of the column of the queen in row $i$ under a uniform random solution. Let $d_i = \log N - H_i \ge 0$ be the entropy deficit of that marginal and $d = \sum_i d_i$.
+
+\begin{theorem}[Product proposals for the queens]
+\label{thm:product}
+For any proposal $g$ on $[N]^N$ of product form, the importance sampling estimator of $Q(N)$ has relative variance at least
+\[
+\exp\big( N \log N - d - \log Q(N) \big) - 1 ,
+\]
+with equality in the exponent at the product of the marginals of $\pi^*$. The crude estimator from the uniform distribution on $[N]^N$ has relative variance $\exp( N \log N - \log Q(N) ) - 1$, so no product proposal reduces the relative second moment (one plus the relative variance) of crude Monte Carlo by more than the factor $e^{d}$.
+\end{theorem}
+
+\begin{proof}
+The estimator is $\Ind_{\{X \in \cX^*\}} / g(X)$ with $X \sim g$, its mean is $Q(N)$, and its second moment is
+\[
+\sum_{x \in \cX^*} \frac{1}{g(x)} = Q(N)^2 \, \EE_{\pi^*}\Big[ \frac{\pi^*(X)}{g(X)} \Big] ,
+\]
+so the relative second moment is $\EE_{\pi^*}[\pi^* / g] \ge \exp \EE_{\pi^*} \log(\pi^* / g) = \exp D(\pi^* \| g)$ by Jensen. For $g = \prod_i g_i$ a product,
+\begin{align*}
+D(\pi^* \| g) &= -H(\pi^*) - \sum_i \EE_{\pi^*} \log g_i(X_i) \\
+&= -H(\pi^*) + \sum_i \big( H_i + D(\pi^*_i \| g_i) \big) \ge \sum_i H_i - H(\pi^*),
+\end{align*}
+with equality when each $g_i$ is the marginal $\pi^*_i$. Since $\sum_i H_i = N \log N - d$ the bound follows. The crude estimator is the case $g_i$ uniform, $D = N \log N - \log Q(N)$.
+\end{proof}
+
+The marginals of $\pi^*$ are the finite $N$ precursors of Simkin's queenon\index{queenon}, and we computed them exactly from all solutions for $N \le 12$. They are far from flat, as Chapter~\ref{ch:open} showed, having density $1.42$ times uniform at the edges of the middle row and $0.49$ at the corners (at $N = 13$), but their entropy deficit is tiny: $d = 0.68, 0.22, 0.21, 0.26, 0.26$ nats for $N = 8$ to $12$, at these sizes. The best product proposal therefore improves on crude Monte Carlo by a factor of at most $e^{d}$, which is $e^{0.26} \approx 1.3$ at $N = 11, 12$, and Table~\ref{tab:ce} gives the bound against the crude relative variance. By Simkin's theorem $\log Q(N) = N \log N - \alpha N + o(N)$, so the bound grows like $e^{\alpha N - d}$, that is like $e^{(1.94 - d/N) N}$. We computed $d$ only for $N \le 12$ and do not assume it bounded: it is a sum of row deficits and may grow linearly in $N$, so the bound is exponential as long as $d / N$ stays below $\alpha$, which we expect; the method is exponential on the queens whatever the cross entropy iteration does, because the family it projects onto cannot represent the correlations that the column and diagonal constraints impose. The point is not specific to the queens. For any counting problem whose solutions have nearly uniform one dimensional marginals and exponentially small density, the product family buys nothing, and Rubinstein's own analysis with Glynn \cite{RubinsteinGlynn} of the curse of dimensionality of likelihood ratios is the same observation from the side of the weights.
+
+\begin{table}[t]
+\centering
+\small
+\caption{The cross entropy method on the queens with the product family. The entropy deficit $d$ of the solution marginals, the lower bound $e^{N \log N - d - \log Q(N)} - 1$ on the relative variance of any product proposal, and the crude relative variance $N^N / Q(N) - 1$, all exact. The last three columns are one run of the method with $M = 20000$ samples per iteration, elite fraction $0.1$ and smoothing $0.5$: the iterations until the level reached zero (or $61$, the cap, if it did not), the distinct solutions found by $2 \times 10^5$ draws from the final proposal, and the ratio of the final estimate to $Q(N)$.}
+\label{tab:ce}
+\footnotesize
+\begin{tabular}{rrrrrrr}
+\toprule
+$N$ & $d$ & product bound & crude & iterations & distinct & ratio \\
+\midrule
+8 & 0.68 & $9.3 \times 10^4$ & $1.8 \times 10^5$ & 30 & 3 & 0.035 \\
+9 & 0.22 & $8.8 \times 10^5$ & $1.1 \times 10^6$ & 61 & 0 & 0 \\
+10 & 0.21 & $1.1 \times 10^7$ & $1.4 \times 10^7$ & 61 & 0 & 0 \\
+11 & 0.26 & $8.2 \times 10^7$ & $1.1 \times 10^8$ & 61 & 0 & 0 \\
+12 & 0.26 & $4.8 \times 10^8$ & $6.3 \times 10^8$ & 61 & 0 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The run in the table shows the method's characteristic failure, which is worse than the bound. The product family can represent one configuration exactly, by setting each $v_{i,c}$ to $0$ or $1$, and the elite update pulls it there: the level $\gamma_t$ descends slowly and stalls, and the proposal collapses onto a handful of placements with few attacks, from which the elite of the next iteration is drawn. In the run of the table (the level history is stored in \texttt{code/ce.json} under \texttt{level\_history}) the level at $N = 9$ fell to $2$ by iteration 36 and stayed there, and at $N = 10, 11, 12$ it stayed within one of its starting value for about thirty iterations and first reached $1$ at about iterations 44, 42 and 50, so that at none of these sizes did it reach zero. At $N = 8$ the level fell from $5$ to zero over the thirty iterations, but the final proposal found three of the ninety two solutions and estimated the count at $3.2$, with an effective sample size of $17$ from two hundred thousand draws. The estimator is unbiased in principle and useless in practice, which is what a relative variance of order $10^5$ (the product bound at $N = 8$ is $9.3 \times 10^4$) means.
+
+\section{Richer families and the GBC question}
+
+The theorem is about product families. A sequential family $g(x) = \prod_i g_i(x_i \mid x_1, \dots, x_{i-1})$ with unrestricted conditionals contains $\pi^*$ itself, so the divergence can be zero; but the conditionals have exponentially many parameters and learning them is counting. Between the two extremes are families of polynomial size: Markov conditionals of order $k$, which Rubinstein uses for travelling salesman tours, or a neural network conditional, or the quantile generators of Chapter~\ref{ch:gbc}. For a family $\mathcal{G}$ of polynomial size the cross entropy method is polynomial if and only if two things hold: the family contains a $g$ with $\EE_{\pi^*}[\pi^*/g]$ polynomial in $N$, which is the relative second moment of the estimator and forces $D(\pi^* \| g) = O(\log N)$, and the iteration finds it. The first is a representation question, and it is exactly the question the amortised ladder theorem of Chapter~\ref{ch:gbc} asks of the level set generator: is there a polynomial size generator whose output is within small divergence of the uniform distribution on the level set? The second is an optimisation question, and the cross entropy iteration has no guarantee of answering it. For fixed $k$ the family of order $k$ conditionals with full tables is a decomposable log linear model, an exponential family with about $N^{k+2}$ parameters, the projection of $\pi^*$ onto it is the set of order $k$ conditionals of $\pi^*$, and the elite update is the closed form maximiser given by the elite conditional frequencies. What nothing guarantees is that the elite, drawn from the previous proposal, remain representative of the level set. The collapse seen in the table is this feedback and not a local minimum: for the product family each update has a unique maximiser.
+
+The cross entropy method is thus the vertical walk with the Markov chain replaced by a learned sampler, which is the GBC implementation of Chapter~\ref{ch:gbc}, with the one difference that it learns the sampler from its own previous output instead of from a chain. The difference is not in its favour. A chain on $\{ S \le m \}$ is exact if it mixes, and the only question is time; a learned sampler is approximate even in the limit, and the question is whether the approximation error stays polynomially small down the ladder. Everything the book proves about the walk applies, and nothing additional is proved.
+
+\section{Cloning, splitting and the vertical walk}
+
+Rubinstein's Gibbs cloner, and the generalised splitting of Botev and Kroese \cite{BotevKroese} that systematised it, drop the parametric family. A population of $M$ particles is propagated through the nested level sets $\{ S \le \gamma_1 \} \supset \{ S \le \gamma_2 \} \supset \cdots$; at each level the particles that satisfy the new constraint are cloned to restore the population, and each clone is moved by a few sweeps of a Gibbs sampler that resamples one coordinate at a time conditional on the others and on $S \le \gamma_t$; the count is the product of the surviving fractions times $|\cX|$. This is the Feynman Kac\index{Feynman Kac} estimator of Chapter~\ref{ch:smc} with the Gibbs kernel as the mutation and the level sets as the potentials, and it is the vertical walk with the swap chain replaced by a single site chain and the sequential rungs replaced by a population. Its unbiasedness, for fixed levels, is Del Moral's theorem; its variance is the product estimator bound plus the resampling noise; and its running time is polynomial if the Gibbs kernel on $\{ S \le \gamma_t \}$ mixes in polynomial time at every level, since a kernel that does not mix leaves the clones correlated and the surviving fractions of exponential variance. For the queens the single site Gibbs move changes the column of one queen, which leaves the permutation structure unless the rooks embedding is used, and on permutations the natural single site move is the swap; either way the chain on the bottom level sets is the one whose expansion is Conjecture~\ref{conj:expansion} of Chapter~\ref{ch:mixingproof}, and the shattering results of Chapter~\ref{ch:open} apply unchanged. We have not run a cloner, but the shattering results of Chapter~\ref{ch:open} suggest that on a randomly conditioned board at $N = 12$ its clones would be trapped in the components of $\{ S \le 1 \}$, and that the fraction it reports at the bottom level would be the fraction of its clones that happened to be in the right component. Rubinstein's cloner is the vertical walk under another name, with the same conjecture at the bottom.
+
+\section{Stochastic enumeration and Knuth's estimator}
+
+The third of Rubinstein's methods is older than all of them. Knuth\index{Knuth's estimator} in 1975 \cite{Knuth1975} proposed estimating the size of a backtracking tree by a single random root to leaf path: at a node with $k$ children choose one uniformly and multiply a running product by $k$; the product at the leaf is an unbiased estimate of the number of leaves. For the queens the tree is the self reducibility\index{self reducibility} tree of Chapter~\ref{ch:completion}, the children of a node being the columns in which the next queen can be placed without attack, and the estimator is a product of branching factors along a random path. It is unbiased, polynomial time per sample, and its relative variance is exponential whenever the tree is unbalanced, since a path that enters a large subtree and one that enters a small one carry the same weight. Rubinstein's stochastic enumeration runs $B$ paths in parallel and shares children among them, which reduces the variance by an amount Vaisman and Kroese \cite{VaismanKroese} later quantified.
+
+In the language of this book Knuth's estimator is a vertical walk down the self reducibility ladder with no Markov chain at all: each rung is the ratio of the number of partial placements with $i + 1$ queens to the number with $i$, estimated from one sample rather than from a mixed chain, and the product of $N$ such ratios is the count. Its variance is controlled not by mixing but by the balance of the tree, and the tree of a hard board is unbalanced by construction, since most branches die and the surviving ones are the hard to find completions. An estimator with polynomial relative variance on every board would be an FPRAS and would give $\NP = \RP$; Knuth's estimator has unbiasedness for free and pays for it entirely in variance, and no modification of it that keeps polynomial cost per path is known to control the variance on hard trees.
+
+\section{Does it help with P = RP}
+
+No, and the reasons are instructive. The three methods are three positions on one spectrum. The cross entropy method with a product family has no mixing problem and an exponential divergence, and Theorem~\ref{thm:product} makes this a theorem for the queens: it cannot beat crude Monte Carlo by more than $e^{d}$, which is at most $e^{0.68}$ for $8 \le N \le 12$. The cloner has no divergence and the mixing problem, and is the vertical walk. Knuth's estimator has neither a divergence nor a mixing problem and an exponential variance from tree imbalance, which is the same obstruction wearing a third costume: the uniform distribution on solutions is not the push forward of anything simple, whether a product measure, a short chain or a random path. The vertical walk, the cloner, the cross entropy method with a rich family, and the GBC generator all reduce the counting problem to producing samples close to uniform on level sets, and the main equivalence of Chapter~\ref{ch:theorems} says that any of them succeeding on every board implies $\NP = \RP$. Rubinstein's work does not escape the equivalence, and he did not claim it did: his claims were about instances, and on instances the cloner is a good algorithm.
+
+What his work adds is a way of stating the question that the walk does not make explicit. The cross entropy method asks for the divergence between the solution law and the nearest member of a family of polynomial size, and the answer, for the product family, is a number we can compute: $N \log N - d - \log Q(N)$, the information that the column and diagonal constraints carry beyond the marginals. That number, generalised to richer families, is the quantity on which the GBC programme turns, and it suggests a measurement we have not made: the divergence from $\pi^*$ of the best order $k$ Markov sequential family, as a function of $k$ and $N$, computed exactly for $N \le 12$. If it falls to $O(\log N)$ (necessary, though not sufficient, for polynomial relative variance) at $k = O(\log N)$ on unconditioned boards and stays linear in $N$ on conditioned ones, that would be the cross entropy form of the shattering depth, and it is the natural next experiment in Rubinstein's direction.

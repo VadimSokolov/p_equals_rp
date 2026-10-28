@@ -1,0 +1,56 @@
+\chapter{A Cluster Chain for the Queens}
+\label{ch:swendsen}
+
+The swap chain of Chapters~\ref{ch:mixing} and~\ref{ch:experiments} changes two queens at a time and cannot leave a component of a level set that is disconnected under swaps. Cluster chains in the style of Swendsen\index{Swendsen Wang algorithm} and Wang change many variables at once and are a standard tool against the slow mixing that local chains suffer at some phase transitions. This chapter designs such a chain for the queens, proves it is valid, and says what would have to be true for it to mix rapidly.
+
+\section{The queens as a Potts like model}
+
+A permutation $x$ is a perfect matching between rows and columns. The energy $S(x)$ is a sum over pairs of rows,
+\[
+S(x) = \sum_{i < j} \Ind\{ |x_i - x_j| = j - i \} = \sum_{i < j} J_{ij}(x_i, x_j) ,
+\]
+a pairwise interaction between the row variables. The Boltzmann\index{Boltzmann distribution} weight $e^{-S/\gamma}$ factors over pairs as $\prod_{i<j} e^{-J_{ij}(x_i, x_j)/\gamma}$, and the hard level set constraint $S \le m$ does not factor but is the limit of a soft one. The structure is that of a Potts model on the complete graph of rows with $N$ colours, the columns, under the constraint that all colours are distinct, which is a hard core exclusion on top of the Potts interaction. The exclusion is what makes the queens a permutation problem and not a spin system.
+
+\section{The Edwards Sokal augmentation}
+
+Write the pairwise weight as $e^{-J_{ij}/\gamma} = (1 - p) + p \, \Ind\{ J_{ij} = 0 \}$ with $p = 1 - e^{-1/\gamma}$, which is valid since $J_{ij} \in \{0, 1\}$. Introduce a bond variable $d_{ij} \in \{0, 1\}$ for each pair with joint weight
+\[
+w(x, d) = \prod_{i < j} \Big( (1 - p) \, \Ind\{ d_{ij} = 0 \} + p \, \Ind\{ d_{ij} = 1 \} \, \Ind\{ J_{ij}(x_i, x_j) = 0 \} \Big) .
+\]
+Summing over $d$ recovers the Boltzmann weight of $x$, and the conditional law of $d$ given $x$ is: $d_{ij} = 1$ with probability $p$ if rows $i$ and $j$ do not attack, and $d_{ij} = 0$ otherwise. An open bond $d_{ij} = 1$ records a commitment that rows $i$ and $j$ will not attack after the update.
+
+The conditional law of $x$ given $d$ is uniform over permutations such that every open bond is respected, that is, $|x_i - x_j| \ne j - i$ for all $(i, j)$ with $d_{ij} = 1$, with the unbonded pairs free. This is the Swendsen Wang update, and it is where the queens differ from the Potts model. In the Potts model the constraint of an open bond is that the two spins agree, so the constraint graph decomposes into connected components each of which can be recoloured freely with a single colour, and the update is trivial. For the queens the constraint of an open bond is that the two columns differ by something other than the row distance, which does not reduce to a single colour per component, and sampling a uniform permutation subject to a set of such constraints is itself a hard problem in general.
+
+\section{A tractable cluster move}
+
+The way around this is to restrict which bonds are opened so that the conditional update becomes tractable. Let $R \subseteq \{1, \dots, N\}$ be a random subset of rows, chosen by including each row independently with probability $q$, and open bonds only within $R$ and between $R$ and its complement, with the rows outside $R$ frozen. The update then resamples the columns of the rows in $R$, which is a permutation of the columns they currently occupy, subject to the constraint that the resampled rows do not attack each other along any opened bond and do not attack any frozen row along an opened bond.
+
+For $|R| = 2$ this is the heat bath version of the swap chain. For $|R| = k$ it is a uniform sample from the $k!$ permutations of $k$ columns among $k$ rows subject to diagonal constraints, which for $k$ up to about $8$ can be done by enumeration, and for larger $k$ by a nested swap chain. The resulting algorithm is a block Gibbs sampler that updates a random block of rows at once, and it is valid for the Boltzmann distribution at any temperature by the standard argument, since each step is a Gibbs update of a conditional distribution. For the hard level set $\{ S \le m \}$ we do not take a limit of the Edwards Sokal model, since as $\gamma \to 0$ the Boltzmann law concentrates on minimum energy configurations rather than on the uniform law on the level set. We define the chain directly: choose a random block, and resample it uniformly among block permutations that keep the total energy at most $m$. This is a block Gibbs sampler for the uniform law on $\{ S \le m \}$, which is what the Proposition below needs.
+
+\section{Validity}
+
+\begin{proposition}
+\label{prop:blockvalid}
+The block chain with binomially distributed block size and exact resampling of each block conditional on the level set is reversible with respect to the uniform distribution on the level set, and is irreducible on it whenever the level set is connected under moves that permute any $k$ rows at once for $k$ up to the maximal block size attained.
+\end{proposition}
+
+\begin{proof}
+Each step is a Gibbs update of the conditional distribution of the block given the rest, which is reversible with respect to the target. The chain is a mixture over blocks of reversible kernels and is reversible. Irreducibility is by definition of connectivity under the allowed moves.
+\end{proof}
+
+The chain is therefore valid, and the question is its mixing time\index{mixing time}. With $q = 2/N$ it is essentially the swap chain. With $q = 1$ it resamples the whole board exactly, which is the problem itself. The interesting regime is $q$ a constant such as $1/4$, where each step moves a quarter of the queens and the block resampling is done by a nested chain, which the Proposition covers only if it is reversible for the block conditional.
+
+\section{What rapid mixing would require}
+
+For the block chain to mix rapidly on $\{ S \le 1 \}$ at constant block fraction $q$, two things are needed. The level set must be connected under block moves, which is weaker than connectivity under swaps and is plausible: any two solutions differ in some set of rows, and if that set is at most $qN$ a single block move connects them. And the conductance\index{conductance} must be inverse polynomial, which means that from any subset of the level set of mass at most a half, a block move escapes with probability at least $1/\mathrm{poly}(N)$. The second is the hard part. If the level set has exponentially many components under swaps, each polynomial in size, then escape from a component requires that the exact block conditional given the frozen rows put appreciable mass outside the current component. We expect, without proof, that for a typical block the frozen rows leave few completions of energy at most $1$, so that the conditional is concentrated on the current configuration and a few neighbours, and then the conductance is exponentially small.
+
+This is the same obstruction as before at a coarser scale. The cluster chain enlarges the neighbourhood of a configuration from $\binom{N}{2}$ swaps to $\binom{N}{qN} (qN)!$ block permutations, but if the solutions are spread uniformly over an exponentially larger space the enlargement does not help: the fraction of the neighbourhood that consists of solutions is still exponentially small (a heuristic about proposals; for the exact block update the relevant statement is the one above about the block conditional). Cluster chains defeat phase transitions in the Potts model because the clusters are correlated with the structure of the low energy states, the magnetised domains, and a cluster move flips a domain. For the queens there is no analogue of a domain that we can see, and the block moves are not correlated with anything.
+
+\section{A conjecture and an experiment}
+
+\begin{conjecture}
+\label{conj:blockmix}
+For the block chain on $\{ S \le 1 \}$ for the unconditioned $N$ queens problem, the mixing time is polynomial in $N$ for every constant $q \in (0, 1)$. For the block chain on $\{ S \le 1 \}$ for the completion problem with partial placements drawn from the Gent Jefferson Nightingale~\cite{GJN} reduction applied to hard satisfiability instances, the mixing time is superpolynomial for every $q$ bounded away from one.
+\end{conjecture}
+
+The first half says that the unconditioned problem, which is in $\Pc$ as a decision problem and which the experiments of Chapter~\ref{ch:experiments2} suggest is well behaved, has well connected level sets. The second half says that the conditioning, which is where the $\NP$ hardness enters, shatters them. The experiment that tests both is to run the block chain on unconditioned and on reduction boards for $N$ up to $40$, measure autocorrelation times and genealogical coalescence, and compare. We have run it only for the swap chain and only on unconditioned boards, and we report the results in the next chapter. The conditioned case is the one that matters, and it is open.

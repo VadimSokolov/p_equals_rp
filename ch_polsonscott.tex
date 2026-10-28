@@ -1,0 +1,102 @@
+\chapter{The Algorithms of Vertical Likelihood Monte Carlo}
+\label{ch:polsonscott}
+
+Chapter~\ref{ch:vertical} used the Lorenz identity and the idea of a weight on the quantile axis. This chapter goes back to the source, the paper of Polson and Scott, and sets out the algorithms it contains one by one: the weighted slice sampler, the harmonic mean and power posterior special cases, the connection to energy level samplers, the default weight and its implementation, the equivalence with nested sampling, and the mixing result for the chain of likelihood ordinates. It then answers the question that the program turns on: can vertical likelihood Monte Carlo be made polynomial time? The answer is that the part of the algorithm that lives on the quantile axis already is under stated exactness hypotheses, by a result sketched below from the paper's mixing lemma (we do not give a complete proof), and that the whole algorithm is conjectured to be polynomial exactly when the level set draws are, granting those hypotheses.
+
+\section{The weighted joint}
+
+Let $L$ be the likelihood, $p$ the prior on $\cX$, and $Z(y) = P\{ L(X) > y \}$ the survival function of the likelihood. Polson and Scott begin from the slice sampling joint of Damien, Wakefield and Walker, $p(x, u) \propto p(x) \, \Ind\{ 0 < u < L(x) \}$, whose $x$ marginal is the posterior, and generalise it by a weight on the slice variable:
+\[
+\begin{gathered}
+\pi_w(x, u) = \frac{ w(u) \, \Ind\{ 0 < u < L(x) \} \, p(x) }{ Z_w } , \qquad W(u) = \int_0^u w(s) \, ds , \\
+Z_w = \int W(L(x)) \, p(x) \, dx = \int_0^\infty w(u) Z(u) \, du .
+\end{gathered}
+\]
+The two marginals are
+\[
+\pi_w(x) = \frac{ p(x) \, W(L(x)) }{ Z_w } , \qquad \pi_w(u) = \frac{ w(u) \, Z(u) }{ Z_w } ,
+\]
+and the vertical importance sampling estimator of $Z$ draws $x^{(i)} \sim \pi_w(x)$ and uses normalised weights proportional to $1 / W(L(x^{(i)}))$. The choice of a proposal density on $\cX$, which is the whole difficulty of importance sampling in high dimension, has been replaced by the choice of a weight $w$ on the half line, which is the vertical axis of the likelihood.
+
+The joint is sampled by a two step Gibbs scheme, the weighted slice sampler: draw $u \mid x$ from $w(u) \, \Ind\{ 0 \le u \le L(x) \}$, which is one dimensional, and draw $x \mid u$ from $p(x) \, \Ind\{ L(x) \ge u \}$, which is the prior restricted to a likelihood level set, and is the conditioned draw of every other chapter in this book, here an oracle assumption: producing it in polynomial time is as hard as the sampling half of the program.
+
+\section{Special cases}
+
+Uniform weight, $w \equiv 1$. Then $W(u) = u$, $\pi_w(x) \propto p(x) L(x)$ is the posterior, and the importance weights are $1 / L(x^{(i)})$: this is the harmonic mean estimator of Newton and Raftery, obtained as the uniform weight case, and the paper notes that its variance is typically infinite and that it does not respond to the prior, so that a decreasing $w$ is needed.
+
+Power weight, $w(u) = a u^{a-1}$ for $a \in (0, 1)$. Then $W(u) = u^a$ and $\pi_w(x) \propto p(x) L(x)^a$ is the power posterior at temperature $1/a$, the object of Friel and Pettitt's power posterior method and of annealed importance sampling; a schedule of $a$ values is a schedule of weights.
+
+Mixtures with a point mass at zero, $w(u) = c \, \delta_0(u) + (1 - c) w^*(u)$. The $x$ marginal is a mixture of the prior and a powered or annealed posterior, which is the setting of bridge sampling and path sampling.
+
+Energy level samplers. With the Boltzmann likelihood $L = e^{-h}$ and the slice variable read as an energy, the joint $p(x, u) \propto w(u) \, \Ind\{ u \ge h(x) \}$ implies the energy distribution $P(h(X) = s) \propto N(s) G(s)$ with the tail weight $G(s) = \int_{u \ge s} w(u) \, du$, and the choices $G = e^{-s}$ (canonical ensemble), $G = 1/\mathcal{Z}(s)$ (the $1/k$ ensemble, the nested sampling weight) and $G = 1/N(s)$ (multicanonical, which is attainable only up to the mode of $N$) are discussed in the energy domain samplers of Chapter~\ref{ch:vertical}.
+
+\section{The score heuristic and the default weight}
+
+Which $w$? The paper's answer is a score function heuristic. The integrand $Z(y)$ in $Z = \int_0^\infty Z(y) \, dy$ changes fastest where $-Z'(y) / Z(y)$ is large, and a proposal should place likelihood ordinates there. The paper's Theorem 2 computes the density of the ordinate $Y = L(X)$ under $\pi_w$:
+\[
+f(y) = -\frac{ W(y) \, Z'(y) }{ Z_w } ,
+\]
+so that the ordinates follow the score if $W(y) \propto 1 / Z(y)$. The recommended default is therefore
+\[
+W(u) = \frac{1}{ \max\{ \eta, \, Z(u) \} } , \qquad \eta \in (0, 1] ,
+\]
+with the truncation at $\eta$ keeping the importance function proper and $\eta$ chosen so that $Z^{-1}(\eta)$ is near the likelihood maximum; $\eta = 1$ recovers the prior. The paper calls the truncated version the table mountain hat.
+
+The implementation uses the one dimensional structure of the $u$ step. With $W = 1 / \max\{\eta, Z\}$, the draw of $u \mid x$ is: draw $T$ uniform on $(0, 1 / \max\{ \eta, Z(L(x)) \})$; if $T \le 1$ set $u = 0$, otherwise set $u = Z^{-1}(1/T)$, by bisection if $Z$ is not invertible in closed form. This is the paper's Lemma 3, and it means that the vertical axis is handled exactly given $Z(\cdot)$, with the only Monte Carlo on $\cX$ being the restricted draw. The chain also produces, as a byproduct, an estimate of the whole curve $Z(u)$, which in the counting setting is the density of states.
+
+\section{The equivalence with nested sampling}
+
+Polson and Scott show that nested sampling is a particular weight. Nested sampling with $K$ live points produces ordinates $y_i$ with $Z(y_i) \approx e^{-i/K}$ and estimates $Z$ by the Riemann sum $\sum_i \Lambda(e^{-i/K}) ( e^{-(i-1)/K} - e^{-i/K} )$. Choose $\gamma$ with $\log Z(\gamma) \approx -n/K < 0$ and set
+\[
+W(u) = -\frac{1}{ Z(u) \, \log Z(\gamma) } , \qquad u \in [0, \gamma] .
+\]
+Then the ordinate density is $f(y) = Z'(y) / \{ Z(y) \log Z(\gamma) \}$ with distribution function $F(y) = \log Z(y) / \log Z(\gamma)$, which says that $\log Z(Y)$ is uniform on $[\log Z(\gamma), 0]$; sorting $n$ draws gives $Z(y_{(i)}) \approx e^{-i/K}$, the nested sampling ordinates, with the same weights. Nested sampling is the weighted slice sampler with the weight $1/Z$ on a truncated range, and the two produce statistically identical ordinates, given the number of draws. The paper adds that nested sampling moves only upward in likelihood while the weighted slice sampler moves both ways, and that this is why the latter mixes better in the examples.
+
+\section{Mixing of the ordinate chain}
+
+The paper's Lemma 4 gives the transition kernel of the marginal chain of ordinates $Y_n = L(X_n)$ under the weighted slice sampler:
+\[
+P\{ Y_{n+1} \le z \mid Y_n = y \} = \int_0^{y \wedge z} \Big\{ 1 - \frac{ Z(z) }{ Z(u) } \Big\} \frac{ w(u) }{ W(y) } \, du ,
+\]
+and Corollary 5 specialises it to $W = 1/Z$. Here $w$ has an atom of mass $W(0) = 1$ at $u = 0$, and a direct computation from Lemma 4 gives, for $z < y$, the following (the paper's Corollary 5 omits the atom, so the correction is ours):
+\begin{gather*}
+P\{ Y_{n+1} \le z \mid Y_n = y \} = \frac{ Z(y) }{ 2 Z(z) } - \frac{ Z(y) Z(z) }{ 2 } , \\
+P\{ Y_{n+1} \le y \mid Y_n = y \} = \tfrac12 - \tfrac12 Z(y)^2 ,
+\end{gather*}
+so the chain is equally likely to move up or down in the ordinate at every state, up to a correction of order $Z(y)$, and the paper concludes geometric ergodicity from the drift criteria of Roberts and Rosenthal.
+
+We can say more. Put $v = -\log Z(y)$, so that $v \in [0, v_{max}]$ with $v_{max} = \log(1/\eta)$ under the truncated weight $W = 1/\max\{\eta, Z\}$ of the previous section, and, for a rare event with $L = \Ind_A$, $\rho = P(A)$ and $\eta = \rho$, $v_{max} = \log(1/\rho)$. A weighted slice step from $x$ with ordinate $v_x$ first draws $u$ with $P(u \le t) = W(t)/W(L(x)) = Z(L(x))/Z(t)$, which says that $v_x - v_u$ is a standard exponential truncated at $v_x$, and then draws $x'$ uniformly from $\{ L > u \}$, which says that $Z(L(x'))/Z(u)$ is uniform and so $v_{x'} - v_u$ is a standard exponential. The new log ordinate is therefore $v_{x'} = v_x - E_1 + E_2$ with $E_1, E_2$ independent standard exponentials, up to reflection at the ends of the interval: the increment has the Laplace law, symmetric with mean zero and variance two. This is Corollary 5 in another form, since $P(E_2 - E_1 \le -d) = \tfrac12 e^{-d}$ recovers $P\{ Y_{n+1} \le z \mid Y_n = y \} = Z(y) / (2 Z(z))$ up to the correction of order $Z(y)$ displayed above, which comes from the atom of $w$ at zero.
+
+\begin{conjecture}
+\label{conj:reflectedmix}
+Assume that the draws of $u \mid x$ and of $x \mid u$ are exact and that $Z(\cdot)$ is known exactly. Use the truncated weight $W = 1/\max\{\eta, Z\}$ of the previous section, with $\eta = \rho$ for a rare event of probability $\rho$, and put $v_{max} = \log(1/\eta)$. While $v_n = -\log Z(L(X_n))$ lies in $[0, v_{max}]$ the chain of log ordinates moves as a symmetric random walk with Laplace increments. Model the chain by this walk reflected at $0$ and $v_{max}$. Then the mixing time of the reflected walk from a warm start to within total variation $\epsilon$ is $O( v_{max}^2 \log(1/\epsilon) )$, which for a rare event of probability $\rho$ is $O( \log^2(1/\rho) \log(1/\epsilon) )$, and for the $N$ queens on permutations is $O( N^2 \log(1/\epsilon) )$. We do not prove this: the proof below is a heuristic, and no precise theorem is cited for the relaxation step.
+\end{conjecture}
+
+With the untruncated weight $1/Z$ the statement is ill posed: $Z_w = \int w Z = \int -Z'/Z$ diverges, so $\pi_w$ is improper, and $v_{max} = \infty$ since $Z(y_{max}) = 0$. With the truncated weight the true chain is not reflected beyond $v_{max}$: there the weight is constant and the ordinate has an exponential tail. The conjecture is about the reflected model, not about the true chain, and we do not bound the discrepancy.
+
+\begin{proof}[Heuristic, not a proof]
+The increment law is derived above. A symmetric random walk with increments of finite variance on an interval of length $M$, reflected at both ends, has relaxation time of order $M^2$ divided by the increment variance, by the standard spectral estimate for reflected walks or by comparison with Brownian motion on an interval; we cite no precise theorem for this step. The increment variance is two, and a mixing time bound follows from the relaxation time bound of Chapter~\ref{ch:mixing} with the stationary distribution uniform on the interval only from a warm start, since a continuous state space has no minimal stationary mass; from a point start a further argument (a density bound after one step, which the Laplace kernel supplies away from the boundary) is needed and is not carried out here. The value of $v_{max}$ for the queens is $\log(N! / Q(N)) = (\alpha - 1) N + o(N) \approx 0.942 N$ by Simkin.
+\end{proof}
+
+Two caveats attach to the conjecture. First, it is stated for a continuous likelihood ordinate, where $Z(L(X))$ is exactly uniform; for the queens the ordinate $e^{-S}$ takes finitely many values and the chain lives on atoms, and the conjecture applies to the chain after the tie breaking randomisation of Chapter~\ref{ch:nested}, which replaces each atom by an interval of the quantile axis of the atom's width; the mixing bound is then for this continuous proxy, and the discrete chain inherits it with the same constant because the proxy's projection onto the atoms is a function of the proxy chain. Second, the increments are unbounded and the walk is reflected, so that a jump that would overshoot an endpoint is truncated there; the relaxation bound of order $M^2$ for such walks follows from the Dirichlet form comparison with the simple random walk on the interval, whose gap is of order $1/M^2$, using that the Laplace increments have a density bounded below on $[-1, 1]$, and we expect this standard comparison to hold but have neither a proof nor a precise reference for it.
+
+The conjecture is the quantitative form of the paper's geometric ergodicity, and it is the heuristic statement, under the exactness hypotheses above, that on the vertical axis the algorithm is polynomial (given the exactness hypotheses, which include knowledge of $Z(\cdot)$, hence of $Z$ and $\rho$, so that the statement says the traversal is cheap given the answer, not that the answer is cheap): the number of weighted slice steps needed to traverse the staircase from top to bottom and equilibrate is quadratic in the log of the rare event probability, which is quadratic in $N$ for the queens, with no dependence on the structure of $\cX$.
+
+\section{Can vertical likelihood be polynomial time?}
+
+Assemble the pieces. The weighted slice sampler alternates a $u$ step, which is exact and costs one evaluation of $Z$ or its inverse, and an $x$ step, which is a draw from the prior restricted to a level set. The reflected walk conjecture says that the number of alternations is polynomial, under its hypotheses. The $u$ step needs $Z(u)$, which is unknown; the paper's adaptive scheme estimates the curve $Z(u)$ from the chain itself in the manner of Wang Landau, but we know of no polynomial convergence result for that scheme and do not analyse it. The Yakowitz and stratified bounds of Chapters~\ref{ch:yakowitz} and~\ref{ch:beyond} control the error of the final estimate only once the ordinates and $Z(\cdot)$ are in hand. So we state what follows as a conjecture, with the missing pieces listed.
+
+\begin{conjecture}
+\label{conj:vlpoly}
+Suppose the adaptive estimate of $Z(\cdot)$ converges in polynomially many steps, and suppose $\rho > 0$ (for $\rho = 0$ a stopping rule is needed, and for the queens $\log(1/\rho)$ may be replaced by its upper bound $\log N!$ when $\rho > 0$). Vertical likelihood Monte Carlo with the weight $W = 1/\max\{\eta, Z\}$ estimates $Z$ to relative error $\epsilon$ with probability $\tfrac34$ using a number of weighted slice steps polynomial in $\log(1/\rho)$ and $\epsilon^{-1}$, which we expect to be of order $\log^2(1/\rho) \cdot \epsilon^{-2}$ up to a further factor of $\log(1/\rho)$ from the stratified bound, each requiring one draw from the prior restricted to a likelihood level set within total variation of exact equal to $\epsilon$ divided by the number of steps. The algorithm runs in polynomial time if and only if those restricted draws do. In particular, for log concave $L$ and $p$ it runs in polynomial time by Frieze, Kannan and Polson (1994); for the queens completion count it runs in polynomial time if and only if $\NP = \RP$, by the main equivalence of Chapter~\ref{ch:theorems}.
+\end{conjecture}
+
+\begin{proof}[Heuristic, not a proof]
+The number of steps is the mixing time of the ordinate chain times the number of effectively independent ordinates needed, of order $\epsilon^{-2}$ times a power of $\log(1/\rho)$ by the stratified quadrature bound applied to the log ordinates, whose range is $\log(1/\rho)$. Each step's restricted draw contributes a bias at most its total variation error, so the per step error must be the tolerance divided by the number of steps (or a coupling argument must replace the union bound); the earlier version of this argument overlooked that the sum of errors over the walk exceeds the tolerance otherwise. The adaptive estimate of $Z(\cdot)$ and the case $\rho = 0$ are not handled. The two instances are the log concave case, where the restricted draw is a Metropolis ball walk on a log concave density with polynomial mixing, and the queens, where the restricted draw is the level set sampler of the main equivalence.
+\end{proof}
+
+So the answer to the question is yes and no, in a precise sense. Yes: the algorithm's own machinery, the weight, the slice step, the traversal of the staircase, is polynomial, with the exponent two in the log of the rare event probability, and this is a conjecture, supported by a heuristic argument, for the reflected model from a warm start, under exactness hypotheses that include knowledge of $Z(\cdot)$ and hence of the quantity being estimated; the full algorithm is only conjectured to be polynomial given those draws. No: the algorithm calls a subroutine, the restricted prior draw, and that subroutine is polynomial for convex problems and is, for $\NP$ complete energies, exactly as hard as $\NP = \RP$. Vertical likelihood Monte Carlo cannot be made polynomial time for the queens by a choice of weight alone, unless $\NP = \RP$, because the weight lives on an axis on which the problem is easy only given the exactness hypotheses, which include knowledge of $Z(\cdot)$, and the problem is on the other axis.
+
+\section{What the weight can still do}
+
+The weight is not idle. It decides how many restricted draws are made at each level, and so it decides where the polynomial cost is spent. The score heuristic puts the draws where $Z$ changes fastest, which for the queens is the bottom of the staircase, where the ratios $N(s-1)/N(s)$ are smallest; this is the right place, and it is where the split sampler's elite fraction and the dynamic nested sampler's live point allocation also concentrate. A weight that undersampled the bottom would give a polynomial algorithm with a large constant, and a weight that oversampled it would waste restricted draws at the hardest level. The Polson Scott weight $1/Z$ is the one that makes the ordinate chain (approximately) symmetric, and symmetry is what gives the clean $M^2$ mixing bound; it is, in this sense, the natural weight, and the reflected walk conjecture above is the reason to use it. What no weight can do is make the restricted draw at the bottom rung cheaper than the mixing time of the level set chain, and that mixing time is the subject of everything else in this book.

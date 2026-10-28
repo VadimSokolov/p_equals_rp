@@ -1,0 +1,50 @@
+\chapter{A Worked Example: The Eight Queens by Every Method}
+\label{ch:worked}
+
+Everything in the book can be checked by hand on the eight queens, where the density of states is known exactly and the numbers are small enough to follow. This chapter does so. It computes the staircase, runs the product estimator, nested sampling, the Polson Scott chain and the stratified quadrature on it with exact arithmetic where possible, and compares the predicted errors with those observed in Chapter~\ref{ch:experiments}. The point is to see each theorem of the book as a number.
+
+\section{The staircase}
+
+From Table~\ref{tab:dos} the density of states for $N = 8$ on the $40320$ permutations is $N(0) = 92$, $N(1) = 888$, $N(2) = 2864$, $N(3) = 6872$, $N(4) = 7892$, $N(5) = 7552$, $N(6) = 5658$, and so on down to $N(28) = 2$. The level set probabilities $Z_m = \PP(S \le m)$ are
+\[
+\begin{gathered}
+Z_0 = 0.00228, \; Z_1 = 0.0243, \; Z_2 = 0.0953, \; Z_3 = 0.266, \\ Z_4 = 0.462, \; Z_5 = 0.649, \; Z_6 = 0.789 ,
+\end{gathered}
+\]
+and the ratios $\theta_m = Z_{m-1} / Z_m$ are
+\[
+\begin{gathered}
+\theta_1 = 0.094, \; \theta_2 = 0.255, \; \theta_3 = 0.359, \; \theta_4 = 0.576, \\ \theta_5 = 0.711, \; \theta_6 = 0.822, \; \theta_7 = 0.902 .
+\end{gathered}
+\]
+The quantile function of the Boltzmann likelihood $L = e^{-S}$ is the staircase with heights $e^{-s}$ and widths $N(s)/40320$; its integral, the partition function at unit temperature divided by $40320$, is $Z = 0.03378$, and its leftmost step, of width $0.00228$ and height one, is the rare event. The entropy drop from permutations to solutions is $\log(1/Z_0) = \log(40320/92) = 6.08$ nats, which is $0.76 N$, somewhat less than Simkin's asymptotic $0.94 N$ because $N = 8$ is far from the limit.
+
+\section{The product estimator}
+
+Run the ladder with the integer levels, starting from the uniform distribution and taking the first rung to be $Z_5 = 0.649$, the fraction of uniform permutations with at most five attacks, and then the five ratios $\theta_5, \dots, \theta_1$. With $M = 400$ samples per rung the relative variance of the product is, by the formula of Chapter~\ref{ch:product},
+\[
+\prod_{t} \Big( 1 + \frac{1 - \theta_t}{M \theta_t} \Big) - 1 = 0.0406 ,
+\]
+a coefficient of variation of $0.20$. The experiment of Chapter~\ref{ch:experiments}, with the same $M$ and an adaptive ladder of five rungs, observed a coefficient of variation of $0.13$ across ten runs; the adaptive ladder, which placed its rungs at the $30\%$ quantiles rather than the integer levels, achieved slightly better balance, which we expect explains why the observed value is below the prediction. The bottom rung contributes most of the variance: $(1 - 0.094) / (400 \times 0.094) = 0.024$ of the $0.041$.
+
+\section{Nested sampling}
+
+With $n$ live points, nested sampling reaches the solutions after about $n \log(1/Z_0) = 6.08 n$ steps; with $n = 20$ that is $122$ steps, each a conditioned draw. The positional error in $\log \hat Z_0$ is $\sqrt{6.08 / 20} = 0.55$, a relative error of about $55\%$ in the count; with $n = 200$ it is $17\%$ and with $n = 2000$ it is $5.5\%$. The Rao Blackwellised estimate of Chapter~\ref{ch:beyond} replaces the plug in weights $e^{-(k-1)/n} - e^{-k/n}$ by $(n/(n+1))^{k-1}/(n+1)$; for $n = 20$ and $k = 122$ the logarithm of the ratio of the two weights is $121 \log(20/21) + 121/20 - \log(21 (1 - e^{-1/20})) = 0.122$, a $13\%$ difference, which is not small; the plug in weights differ from the Rao Blackwellised ones by this factor at $n = 20$. At $n = 200$ the difference is $1.3\%$.
+
+\section{The Polson Scott chain}
+
+The chain of log ordinates $v = -\log Z(L(x))$ under the weight $W = 1/Z$ is, by Chapter~\ref{ch:polsonscott}, a symmetric random walk with Laplace increments on $[0, 6.08]$. Its relaxation time is of order $6.08^2 = 37$ steps, and the chain equilibrates on the staircase in what we expect to be a few hundred weighted slice steps (not measured here), each requiring one restricted draw. Compare the $122$ conditioned draws of nested sampling with $n = 20$: the two methods cost the same order of restricted draws, as the theory of Chapter~\ref{ch:polsonscott} says they should, since both are traversals of the same interval of length $\log(1/Z_0)$.
+
+The restricted draw itself, for $N = 8$, is cheap: the swap chain on $\{ S \le 1 \}$ has autocorrelation time $59$ swaps by Chapter~\ref{ch:experiments2}, and the level set is a single component of $980$ states by Chapter~\ref{ch:open}. The whole count of the $92$ solutions by the Polson Scott chain costs about $300 \times 60 = 18\,000$ swap proposals, against $40\,320$ permutations to enumerate; this figure uses the autocorrelation time of one observable as the cost of a restricted draw, whereas the exact relaxation time of the chain at $N = 8$ is $301$ swaps (Table~\ref{tab:gap}), which would give about $90\,000$ proposals, more than the enumeration. At $N = 8$ the Monte Carlo method does not beat enumeration, and we make no claim about the cost at larger $N$ here.
+
+\section{Quadrature}
+
+Suppose the ordinates on the quantile axis were known exactly and only the integral $\int_0^1 \Lambda$ had to be computed. The staircase has $K = 20$ jumps (21 nonempty levels) for $N = 8$. The trapezoid sums on $n$ sorted uniforms have root mean squared error at most $\sqrt 3 \, K \lambda_1 / n = 35 / n$ in absolute terms; the stratified midpoint rule has $\sqrt{K} \lambda_1 / (2 n) = 2.2 / n$. For relative error $1\%$ in $Z = 0.0338$ one needs absolute error $3.4 \times 10^{-4}$, hence $n = 102\,000$ sorted uniforms or $n = 6\,600$ stratified nodes. These are large numbers, and they are the reason the quadrature is never done this way: one does not evaluate $\Lambda$ at chosen points, because one cannot, and the ordinates come from the walk. The numbers do show the factor of about $16$ that stratification buys, and they show that the quadrature cost is dwarfed by the restricted draws once $N$ is large, since $K$ grows linearly and the restricted draw cost grows like $N^{1.8}$ or worse.
+
+\section{Wang Landau}
+
+The flat histogram condition for $N = 8$ requires the chain to visit each of the $21$ nonempty levels equally often, which means reweighting the ground state by a factor $7892 / 92 = 86$ relative to the mode. The chain achieves this by rejecting as many as $85$ of every $86$ proposed moves out of a solution, and the ground state estimate is noisy in proportion. Chapter~\ref{ch:experiments} reported an $11\%$ error at the ground state for $N = 10$ and errors below $2\%$ in the bulk. Wang Landau is the method that returns the whole staircase, and the price is that it spends its effort evenly where the ladder spends it at the bottom.
+
+\section{The connectivity check}
+
+Finally, the structural fact. The $92$ solutions and $888$ near solutions form, under swaps, a single connected component of $980$ states, and $76$ of the $92$ solutions have no neighbouring solution under a single swap. The swap chain on $\{ S \le 1 \}$ therefore moves between solutions by passing through near solutions, spending about $90\%$ of its time on them, which is the fraction $888/980$, and the bottom ratio $\theta_1 = 92/980 = 0.094$ is exactly the fraction of time at energy zero that Chapter~\ref{ch:experiments2} measured as $0.094$. Every number agrees with every other, which is what one expects when the problem is small enough to enumerate, and the agreement is the calibration on which the larger claims of the book rest.

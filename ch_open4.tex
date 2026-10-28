@@ -1,0 +1,97 @@
+\section{The fourth round: gaps, depths and windows}
+\label{sec:round4}
+
+This round carries out three computations that the earlier rounds left open: the spectral gap of the bottom rung chain, the growth of the shattering depth with $N$, and the divergence of the solution law from Markov window families. One of them moved the program's conjecture; one of them showed that a depth of three does not suffice on all boards; and one closed a door that Chapter~\ref{ch:ce} had left ajar.
+
+\begin{problem}[The spectral gap of the bottom rung chain]
+Compute the spectral gap of the swap chain on the giant component $G_N$ of $\{ S \le 1 \}$ and its growth with $N$.
+\end{problem}
+
+Status. Computed exactly for $N = 8$ to $12$ by a sparse eigensolver on the transition matrix of the chain, which has $980$, $3636$, $14824$, $69096$ and $355860$ states; the last took over an hour, the top of the spectrum being nearly degenerate. Table~\ref{tab:gap} gives the relaxation time $1 / \gamma$ of the chain in proposed swaps, the relaxation time restricted to the subspace of functions invariant under the eight symmetries of the board, which is the one that governs every symmetric observable and in particular the ground state indicator that the walk averages, the conductance of the cut defined by the sign of the second eigenvector, and the symmetry under which the second eigenvector is antisymmetric.
+
+\begin{table}[t]
+\centering
+\small
+\caption{The swap chain on the giant component $G_N$ of $\{ S \le 1 \}$: number of states, relaxation time $1/\gamma$ in proposed swaps, relaxation time on the symmetric subspace, the conductance of the sign cut of the second eigenvector, and the symmetry under which that eigenvector is antisymmetric. The three smallest nonzero eigenvalues of $I - P$ for the lazy chain are $0.00166, 0.00182, 0.00261$ at $N = 8$; $0.001127, 0.001127, 0.001138$ at $N = 9$; $0.000910, 0.000914, 0.000914$ at $N = 10$; $0.000571, 0.000571, 0.000572$ at $N = 11$; and $0.000484, 0.000484$ for the first two at $N = 12$, where the symmetry analysis was not run.}
+\label{tab:gap}
+\begin{tabular}{rrrrrl}
+\toprule
+$N$ & states & $1/\gamma$ & symmetric & $\Phi$(cut) & antisymmetric under \\
+\midrule
+8 & 980 & 301 & 275 & 0.0070 & both reflections \\
+9 & 3636 & 444 & 433 & 0.0077 & transpose \\
+10 & 14824 & 549 & 547 & 0.0072 & transpose \\
+11 & 69096 & 875 & 874 & 0.0073 & half turn \\
+12 & 355860 & 1033 & & 0.0060 & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three things are in the table. First, the relaxation time grows faster than the autocorrelation time of Chapter~\ref{ch:experiments2}: the pairwise exponents are $3.3$, $2.0$, $4.9$ and $1.9$ and the least squares exponent over $N = 8$ to $12$ is $3.1$, against the $1.76$ of the first row column to $N = 32$. The two are not in conflict, since the autocorrelation time of one observable is a lower bound for the relaxation time up to a factor of about two and the first row column is far from the slowest function, but the exponent that the expansion conjecture of Chapter~\ref{ch:mixingproof} has to deliver is the larger one. Second, the top of the spectrum is nearly degenerate: at $N = 10$ and $11$ the three smallest nonzero eigenvalues agree to two or three figures, and the second eigenvector is antisymmetric under a board symmetry, the transpose at $N = 9$ and $10$ and the half turn at $N = 11$, while the symmetric subspace relaxes at almost the same rate. The symmetry explains the particular eigenvector and not the slowness. A band of near degenerate slow modes is the spectral signature of many bottlenecks of comparable strength, and the landscape of Chapter~\ref{ch:mixingproof} says what they are: clusters of near solutions attached to the giant component by few swaps. Third, the sign cut of the second eigenvector has conductance between $0.006$ and $0.008$ at every $N$, so it is not the bottleneck; by Cheeger's inequality the true conductance satisfies $\gamma / 2 \le \Phi \le \sqrt{2 \gamma}$, that is, $0.0005 \le \Phi_{12} \le 0.044$, and the bottleneck sets are not symmetry halves but something smaller that the eigenvector does not reveal directly. Finding them is the next step on this problem: the second eigenvector restricted to the symmetric subspace, thresholded at levels other than zero, and the clusters it isolates.
+
+The practical reading is that the expansion conjecture should be stated with $c'$ near $3$ rather than near $2$, that the bottom rung needs of order $N^3$ swaps per effective sample for the worst observable and of order $N^{1.8}$ for the first row column over the range measured, and that the computation at $N = 13$ with a symmetry reduced matrix, which has eight times fewer states, is within reach and would tell whether the pairwise exponents, which swing between $1.9$ and $4.9$, are settling.
+
+\begin{problem}[Growth of the shattering depth]
+Determine how $m_c(B)$ grows with $N$ on random boards.
+\end{problem}
+
+Status. Measured at $N = 14$ and partly at $N = 16$, with a C implementation of the enumeration that handles level sets of twenty million placements. Table~\ref{tab:depthgrowth} gives the distribution of the solution depth $m_s$ and the shattering depth $m_c$ over the random boards at each $(N, k)$, and the mean ratio $N(0) / |\{ S \le m_c \}|$ at the depth. The fraction of boards that need $m_c = 4$ grows. At $N = 12$ the level set was connected at $m = 3$ on $75$ of $80$ boards (already at $m = 2$ on three more); at $N = 14$ it is connected at $m = 3$ on $22$ of $40$ and needs $m = 4$ on the other $18$, and at $N = 16$ with four fixed queens it is connected at $m = 3$ on one board of eight and needs $m = 4$ on the other seven, while with five fixed queens it is connected at $m = 3$ on three of eight and needs $m = 4$ on the other five. The solution depth does not grow: completions reconnect at $m = 1$ or $2$ at every size. The price grows with the depth, from $1 \times 10^{-3}$ at $N = 12$ to $3 \times 10^{-4}$ at $N = 14$ and $1 \times 10^{-4}$ to $2 \times 10^{-4}$ at $N = 16$, a factor of about three for every two rows. Since $k$ changes with $N$ in the table ($2$ and $3$ at $N = 12$ and $14$, $4$ and $5$ at $N = 16$), the effects of $N$ and of $k$ are confounded.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Growth of the depths with $N$ on random boards with $k$ fixed queens, forty boards per row at $N = 12$, twenty at $N = 14$ and eight at $N = 16$: the number of boards with solution depth $m_s = 1$ and $2$, with shattering depth $m_c = 2$, $3$ and $4$, and the mean of $N(0) / |\{ S \le m_c \}|$ over the boards.}
+\label{tab:depthgrowth}
+\begin{tabular}{rrrrrrrr}
+\toprule
+$N$ & $k$ & $m_s{=}1$ & $m_s{=}2$ & $m_c{=}2$ & $m_c{=}3$ & $m_c{=}4$ & mean ratio \\
+\midrule
+12 & 2 & 15 & 25 & 0 & 39 & 1 & $7.9 \times 10^{-4}$ \\
+12 & 3 & 15 & 25 & 3 & 36 & 1 & $1.3 \times 10^{-3}$ \\
+14 & 2 & 15 & 5 & 0 & 12 & 8 & $3.0 \times 10^{-4}$ \\
+14 & 3 & 13 & 7 & 0 & 10 & 10 & $2.8 \times 10^{-4}$ \\
+16 & 4 & 5 & 3 & 0 & 1 & 7 & $1.0 \times 10^{-4}$ \\
+16 & 5 & 4 & 4 & 0 & 3 & 5 & $1.7 \times 10^{-4}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This shows that a depth of three does not suffice on every board measured, and it changes the conjecture. The hypothesis that the depth is bounded on random boards and grows only on reduction boards is no longer clearly the best reading of the data; the typical depth on random boards moves by about one between $N = 12$ and $16$, and the question is whether it keeps moving and at what rate. If $m_c$ grows like $\log N$ the price $N(0) / |\{ S \le m_c \}|$ is only quasi-polynomial, of order $N^{c \log N}$, by the heuristic that each extra attack costs a factor of order $N$, and the rung skipping theorem gives a quasi-polynomial and not a polynomial walk on random boards; only a bounded $m_c$ gives an inverse polynomial price. If $m_c$ grows like $cN$ the price is exponential and the walk fails on random boards, which would place the random queens completion problem with the problems on which Monte Carlo fails on average, and would make the reduction board question moot for this chain. The data to $N = 16$ cannot tell $\log_2 N$ from $N / 4$: rounded down, both give $3$ at $N = 12$ and $4$ at $N = 16$. The measurement that decides is the depth at $N = 20$ and $24$, which the C enumeration can reach for level sets up to about $10^8$ placements, and at those sizes $\log_2 N$ rounded down predicts $4$ and $N / 4$ predicts $5$ to $6$. We state the revised conjecture with the alternative it must beat.
+
+\begin{conjecture}[Depth growth]
+\label{conj:depthgrowth}
+On random boards with a fixed number of fixed queens, $m_c(B) = O(1)$ with high probability, so that the price of rung skipping is inverse polynomial. The data to $N = 16$ do not exclude slow growth: $m_c(B) = O(\log N)$ would make the price quasi-polynomial, and the alternative, $m_c(B) \ge cN$, would make the vertical walk exponential on random boards.
+\end{conjecture}
+
+The unconditioned problem is unaffected: $\{ S \le 2 \}$ is connected for $N \le 11$ with no fixed queens, and the realistic prize of Chapter~\ref{ch:program} rests on the connectivity of $\{ S \le 2 \}$ or on the giant component of $\{ S \le 1 \}$, together with the rung ratio hypothesis of its theorem, and not on the depth of a conditioned board.
+
+\begin{problem}[Markov window families]
+Compute the divergence from the uniform law on solutions to its projection on the order $k$ Markov sequential family, as a function of $k$ and $N$.
+\end{problem}
+
+Status. Computed exactly for $N = 8$ to $13$ from all solutions. For the family $g(x) = \prod_i g_i(x_i \mid x_{i-k}, \dots, x_{i-1})$ with unrestricted window conditionals, the minimum divergence is
+\[
+D_k(N) = \sum_{i=1}^N H(X_i \mid X_{i-k}, \dots, X_{i-1}) - \log Q(N) ,
+\]
+with the window truncated at row $1$ for $i \le k$, by the same entropy decomposition as Theorem~\ref{thm:product} of Chapter~\ref{ch:ce}, the conditional entropies being those of a uniform random solution, and Table~\ref{tab:window} gives it. Two facts are in the table. For fixed window $k$ the divergence grows linearly in $N$: $D_2$ increases by about $2.4$ nats per row and $D_3$ by about $2.9$ from $N = 10$ on, so the information that the diagonal constraints carry beyond any fixed window is more than two nats per queen, and, if the linear growth seen for $N = 8$ to $13$ continues, the relative variance of importance sampling from any such family, at least $e^{D_k} - 1$, is exponential in $N$. And the window needed to bring the divergence below one nat is about half the board: $k = 3, 4, 5, 5, 6, 7$ for $N = 8$ to $13$. This is the cross entropy form of the shattering depth that Chapter~\ref{ch:ce} asked for, and it is linear in $N$. A sequential family whose conditionals see only a window of fixed width, which is what the cross entropy method uses for permutation problems, cannot give a polynomial time counter for the queens; a family whose conditionals see the whole history can, in principle, since $D_{N-1} = 0$, but the representation question of Chapter~\ref{ch:gbc} is then whether a conditional of the full history can be computed by a polynomial size circuit to within $O(\log N)$ nats, and the window computation says the circuit cannot be local.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Divergence $D_k(N)$ in nats from the uniform law on solutions to the best order $k$ Markov sequential family, exact from all solutions, and the least $k$ with $D_k < 1$.}
+\label{tab:window}
+\begin{tabular}{rrrrrrrrr}
+\toprule
+$N$ & $Q(N)$ & $D_0$ & $D_1$ & $D_2$ & $D_3$ & $D_4$ & $D_5$ & $k(D_k < 1)$ \\
+\midrule
+8 & 92 & 11.4 & 7.3 & 3.0 & 0.82 & 0.21 & 0 & 3 \\
+9 & 352 & 13.7 & 10.2 & 5.9 & 2.1 & 0.67 & 0.26 & 4 \\
+10 & 724 & 16.2 & 12.6 & 8.1 & 3.6 & 1.15 & 0.37 & 5 \\
+11 & 2680 & 18.2 & 14.9 & 11.0 & 6.3 & 2.45 & 0.81 & 5 \\
+12 & 14200 & 20.0 & 16.8 & 13.3 & 9.7 & 5.13 & 2.03 & 6 \\
+13 & 73712 & 21.9 & 18.7 & 15.4 & 12.3 & 8.28 & 4.31 & 7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The three computations point the same way. The chain's relaxation time grows like $N^3$, the fraction of conditioned boards that need the deeper level set grows with $N$, and the window a sequential family needs grows like $N / 2$: on every axis the queens get harder with $N$ faster than the first measurements suggested. Nothing in this round is a proof.

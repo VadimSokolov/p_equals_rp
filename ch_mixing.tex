@@ -1,0 +1,80 @@
+\chapter{Markov Chains and Mixing Times}
+\label{ch:mixing}
+
+Every conditioned draw in the vertical walk is produced by a Markov chain. The number of steps the chain needs before its state is nearly uniform on the level set is the mixing time, and it is the quantity that decides whether the walk is polynomial. This chapter collects the theory of mixing that the rest of the book relies on: the spectral gap, conductance and Cheeger's inequality, canonical path\index{canonical paths}s, coupling, and the particular difficulties of chains on level sets.
+
+\section{Chains, stationarity and reversibility}
+
+Let $\cX$ be a finite state space and $P$ a transition matrix, $P(x, y) \ge 0$, $\sum_y P(x, y) = 1$. A distribution $\pi$ is stationary if $\pi P = \pi$. The chain is irreducible if every state is reachable from every other, aperiodic if the greatest common divisor of return times is one, and ergodic if both; an ergodic chain has a unique stationary distribution and $P^t(x, \cdot) \to \pi$ for every $x$. The chain is reversible with respect to $\pi$ if $\pi(x) P(x, y) = \pi(y) P(y, x)$ for all $x, y$, the detailed balance condition. Metropolis\index{Metropolis algorithm} chains and random scan Gibbs chains are reversible by construction.
+
+The Metropolis chain for a target $\pi$ on permutations with symmetric proposal $q$ moves from $x$ to a proposed $y \sim q(x, \cdot)$ and accepts with probability $\min\{1, \pi(y) / \pi(x)\}$. For the uniform distribution on a level set $\{ S \le m \}$ the acceptance probability is one if $S(y) \le m$ and zero otherwise: the chain proposes a swap of two queens and makes it if the energy stays below the level. This is the chain used in the experiments of Chapter~\ref{ch:experiments}. It is reversible with respect to the uniform distribution on the level set, and it is irreducible if and only if the level set is connected under swaps.
+
+\section{Total variation and mixing time}
+
+The distance of the chain from stationarity after $t$ steps, started from $x$, is
+\[
+d_x(t) = \| P^t(x, \cdot) - \pi \|_{TV} = \tfrac12 \sum_y |P^t(x, y) - \pi(y)| ,
+\]
+which also equals $\max_{A \subseteq \cX} | P^t(x, A) - \pi(A) |$, and the mixing time\index{mixing time} is
+\[
+\tau(\epsilon) = \min\{ t : \max_x d_x(t) \le \epsilon \} .
+\]
+A standard submultiplicativity argument shows that $\tau(\epsilon)$ is at most $\tau(\tfrac14) \lceil \log_2(1/\epsilon) \rceil$, so the dependence on $\epsilon$ is logarithmic and one speaks of the mixing time $\tau = \tau(\tfrac14)$. A chain on an exponentially large state space mixes rapidly if $\tau$ is polynomial in the size of the problem description, here $N$.
+
+The definition of a polynomial level set sampler\index{level set sampler} in Chapter~\ref{ch:prp} asks for a sample within total variation $\delta$ of uniform in time polynomial in $N$ and $\log(1/\delta)$. By the submultiplicativity bound this is achieved by a rapidly mixing chain on each level set, together with a polynomial time way to find a starting state in the level set. For the queens a starting state in $\{ S \le m \}$ is easy to find for $m$ in the bulk, by rejection, and for $m$ near zero on a partially filled board the starting state is itself an $\NP$ hard problem (on the empty board explicit solutions exist for every $N \ge 4$); the vertical walk attempts it by inheriting the starting state from the previous level, which is the whole point of the ladder.
+
+\section{The spectral gap}
+
+For a reversible chain the matrix $P$ is self adjoint on $L^2(\pi)$ with real eigenvalues $1 = \lambda_1 > \lambda_2 \ge \dots \ge \lambda_{|\cX|} \ge -1$. The spectral gap\index{spectral gap} is $\gamma = 1 - \lambda_2$ and the absolute spectral gap is $\gamma_* = 1 - \max\{\lambda_2, |\lambda_{|\cX|}|\}$; making the chain lazy, $P \to (I + P)/2$, forces all eigenvalues nonnegative and halves the gap. The relaxation time is $t_{rel} = 1/\gamma_*$, and the standard bounds are
+\[
+(t_{rel} - 1) \log \frac{1}{2\epsilon} \le \tau(\epsilon) \le t_{rel} \log \frac{1}{\epsilon \, \pi_{min}} ,
+\]
+where $\pi_{min} = \min_x \pi(x)$. For the uniform distribution on a level set of size $|\cX_m|$ the upper bound reads $\tau \le t_{rel} ( \log |\cX_m| + \log(1/\epsilon) )$, and $\log |\cX_m| \le \log N! = O(N \log N)$, so a polynomial relaxation time gives a polynomial mixing time.
+
+\section{Conductance and Cheeger's inequality}
+
+The spectral gap is hard to compute directly on an exponentially large space. Jerrum and Sinclair's method is to bound it by the conductance\index{conductance}, a geometric quantity. For $A \subseteq \cX$ with $\pi(A) \le \tfrac12$ let
+\[
+\Phi(A) = \frac{F(A, A^c)}{\pi(A)} , \qquad F(A, B) = \sum_{x \in A, y \in B} \pi(x) P(x, y) ,
+\]
+be the probability of leaving $A$ in one step from stationarity, conditional on being in $A$, and let $\Phi = \min_{\pi(A) \le 1/2} \Phi(A)$ be the conductance of the chain. Cheeger\index{Cheeger's inequality}'s inequality for Markov chains, due in this form to Jerrum and Sinclair and to Lawler and Sokal, states
+\[
+\frac{\Phi^2}{2} \le \gamma \le 2 \Phi .
+\]
+A chain mixes rapidly if and only if its conductance is at least inverse polynomial: there is no set of stationary mass at most a half from which the chain escapes with probability less than $1/\mathrm{poly}(N)$ per step. The failure of mixing is always a bottleneck, a set $A$ with small boundary relative to its mass, and the level sets of the queens energy are suspected to have exactly such bottlenecks at low energy, where, on partially filled boards, the components under swap moves are suspected to be isolated and scattered (on unconditioned boards the exact data show a giant component, below).
+
+\section{Canonical paths}
+
+Jerrum and Sinclair's technique for lower bounding the conductance is to route a flow between every pair of states along a canonical path and to bound the congestion of the routing. For each pair $(x, y)$ choose a path $\Gamma_{xy}$ in the transition graph, and define the congestion
+\[
+\kappa = \max_{(u, v) : P(u, v) > 0} \frac{1}{\pi(u) P(u, v)} \sum_{(x, y) : (u, v) \in \Gamma_{xy}} \pi(x) \pi(y) \, |\Gamma_{xy}| .
+\]
+Then $\gamma \ge 1 / \kappa$, and so, for a lazy chain, for which $\gamma_* = \gamma$, $t_{rel} \le \kappa$. The congestion is small if the paths are short and spread evenly over the edges, which in practice means exhibiting an injection from the set of pairs $(x, y)$ whose paths use a given edge into the state space, with a small loss. This is the technique that proved rapid mixing for the permanent\index{permanent} of dense matrices and for the ferromagnetic Ising model, and its refinement by Jerrum, Sinclair and Vigoda, with weights on the states to balance the congestion, proved rapid mixing for the permanent in general.
+
+For the queens the canonical path method would require, for each pair of placements in a level set, a sequence of swaps staying within the level set, and a bound on how many pairs route through any one swap. For $m$ in the bulk this is plausible and we expect it can be carried out. For $m$ near zero on an unconditioned board the exact data of Chapter~\ref{ch:open} show that almost all solutions lie in one component of $\{ S \le 1 \}$ (all of them at $N = 8$, $10$, $11$; all but $4$ of $14200$ at $N = 12$), so the first requirement is plausible there, and the method is open rather than inapplicable. On partially filled boards, which is where the conjecture of Chapter~\ref{ch:prp} lives, the components are scattered and the method does not apply, which is evidence for that conjecture and no more.
+
+\section{Coupling}
+
+The coupling\index{coupling} method bounds mixing by constructing two copies of the chain, started from different states, run jointly so that each is marginally a copy of $P$ and so that once they meet they stay together. If $T$ is the meeting time then $d_x(t) \le \max_y \PP(T > t)$, where $y$ is the starting state of the second copy, and the mixing time is bounded by the tail of $T$. The path coupling theorem of Bubley and Dyer reduces the construction to adjacent pairs of states: if a metric on $\cX$ can be found such that for every pair at distance one there is a one step coupling that contracts the expected distance by a factor $1 - \beta$, then $\tau(\epsilon) \le \beta^{-1} \log( D / \epsilon )$ where $D$ is the diameter. Coupling proved rapid mixing for graph colourings with enough colours, for independent sets at low density, and for many spin systems above their critical temperature.
+
+For a level set chain on permutations the natural metric is the number of transpositions separating two permutations, and the natural coupling makes the same swap proposal in both copies. The coupling contracts if, on average, a proposed swap is accepted in both copies or rejected in both; it fails to contract when one copy accepts and the other rejects, which happens when the swap crosses the level in one copy but not the other. At high levels this is rare and the coupling contracts; at low levels it is the norm.
+
+\section{Slow mixing: torpidity}
+
+A chain is torpid\index{torpid mixing}ly mixing if its mixing time is exponential. The standard proof is to exhibit a bottleneck: a set $A$ with $\pi(A) \le \tfrac12$ and $\Phi(A)$ exponentially small, from which Cheeger's inequality gives an exponentially small gap. Gore and Jerrum\index{Gore and Jerrum}'s proof that Swendsen\index{Swendsen Wang algorithm} Wang mixes torpidly on the complete graph at the Potts critical temperature exhibits the bottleneck between the ordered and disordered phases: the chain must pass through configurations of mixed magnetisation that have exponentially small weight. Borgs, Chayes and others showed the same for the Ising model on the torus below the critical temperature with single site dynamics. In every case the bottleneck is a phase coexistence, and the chain's inability to cross it is the dynamical manifestation of a first order transition.
+
+For the queens we conjecture a bottleneck of a different kind, not between two phases but among exponentially many components of a low level set. There is no magnetisation to measure, and the components are not related by any symmetry; they are simply the connected pieces of $\{ S \le m \}$ under swaps, and on partially filled boards we believe that for $m = O(1)$ there are exponentially many of them, each of size polynomial in $N$. On unconditioned boards the exact data show the opposite, a giant component. A chain confined to swaps cannot leave its component. A chain with nonlocal moves, such as the cluster moves of Swendsen Wang on the row column bipartite graph, may leave it, and the question is whether it leaves it fast enough.
+
+\section{Frieze, Kannan and Polson: log concave sampling}
+
+One of the first results showing a Metropolis chain mixing in polynomial time on a continuous space of high dimension is due to Frieze, Kannan and Polson\index{Frieze, Kannan and Polson} in 1994, sharpening Applegate and Kannan (1991). Let $f$ be a log concave density on a convex body $K \subseteq \mathbb{R}^d$, and consider the random walk that from $x$ proposes a uniformly random point $y$ in the ball of radius $r$ about $x$, and accepts with probability $\min\{1, f(y) / f(x)\}$, rejecting proposals that leave $K$. Frieze, Kannan and Polson proved that, for $r$ of order $1/\sqrt d$ and a suitable warm start, the chain reaches total variation distance $\epsilon$ from $f$ in a number of steps polynomial in $d$, the diameter of $K$, and $\log(1/\epsilon)$. The proof establishes an isoperimetric inequality for log concave measures, that any partition of $K$ into two parts of substantial mass has a boundary of substantial measure, and converts it into a conductance bound for the ball walk by the Jerrum Sinclair argument; the localisation lemma of Lov\'asz\index{Lov\'asz, L\'aszl\'o} and Simonovits is the tool for the isoperimetry.
+
+The result matters for this book in three ways. It is among the first mixing bounds for a Metropolis chain as statisticians use it, with a continuous target and an accept reject step, and it placed Bayesian posterior sampling for log concave posteriors in the class of problems with polynomial time randomized algorithms. It continues the Dyer Frieze Kannan volume algorithm, extended from indicators to densities by Applegate and Kannan and then sharpened, so that the vertical ladder for the evidence of a log concave model inherits a polynomial guarantee at every rung. And it is the template for what a mixing proof for the queens would look like: an isoperimetric inequality on the level set, showing that no subset of half the mass has a small boundary under swaps, converted to conductance. For convex bodies the isoperimetry comes from convexity. For the queens level sets there is no convexity, and the giant component\index{giant component} structure of Chapter~\ref{ch:open} is the closest available substitute: the solutions are bridged by near solutions, and an isoperimetric inequality for the bridged graph would give polynomial mixing on unconditioned boards.
+
+\section{The Polson 1996 criterion}
+
+One of us, in a 1996 discussion paper on the convergence of Markov chain Monte Carlo, gave conditions for geometric ergodicity of Gibbs and Metropolis chains in terms of drift conditions and small sets, and emphasised that the rate of convergence of a chain used for a Bayesian computation is governed by the same spectral quantities as a chain used for counting. The point of the paper was that the statistical and the complexity theoretic analyses of Markov chains were the same analysis, and that the rapid mixing bounds of Jerrum and Sinclair could be read as statements about the convergence of Bayesian posterior samplers. Thirty years later the point stands and has been sharpened by the vertical view: the chain that samples a level set for counting is the chain that samples a likelihood slice for posterior inference, and the ladder of levels in the counting problem is the ladder of likelihood thresholds in nested sampling\index{nested sampling}. Mixing time analysis is the common currency.
+
+\section{What mixing means for the thesis}
+
+The thesis of Chapter~\ref{ch:prp} places the whole hardness of counting in the widths of a staircase, and this chapter places the whole hardness of estimating a width in the mixing time of a chain on a level set. The two statements are the same statement. A width $N(s) / |\cX|$ is the stationary mass of the energy shell $\{ S = s \}$, and the mass of a level set $\{ S \le m \}$ is the sum of the widths below $m$; its estimate from conditioned samples is unbiased if the samples are stationary and biased by the total variation distance otherwise; the number of samples needed is polynomial provided the ratios between consecutive levels are bounded below, which we have not shown for the queens; the number of chain steps per sample is the mixing time. If the mixing time is polynomial for every level then the walk is an FPRAS\index{FPRAS} and, for the queens completion count, $\NP = \RP$. If it is exponential for some level then the walk is an exponential algorithm and the thesis says only where the exponential is hiding. We believe the latter. We would be delighted to be wrong.

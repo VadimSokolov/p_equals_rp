@@ -1,0 +1,73 @@
+\chapter{Nested Sampling: The Theory}
+\label{ch:nested}
+
+Nested sampling is the simplest vertical walk and the one whose error analysis is most complete. This chapter gives the algorithm precisely, proves the distributional facts on which it rests, derives the error in the number of live points, discusses the choice of live point number and stopping rule, and states what is known about its consistency and asymptotic normality. It also introduces the variants, importance nested sampling\index{nested sampling} and dynamic nested sampling, that have made it the default evidence estimator in several fields.
+
+\section{The algorithm}
+
+Fix a prior $P$ on $\cX$, a likelihood $L \ge 0$, and a number $n$ of live points.
+
+\begin{enumerate}
+\item Draw $x_1, \dots, x_n$ independently from $P$. Set $k = 0$, $\hat Z_0 = 0$, $X_0 = 1$.
+\item Repeat for $k = 1, 2, \dots$:
+\begin{enumerate}
+\item Let $y_k = \min_i L(x_i)$ and $i_k$ the index attaining it.
+\item Set $X_k = e^{-k/n}$ and $\hat Z_k = \hat Z_{k-1} + y_k (X_{k-1} - X_k)$.
+\item Replace $x_{i_k}$ by a draw from $P$ conditioned on $\{ L > y_k \}$.
+\end{enumerate}
+\item Stop when $X_k \max_i L(x_i) < \epsilon \hat Z_k$ and add $X_k \cdot n^{-1} \sum_i L(x_i)$ to $\hat Z_k$.
+\end{enumerate}
+
+The quantity $X_k$ is an estimate of the prior mass above the current level, $Z(y_k) = \PP_P(L > y_k)$, and the sum is a Riemann sum for $\int_0^1 \Lambda(s) \, ds$ on the grid $X_k$.
+
+\section{The shrinkage lemma}
+
+\begin{lemma}
+Suppose $L(X)$, $X \sim P$, has a continuous distribution. Let $x_1, \dots, x_n$ be independent draws from $P$ conditioned on $\{ L > y \}$ for some $y$, and let $y' = \min_i L(x_i)$. Then $t = Z(y') / Z(y)$ has the law of the maximum of $n$ independent uniforms on $[0, 1]$, that is, $t \sim \mathrm{Beta}(n, 1)$ with density $n t^{n-1}$, independently of $y$ and of $\Lambda$.
+\end{lemma}
+
+\begin{proof}
+For $x \sim P(\cdot \mid L > y)$, the variable $Z(L(x)) / Z(y)$ is uniform on $[0, 1]$, since $Z(L(X)) \sim U(0, 1)$ for $X \sim P$ when $L(X)$ has no atoms (for staircases, ties are broken by an independent uniform) and conditioning on $L > y$ restricts $Z(L(X))$ to $[0, Z(y)]$ uniformly. The minimum of the $n$ likelihoods corresponds to the maximum of the $n$ uniforms.
+\end{proof}
+
+Hence after $k$ steps $Z(y_k) = \prod_{j=1}^{k} t_j$ with the $t_j$ independent $\mathrm{Beta}(n, 1)$, and
+\[
+\log Z(y_k) = \sum_{j=1}^{k} \log t_j , \qquad \EE \log t_j = -\frac{1}{n} , \qquad \Var \log t_j = \frac{1}{n^2} ,
+\]
+since $-\log t_j \sim \mathrm{Exp}(n)$. So $\log Z(y_k)$ has mean $-k/n$ and standard deviation $\sqrt{k}/n$, which justifies the plug in $X_k = e^{-k/n}$ and quantifies its error.
+
+When $L(X)$ has atoms, which it does for the queens where $L = e^{-S}$ takes finitely many values, the lemma holds for the survival function with a tie breaking randomisation: each point carries an independent uniform label $\eta(x)$ and points are ordered by the pair $(L(x), \eta(x))$ lexicographically, which does not change $Z$ and makes the ordering continuous. In practice ties are broken at random when choosing the point to discard, which is the same thing.
+
+\section{The error in the number of live points}
+
+\begin{theorem}
+Let $\hat Z$ be the nested sampling estimate run until the prior mass above the current level is below a fixed fraction $\epsilon$ of $Z$, which takes $k^* \approx n \log(1 / Z(y_*))$ steps where $y_*$ is the stopping level of that rule, the level at which the prior mass $Z(y)$ above it first falls below $\epsilon Z$. Then, under the regularity conditions of Chopin and Robert \cite{ChopinRobert}, as $n \to \infty$ with $\Lambda$ fixed,
+\[
+\sqrt n \, \big( \log \hat Z - \log Z \big) \Rightarrow N(0, \sigma^2) , \quad \sigma^2 = \int_0^1 \frac{ \big( \int_0^s \Lambda(u) \, du - s \Lambda(s) \big)^2 }{s Z^2} \, ds ,
+\]
+and the plug in estimate $\hat Z$ is consistent, $\hat Z / Z \to 1$ in probability.
+\end{theorem}
+
+This is the central limit theorem of Chopin and Robert\index{Chopin and Robert}~\cite{ChopinRobert}, which holds under the regularity conditions stated there; the step and staircase likelihoods used below are discontinuous, and for them we rely on the direct computation of the last section rather than on the theorem. The proof writes $\hat Z = \sum_k y_k (X_{k-1} - X_k)$ as a functional of the random walk $\log Z(y_k)$, which is a sum of independent exponentials, and applies the functional central limit theorem to the walk; the variance $\sigma^2$ is the integral of the squared difference between the true and estimated prior mass, weighted by the slope of $\Lambda$. For a likelihood that is a step at $s = \rho$, which is the rare event case, $\sigma^2 = \log(1/\rho)$ to leading order, which gives the relative error $\sqrt{\log(1/\rho) / n}$ quoted in Chapter~\ref{ch:rates}.
+
+The theorem says three things. The error is $O(n^{-1/2})$ in the number of live points, which is the Monte Carlo rate. The constant is the integral of a functional of $\Lambda$, which is $O(\log(1/\rho))$ for rare events and so grows only linearly in $N$ for the queens. And the error is entirely positional: it comes from not knowing the $t_j$, and it would vanish if they were known, which is the observation that the Rao Blackwell\index{Rao Blackwellisation}ised estimator of Chapter~\ref{ch:beyond} exploits.
+
+\section{The number of live points and the stopping rule}
+
+With $n$ live points the walk takes $n \log(1/Z(y_*))$ steps and each step requires one conditioned draw. The total cost is $n \log(1/Z(y_*))$ draws, and the error is $\sqrt{\log(1/Z(y_*)) / n}$. For a target relative error $\epsilon$ one needs $n = \log(1/Z(y_*)) / \epsilon^2$ live points and $\log^2(1/Z(y_*)) / \epsilon^2$ draws in total, which is the $O(\log^2(1/\rho) / \epsilon^2)$ of the product estimator\index{product estimator} with a well balanced schedule. Nested sampling and the product estimator have the same complexity; they differ in that nested sampling chooses its ladder automatically, one point at a time, while the product estimator requires the ladder to be specified or adapted in batches.
+
+The stopping rule $X_k \max_i L(x_i) < \epsilon \hat Z_k$ says to stop when the maximum possible remaining contribution, the current prior mass times the largest live likelihood, is a small fraction of what has been accumulated. For a rare event indicator the rule as stated does not fire before a solution is found, since every discarded non solution has $y_k = 0$ and so $\hat Z_k = 0$, and all non solutions tie at $L = 0$. The walk therefore has to be run on a graded likelihood such as $e^{-S}$, or on $S$ with ties broken at random, and the width of the ground step is the quantity to be estimated, so the rule needs a modification: continue until all live points are solutions and then add the final term, which is the width times one. We have not run nested sampling in this form; the experiments of Chapter~\ref{ch:experiments} are split sampling.
+
+Skilling\index{Skilling, John}'s~\cite{Skilling} recommendation of $n$ in the tens is for Bayesian evidence problems where $\log(1/Z(y_*))$ is tens of nats. For the queens $\log(1/\rho) \approx 0.94 N$ and a relative error of $0.1$ needs $n \approx 100 N$ live points, which for $N = 16$ is $1600$. The experiments of Chapter~\ref{ch:experiments} used a population of $400$ in the batch form, which corresponds to fewer effective live points and is consistent with the coefficients of variation of $0.13$ to $0.5$ observed, though we have not computed the correspondence between the batch population and effective live points.
+
+\section{Variants}
+
+Importance nested sampling, due to Feroz, Hobson, Cameron and Pettitt~\cite{Feroz} in the MultiNest context, keeps every point ever drawn, including those rejected by the constrained sampler, and weights them by an importance ratio relative to the ellipsoidal proposal used to generate them. The estimator has lower variance than the plain one when the proposal is good and recovers it when the proposal is poor. In the vertical coordinate the importance weights are a nonuniform $\Omega$ on the quantile axis learned from the proposal, and the method is a hybrid of nested sampling and the vertical importance sampler of Chapter~\ref{ch:vertical}.
+
+Dynamic nested sampling, due to Higson, Handley, Hobson and Lasenby~\cite{Higson}, varies the number of live points along the run, adding points where the integrand $\Lambda(s)$ contributes most to $Z$ or to a posterior expectation of interest. In the vertical coordinate it is an adaptive $\Omega$: the density of live points on the quantile axis is proportional to the local contribution, which for the evidence is $\Lambda(s)$ itself, so that dynamic nested sampling approximates the optimal $\Omega \propto \Lambda$ of Chapter~\ref{ch:vertical} on the fly. For the queens, where all the mass is in the last rung, it would put nearly all the live points near the ground step, which is the right thing to do and is what the batch split sampler does by its elite fraction.
+
+Diffusive nested sampling, due to Brewer, Pártay and Csányi~\cite{Brewer}, replaces the hard constraint $L > y_k$ by a mixture of level sets with weights, and runs a single chain on the mixture, which is an instance of the split sampling\index{split sampling} scheme of Birge, Chang and Polson~\cite{BCP} with the weight $\omega(m)$ chosen geometrically. It is the variant most robust to multimodality, because the chain can descend to a lower level and climb back, and it is the variant we would use on a conditioned queens board.
+
+\section{Consistency on the staircase}
+
+For a staircase $\Lambda$ with $K$ steps and the queens in mind, the nested sampling estimate of the ground state width is the final term $X_{k^*} \cdot 1$ where $k^*$ is the step at which the last non solution is discarded, so that $\hat\rho = e^{-k^*/n}$ and $\log \hat\rho = -k^*/n$. The values $-\log t_j$ are independent $\mathrm{Exp}(n)$, so the points $-\log Z(y_j)$ form a Poisson process of rate $n$, and $k^*$ is its number of points in $[0, \log(1/\rho))$, so $k^* \sim \mathrm{Poisson}(n \log(1/\rho))$. Hence $\EE \log \hat\rho = -\EE k^*/n = \log \rho$ exactly, and $\Var \log\hat\rho = \log(1/\rho)/n$, so the estimate is unbiased in the log and its relative error is $\sqrt{\log(1/\rho)/n}$, exactly as the theorem says. The staircase structure plays no role in the positional error, which is the same for every $\Lambda$ with the same $\rho$. It plays a role only in the conditioned draws, which must traverse $K$ distinct level sets on the way down, each with its own mixing time\index{mixing time}. This separation, positional error independent of $\Lambda$ and sampling error dependent on it, is the cleanest expression of the thesis: the walk does not care what the staircase looks like, only how hard each stair is to stand on.

@@ -1,0 +1,100 @@
+\chapter{Exercises}
+\label{app:exercises}
+
+The exercises range from routine verifications to small research projects. Those marked with an asterisk are, as far as we know, open as stated.
+
+\section*{Part I}
+
+\begin{enumerate}
+\item Show that the queens completion problem is in $\NP$ by writing the verifier explicitly and bounding its running time by $O(N^2)$.
+
+\item Show that $2\mathrm{SAT}$ is in $\Pc$ by the implication graph: for each clause $(a \vee b)$ add edges $\neg a \to b$ and $\neg b \to a$, and show the formula is satisfiable if and only if no variable is in the same strongly connected component as its negation.
+
+\item Prove that if $\Pc = \NP$ then $\Pc = \PH$, by induction on the levels of the hierarchy.
+
+\item Prove Adleman's theorem for $\BPP$ rather than $\RP$, with the amplification made explicit via the Chernoff bound.
+
+\item Prove that $\ZPP = \RP \cap \coRP$: given $\RP$ algorithms for $L$ and its complement, construct a Las Vegas algorithm.
+
+\item Verify the time hierarchy theorem's use of universal simulation: where exactly does the $\log f(n)$ factor enter, and for which machine models (for instance, a fixed number of tapes at least two) is it known to be removable?
+
+\item Write out the Valiant Vazirani reduction from $\mathrm{SAT}$ to unique $\mathrm{SAT}$ as a formula transformation, and verify that the resulting formula has polynomial size.
+
+\item Compute Shannon's lower bound on circuit size precisely: show that fewer than $2^{2^n}$ functions are computed by circuits of size at most $2^n / (2n)$ for large $n$.
+
+\item Reconstruct von Neumann's unbiasing trick for a coin of bias $p$ and compute the expected number of flips per output bit. Generalise to a three sided die.
+
+\item $(*)$ Give an explicit family of boards and partial placements, computable in polynomial time from $N$, on which the queens completion problem is $\NP$ hard with the free region a constant fraction of the board.
+\end{enumerate}
+
+\section*{Part II}
+
+\begin{enumerate}
+\item Starting from the 92 solutions for $N = 8$ counted in Table~\ref{tab:dos}, verify that they fall into 12 orbits under the dihedral group, with one orbit of size 4.
+
+\item Compute $\EE[S_N]$ exactly for a uniformly random permutation: derive the expression $\sum_{d=1}^{N-1} 2(N-d)^2 / (N(N-1))$, sum it in closed form, and check that its leading term is $2N/3$.
+
+\item Compute $\Var(S_N)$ and show it is $O(N)$. Which pairs of pairs are correlated?
+
+\item Using the entropy chain rule, derive an upper bound on $Q(N)$ by conditioning each row on the rows before it, determine the exponential rate this bound gives, and compare with Simkin's rate. Beware that the product $\prod_i \max(1, N - 3(i-1) + 2)$, which counts the squares left free by the earlier rows only if their attacks never overlap, is not a valid bound: it falls below $Q(N)$ from $N = 12$ on.
+
+\item Show that for $N$ coprime to $6$ the permutation $x_i = 2i \bmod N$ is a solution. For which other $N$ does a linear permutation $x_i = ai + b \bmod N$ work?
+
+\item From the exact counts to $N = 27$, fit $\log Q(N) - \log N!$ to $c + \beta \log N - aN$ and reproduce the estimates of Chapter~\ref{ch:open}. Try $N \ge 15$ only and compare.
+
+\item $(*)$ Prove or disprove that $N(0)/N(1) \to 0$ as $N \to \infty$.
+\end{enumerate}
+
+\section*{Part III}
+
+\begin{enumerate}
+\item Prove the Lorenz identity for a discrete random variable directly from the definition of the quantile function, without Fubini.
+
+\item Compute the Lorenz curve of the Boltzmann likelihood $e^{-S}$ for $N = 8$ from Table~\ref{tab:dos} and plot it. Where is the kink?
+
+\item Show that the optimal importance density in the quantile coordinate is $\Omega \propto \Lambda$ and that the resulting estimator has zero variance. Why can it not be used?
+
+\item Derive the moments $\EE D_i^k = k! \, n! / (n+k)!$ of uniform spacings from the Dirichlet representation.
+
+\item Carry out the trapezoidal error calculation of Chapter~\ref{ch:yakowitz} for $\Lambda(s) = s^3$ and compare the exact mean squared error with the bound.
+
+\item Implement the stratified midpoint rule and the bracketing sums on a staircase with $K = 20$ random jumps and $n = 10^2, 10^3, 10^4$ nodes, and verify the $K/n^2$ and $K^2/n^2$ scalings.
+
+\item Prove the shrinkage lemma for nested sampling when $L(X)$ has atoms, by introducing a random tie break.
+
+\item Derive $\EE s_k s_l$ for the nested sampling positions and verify the Rao Blackwellised variance formula numerically against repeated runs.
+
+\item Show that the Swendsen Wang bond variables are slice variables in the sense of Damien, Wakefield and Walker.
+
+\item Prove Cheeger's inequality for reversible chains in the form $\Phi^2/2 \le \gamma \le 2\Phi$.
+
+\item Show that the Feynman Kac normalising constant estimate is unbiased for two rungs by direct computation, then in general by the martingale argument.
+
+\item $(*)$ Find the minimax weight $\Omega$ over staircases with $K$ jumps and widths geometrically decreasing with ratio $\theta$.
+\end{enumerate}
+
+\section*{Part IV}
+
+\begin{enumerate}
+\item Write out the quantile function $\Lambda_x$ of an $\RP$ algorithm after $k$ rounds of amplification. Where is its step?
+
+\item Prove the search to decision reduction of Chapter~\ref{ch:theorems} for $\RP$ languages in full detail, including the amplification needed at each prefix extension.
+
+\item Show that if the queens level set chain mixes in polynomial time on every partial board then $\NP = \RP$, citing exactly which theorems are used.
+
+\item Compute the exact ratios $Z_{m-1}/Z_m$ for $N = 9$ from Table~\ref{tab:dos} and compare with the estimated ladder in Table~\ref{tab:ladder}.
+
+\item Run the swap chain on $\{ S \le 1 \}$ for $N = 12$ from each of the four isolated solutions identified in Chapter~\ref{ch:open}. What does the chain do?
+
+\item Implement the block chain of Chapter~\ref{ch:swendsen} with block size $4$ and compare its autocorrelation time with the swap chain for $N = 16$.
+
+\item Compute the variance of $S$ under $\pi_\gamma$ for $N = 8$ to $11$ as a function of $1/\gamma$ and locate the maximum. Does it sharpen with $N$?
+
+\item Reconstruct Stockmeyer's hashing estimator and run it on $N = 8$ with the exact count as the oracle. How many hash lengths are needed?
+
+\item $(*)$ Implement the Gent Jefferson Nightingale reduction for a small unsatisfiable formula and run the swap chain on the resulting board. Report the autocorrelation time.
+
+\item $(*)$ Prove a torpid mixing bound for the swap chain on some explicit family of conditioned boards.
+
+\item $(*)$ Prove rapid mixing of the swap chain on $\{ S \le 1 \}$ for the unconditioned problem.
+\end{enumerate}

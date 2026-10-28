@@ -1,0 +1,92 @@
+\chapter{Pseudorandomness and Hitting Sets}
+\label{ch:pseudo}
+
+This chapter gives proofs of three classical results about randomized classes that Chapter~\ref{ch:classes} only stated, Adleman\index{Adleman's theorem}'s theorem, the Sipser Lautemann theorem and the Valiant\index{Valiant, Leslie} Vazirani isolation lemma, and then describes the Nisan Wigderson\index{Wigderson, Avi} generator and the hitting set approach to derandomization in enough detail to make the comparison with the vertical walk of Chapter~\ref{ch:prp} precise. The reader who wants only the thesis may skip to Part II and return when the hitting set construction is invoked.
+
+\section{Amplification}
+
+Let $A(x, r)$ be an $\RP$ algorithm for $L$ with $r \in \{0,1\}^m$. Running $A$ on $k$ independent random strings and accepting if any run accepts gives an $\RP$ algorithm with failure probability at most $2^{-k}$ on inputs in $L$ and no failures outside $L$. The random string has length $km$. For $\BPP$ one runs $k$ independent copies and takes a majority vote; the Chernoff bound gives failure probability at most $e^{-ck}$ for a constant $c$ depending on the gap. In both cases the failure probability can be made smaller than $2^{-n}$ with $k = O(n)$ repetitions, which is the fact that Adleman's proof below exploits.
+
+\section{Adleman's theorem}
+
+\begin{theorem}[Adleman; Bennett and Gill]
+$\RP \subseteq \Ppoly$, and more generally $\BPP \subseteq \Ppoly$.
+\end{theorem}
+
+\begin{proof}
+Amplify so that for each $x$ of length $n$ the algorithm errs with probability less than $2^{-(n+1)}$ over $r \in \{0,1\}^{m'}$. Say that $r$ is bad for $x$ if $A(x, r) \neq \Ind_L(x)$. For each $x$ fewer than $2^{m' - n - 1}$ strings are bad. There are $2^n$ inputs of length $n$, so fewer than $2^{m' - 1}$ strings are bad for some input, and more than half of the strings are good for every input of length $n$ simultaneously. Fix one such string $r_n$. The circuit that computes $A(x, r_n)$ has polynomial size, since $A$ runs in polynomial time and $r_n$ is a fixed constant, and it decides $L$ on all inputs of length $n$.
+\end{proof}
+
+The proof is a union bound. It produces, for each $n$, a string $r_n$ that works for all inputs at once, but it gives no way to find $r_n$ other than searching through all $2^{m'}$ candidates, which is why the conclusion is nonuniform. The circuit family $\{C_n\}$ exists but is not computable from $n$ in any known polynomial time way. The gap between $\Ppoly$ and $\Pc$ is exactly the gap between knowing that a good string exists and being able to construct it, and that is the gap that a hitting set\index{hitting set} generator closes.
+
+In the vertical coordinates of Chapter~\ref{ch:reorder} the theorem reads as follows. For each $x$ the quantile function\index{quantile function} $\Lambda_x$ has its step at $p(x) \ge 1 - 2^{-(n+1)}$ or at $0$. The string $r_n$ lies in $\{ r : L_x(r) = 1 \}$ for every $x \in L$, that is, $r_n$ is a single point of the cube that is simultaneously in the level set of every input in the language. A hitting set asks for less: a polynomial size collection of points such that every such level set contains at least one of them.
+
+\section{The Sipser Lautemann theorem}
+
+\begin{theorem}[Sipser, G\'acs, Lautemann]
+$\BPP \subseteq \Sigma_2^p \cap \Pi_2^p$.
+\end{theorem}
+
+\begin{proof}
+Since $\BPP$ is closed under complement it suffices to show $\BPP \subseteq \Sigma_2^p$. Let $m$ be the length of the random string after amplification and amplify so that the error is at most $1/(2m)$; repeating an $m_0$ bit algorithm $k$ times and taking a majority vote gives error $e^{-ck}$ at length $k m_0$, so $k = O(\log m_0)$ suffices and $m$ is polynomial. Let $G_x = \{ r : A(x, r) = 1 \}$. If $x \in L$ then $|G_x| \ge (1 - 1/(2m)) 2^m$ and if $x \notin L$ then $|G_x| \le 2^m / (2m)$; we use only that in the first case $G_x$ is almost everything and in the second it is a small fraction.
+
+Lautemann's trick is to consider translates. For $u \in \{0,1\}^m$ let $G_x \oplus u = \{ r \oplus u : r \in G_x \}$. If $G_x$ is a small fraction of the cube, then for any $u_1, \dots, u_m$ the union $\bigcup_i (G_x \oplus u_i)$ has size at most $m |G_x| \le 2^{m-1} < 2^m$ and so does not cover the cube. If $G_x$ is almost everything, then for random $u_1, \dots, u_m$ the probability that a fixed $r$ lies outside every translate is at most $(2m)^{-m}$, and the probability that some $r$ lies outside all translates is at most $2^m (2m)^{-m} = m^{-m} < 1$ for $m \ge 2$, so some choice of $u_1, \dots, u_m$ covers the cube. Therefore
+\[
+x \in L \iff \exists u_1, \dots, u_m \; \forall r \; \bigvee_{i=1}^{m} A(x, r \oplus u_i) = 1 ,
+\]
+which is a $\Sigma_2^p$ predicate, since the inner disjunction is polynomial time computable.
+\end{proof}
+
+The theorem says that two quantifier alternations suffice to simulate randomness. The existential quantifier guesses the shifts $u_i$ and the universal quantifier checks that every random string is covered. In the vertical picture, the shifts move the level set $G_x$ around the cube, and the covering condition says that the union of $m$ shifted level sets is the whole cube, which is possible only if the level set has density close to one.
+
+\section{The Valiant Vazirani isolation lemma}
+
+The isolation lemma is the tool by which randomness converts the problem of finding one solution among many into the problem of finding a unique solution. It is used in Toda\index{Toda's theorem}'s theorem and it is the model for many randomized reductions in counting complexity.
+
+\begin{lemma}[Valiant and Vazirani]
+Let $S \subseteq \{0,1\}^n$ be a nonempty set. Choose $k \in \{1, \dots, n+1\}$ uniformly and then choose $k$ vectors $a_1, \dots, a_k \in \{0,1\}^n$ and bits $b_1, \dots, b_k \in \{0,1\}$ uniformly and independently. Let $S' = \{ s \in S : \langle a_i, s \rangle = b_i \text{ for all } i \}$ over $\mathrm{GF}(2)$. Then $\PP( |S'| = 1 ) \ge 1 / (8(n+1))$.
+\end{lemma}
+
+\begin{proof}
+Suppose $2^{k-2} \le |S| \le 2^{k-1}$ for the chosen $k$, which happens with probability at least $1/(n+1)$. Each $a_i$ halves $S$ in expectation and the constraints are pairwise independent on distinct elements of $S$. For a fixed $s \in S$ the probability that $s$ survives all $k$ constraints is $2^{-k}$, and the probability that some other $s' \in S$ also survives, given that $s$ survives, is at most $(|S| - 1) 2^{-k} \le \tfrac12$. So each $s$ is the unique survivor with probability at least $2^{-k} \cdot \tfrac12$, and summing over $s$ the probability of a unique survivor is at least $|S| 2^{-k-1} \ge 2^{k-2} 2^{-k-1} = \tfrac18$. Multiplying by the probability of choosing the right $k$ gives the bound.
+\end{proof}
+
+\begin{theorem}[Valiant and Vazirani]
+If there is a polynomial time algorithm that decides satisfiability for formulas with at most one satisfying assignment, then $\NP = \RP$.
+\end{theorem}
+
+\begin{proof}
+Given a formula $\varphi$, add the random parity constraints of the lemma, which can be expressed by a polynomial size formula $\varphi'$, and run the unique satisfiability algorithm on $\varphi'$. If $\varphi$ is unsatisfiable so is $\varphi'$, and the algorithm says so. If $\varphi$ is satisfiable then with probability at least $1/(8(n+1))$ the formula $\varphi'$ has exactly one satisfying assignment and the algorithm accepts. Repeating $O(n)$ times gives an $\RP$ algorithm for satisfiability.
+\end{proof}
+
+In our vocabulary the lemma says that random hashing can thin a level set of unknown size down to a single point with nonnegligible probability. It is the complexity theorist's rare event method: instead of walking down the quantile function to find the level set, one slices the level set with random hyperplanes until it is a singleton, and the number of slices needed, which is the $k$ of the lemma, is an estimate of the logarithm of the level set's size. Stockmeyer\index{Stockmeyer's theorem}'s approximate counting theorem of Chapter~\ref{ch:approx} is exactly this idea turned into an estimator.
+
+\section{Pseudorandom generators}
+
+A pseudorandom generator in the sense of Nisan and Wigderson\index{Nisan and Wigderson} is a family of functions $G_n : \{0,1\}^{\ell(n)} \to \{0,1\}^n$ with $\ell(n) \ll n$, computable in time $2^{O(\ell(n))}$, such that no circuit of size $n$ can distinguish $G_n(U_\ell)$ from $U_n$ with advantage more than $1/n$. If $\ell(n) = O(\log n)$ then every $\BPP$ algorithm using $n$ random bits can be derandomized by running it on all $2^{\ell(n)} = n^{O(1)}$ seeds and taking the majority, which shows $\Pc = \BPP$.
+
+The Nisan Wigderson construction takes a Boolean function $f$ on $\ell'$ bits that is hard on average for circuits of size $s$ (we need $s$ at least about $n^2$, see below): no circuit of that size computes $f$ correctly on more than a $\tfrac12 + 1/s$ fraction of inputs. It also takes a combinatorial design, a family of subsets $S_1, \dots, S_n \subseteq \{1, \dots, \ell\}$ each of size $\ell'$ with pairwise intersections of size at most $\log n$. The generator outputs
+\[
+G(z) = \big( f(z|_{S_1}), \, f(z|_{S_2}), \, \dots, \, f(z|_{S_n}) \big) ,
+\]
+where $z|_{S_i}$ is the restriction of the seed $z$ to the coordinates in $S_i$. The proof that $G$ fools small circuits is a hybrid argument: if a circuit $C$ distinguishes $G(z)$ from uniform, then by replacing the output bits one at a time by truly random bits there is a position $i$ at which $C$ distinguishes the $i$th bit from random, and since the other bits depend on $z|_{S_i}$ only through the small intersections $S_j \cap S_i$, they can be computed by a small circuit from the $\log n$ shared bits, and one obtains a small circuit that predicts $f(z|_{S_i})$ from $z|_{S_i}$ with advantage $1/n^2$, contradicting the hardness of $f$; the predictor has size about the size of the distinguisher plus $n^2$, so the hardness of $f$ is needed against circuits of that size at advantage $1/n^2$.
+
+The design exists with $\ell = O(\ell'^2 / \log n)$ and can be constructed explicitly. With $f$ hard for circuits of size $2^{\Omega(\ell')}$ one may take $\ell' = O(\log n)$ and so $\ell = O(\log n)$, which is the Impagliazzo\index{Impagliazzo and Wigderson} Wigderson setting. The hardness amplification that converts worst case hardness, which is what the hypothesis on $\mathrm{E}$ supplies, into the average case hardness that the construction needs is the derandomized XOR lemma, and is the technical heart of their paper.
+
+\section{Hitting set generators}
+
+For $\RP$ a weaker object suffices. A hitting set generator is a family $H_n \subseteq \{0,1\}^n$ of polynomial size, computable in polynomial time, such that every set $S \subseteq \{0,1\}^n$ of density at least $\tfrac12$ that is recognised by a circuit of size $n$ contains a point of $H_n$. Given such a family, an $\RP$ algorithm $A$ is derandomized by accepting $x$ if and only if $A(x, r) = 1$ for some $r \in H_n$: if $x \in L$ then the acceptance set has density at least a half and is hit; if $x \notin L$ then nothing is accepted. The output of a pseudorandom generator\index{pseudorandom generator} is a hitting set, since a set of density a half that avoided it would be a distinguisher. The converse is not obvious, and Andreev, Clementi and Rolim showed in 1998 that nonetheless a hitting set generator suffices to derandomize $\BPP$, not only $\RP$; Goldreich, Vadhan and Wigderson gave a simplified proof in 2011.
+
+Hitting sets are the object closest to the vertical walk. As Chapter~\ref{ch:reorder} will show, the nested sampling\index{nested sampling} walk on a randomized algorithm visits $O(n)$ points of the cube, each a conditioned draw from a level set, and that if the acceptance set has density at least a half the walk hits it. A deterministic hitting set generator is a derandomized walk: a fixed polynomial size set of points that hits every dense level set at once. The construction of Nisan and Wigderson produces such a set from a hard function; the vertical walk produces, for one input at a time and using randomness, points in that input's level set, which is not a hitting set because its points depend on the input and on fresh randomness. Neither gets something for nothing, one needing a hard function and the other fresh randomness, and the thesis of this book is that the two constructions are looking at the same staircase from opposite ends.
+
+\section{The Kabanets Impagliazzo barrier}
+
+Why not simply derandomize polynomial identity testing directly, by a clever choice of evaluation points? Kabanets\index{Kabanets and Impagliazzo} and Impagliazzo proved that any such choice would have consequences beyond the problem itself.
+
+\begin{theorem}[Kabanets and Impagliazzo]
+If polynomial identity testing is in $\Pc$, then either $\mathrm{NEXP} \not\subseteq \Ppoly$ or the permanent\index{permanent} does not have polynomial size arithmetic circuits.
+\end{theorem}
+
+The proof shows that a deterministic identity test would allow one to verify a candidate arithmetic circuit for the permanent in $\NP$, by checking the self reducib\index{self reducibility}ility relations of the permanent as polynomial identities; combined with the assumption that $\mathrm{NEXP} \subseteq \Ppoly$, which by a theorem of Impagliazzo, Kabanets and Wigderson implies $\mathrm{NEXP} = \mathrm{MA} \subseteq \Pc^{\sharp\mathrm{P}} = \Pc^{\mathrm{perm}}$, and the assumption that the permanent has small arithmetic circuits (so that the circuit can be guessed and checked), this would place $\mathrm{NEXP}$ in $\NP$, which the nondeterministic time hierarchy theorem forbids. The upshot is that derandomizing even one natural problem in $\coRP$ requires proving a circuit lower bound, and circuit lower bounds are the thing nobody can prove.
+
+The barrier has a precise reading in the vertical picture. The acceptance set of the identity test, for a nonzero polynomial, is the complement of a hypersurface and has density at least a half; to hit it deterministically one needs a polynomial size set of points that is contained in no hypersurface of bounded degree definable by a small circuit. Such a set is a hitting set for the level sets of a particular family of $\RP$ algorithms, and Kabanets and Impagliazzo show that its existence is as strong as a lower bound. The vertical walk does not evade this. It identifies the level set that must be hit; it does not tell us how to hit it without randomness. We say so again in Chapter~\ref{ch:prp} because it is the single most important thing to understand about the thesis.

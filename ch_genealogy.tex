@@ -1,0 +1,58 @@
+\chapter{Numerical Experiments III: Genealogies}
+\label{ch:genealogy}
+
+Chapter~\ref{ch:smc} proposed the genealogy of the particle system as the diagnostic for shattered level sets, and Chapter~\ref{ch:witchhat} argued that it is a chain based diagnostic that can see something a single chain cannot. This chapter runs it. For the unconditioned queens at $N = 10, 14, 18$ and $22$ and for randomly conditioned boards at $N = 14$ and $18$, we record at each rung of the ladder the number of distinct initial ancestors of the surviving particles, and compare with the number predicted by a neutral model in which selection alone, with no structure in the level set, causes the coalescence. The two agree closely, with two exceptions noted below. On these boards the genealogy shows little coalescence beyond that of selection, which is what connected level sets and rapid mixing would produce, though at this resolution it does not prove them.
+
+\section{The neutral model}
+
+The split sampler of Chapter~\ref{ch:experiments} keeps $M$ particles, selects at each rung the fraction $f_t$ with energy at or below the new level, and refills the population by copying the elite cyclically and mutating each copy by the level set chain. Label each initial particle with an ancestor index and carry the index through selection and mutation. After rung $t$ let $A_t$ be the number of distinct ancestors among the elite.
+
+If the level set at rung $t$ is connected and the chain mixes within it, the energies of the particles at the next selection are independent of their ancestry, and selection of a fraction $f_{t+1}$ picks a random subset. With $A_t$ ancestors each represented by about $M / A_t$ particles, the expected number of ancestors that survive a random selection of fraction $f_{t+1}$ is
+\[
+A_{t+1} \approx A_t \big( 1 - (1 - f_{t+1})^{M / A_t} \big) ,
+\]
+which is the neutral prediction. If instead the level set has shattered into components and the particles of some ancestors are in components from which the next level is unreachable, those ancestors are lost in a block, and $A_{t+1}$ falls below the neutral prediction. A coalescence to one ancestor at the bottom rung, where the neutral model predicts several, would be the signature of the mixing conjecture's failure.
+
+\section{Results}
+
+Table~\ref{tab:genealogy} gives, for each run, the level $m_t$, the observed $A_t$ and the neutral prediction, rung by rung down to the solutions. The prediction iterates the recursion above from $A_0 = M$ on its own predicted values, using the observed selected fractions, rather than applying it to the observed $A_t$ at each rung. The equal family size formula is an upper bound on the neutral expectation, since $1 - (1-f)^n$ is concave in $n$ and cyclic copying leaves family sizes unequal, so a shortfall of the observed count below the prediction is expected even under neutrality; the comparison therefore cannot separate structure from this bias. The predicted counts of the table are a hand computation from the recursion above and the observed fractions in code/genealogy.json; no script in the code directory computes them.
+
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{\footnotesize Distinct ancestors among the elite at each rung, observed against the neutral prediction, for $M = 400$ particles. Unconditioned boards at $N = 10, 14, 18, 22$ and randomly conditioned boards with $k$ queens of a solution fixed. Each cell is level: observed / predicted.}
+\label{tab:genealogy}
+\begin{tabular}{lp{4.3in}}
+\toprule
+board & ancestors by rung (level: observed / predicted) \\
+\midrule
+$N = 10$ & $5{:}167/167, \; 4{:}142/142, \; 3{:}111/120, \; 2{:}75/80, \; 1{:}38/42, \; 0{:}11/12$ \\
+$N = 14$ & $7{:}134/134, \; 6{:}124/125, \; 5{:}101/113, \; 4{:}84/94, \; 3{:}54/68,$ \\
+ & $2{:}39/43, \; 1{:}25/24, \; 0{:}7/7$ \\
+$N = 18$ & $10{:}162/162, \; 8{:}114/118, \; 7{:}101/110, \; 6{:}87/99, \; 5{:}71/81,$ \\
+ & $4{:}54/63, \; 3{:}42/49, \; 2{:}25/28, \; 1{:}10/13, \; 0{:}4/8$ \\
+$N = 22$ & $12{:}131/131, \; 10{:}107/109, \; 9{:}100/102, \; 8{:}94/96, \; 7{:}72/82,$ \\
+ & $6{:}57/74, \; 5{:}40/53, \; 4{:}32/39, \; 3{:}21/27, \; 2{:}15/20, \; 1{:}12/12, \; 0{:}6/6$ \\
+$N = 14$, $k = 3$ & $7{:}142/142, \; 5{:}88/90, \; 4{:}76/79, \; 3{:}57/65, \; 2{:}41/47,$ \\
+ & $1{:}23/27, \; 0{:}13/19$ \\
+$N = 18$, $k = 5$ & $8{:}134/134, \; 7{:}122/125, \; 6{:}104/113, \; 5{:}84/93, \; 4{:}60/72,$ \\
+ & $3{:}43/52, \; 2{:}26/33, \; 1{:}16/19, \; 0{:}6/7$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three observations. First, the observed ancestor counts track the neutral prediction at every rung on every board, up to a one sided shortfall, since in 41 of the 52 cells the observed count is below the prediction, 10 are equal and one is above, and we have no replicate runs to measure the fluctuation: the typical shortfall is $10$ to $20\%$ in the middle rungs and the bottom rung counts agree to within one or two except at $N = 18$ ($4$ against $8$) and at $N = 14$, $k = 3$ ($13$ against $19$). The $N = 18$ bottom rung loses half the predicted ancestors, which is the size of block loss that a diagnostic should detect, so we cannot say that there is no block loss of ancestors; at this particle number we cannot tell it from a fluctuation. Second, the coalescence is severe in absolute terms, from $400$ ancestors to between $4$ and $13$ at the bottom, but it is the coalescence of selection, not of structure: with selected fractions between $0.02$ and $0.60$ over six to twelve rungs, a neutral population loses most of its ancestry, and this is what happens. Third, the conditioned boards behave like the unconditioned ones, consistent with the exact connectivity computations of Chapter~\ref{ch:open}.
+
+\section{Interpretation}
+
+The genealogy is consistent with the first half of the mixing conjecture, within the bias noted above and the resolution limits discussed below. A single chain's autocorrelation time, measured in Chapter~\ref{ch:experiments2}, says that the chain moves within whatever it can reach; the genealogy says that what the population reaches at the bottom is reached from many independent starting points in proportion to their share of the population, which is what connectedness would produce, though the comparison cannot separate this from the bias noted above. The witch's hat of Chapter~\ref{ch:witchhat} would show up here as a population that, starting from $400$ dispersed points, arrives at the spike from only one or two of them while the neutral model predicts ten; nothing of the kind appears.
+
+The experiment also tells us how to size the particle system. The neutral ancestry at the bottom scales roughly linearly in $M$: iterating the neutral recursion with the observed fractions, $M = 400$ leaves between $6$ and $19$ ancestors and $M = 4000$ would leave between $59$ and $187$. A diagnostic that aims to detect a block loss of, say, half the ancestors needs the neutral count at the bottom to be well above ten, which means $M$ in the thousands for $N$ above $20$. The resampling scheme matters as well: cyclic copying of the elite, which we used, preserves ancestry evenly, whereas multinomial resampling adds its own coalescence and would blur the signal.
+
+\section{The experiment on hard boards}
+
+The experiment that remains is the same one that has remained throughout: the genealogy on reduction boards. There the prediction is the opposite of what Table~\ref{tab:genealogy} shows. A board encoding a hard formula has, if the picture of Chapter~\ref{ch:ogp} is right, completions in exponentially many components with the overlap gap property, and a particle population descending the ladder will find, at the bottom rung, that the particles in most components cannot reach a completion at all, since their near completions are near completions of an unsatisfying assignment and the level set below is empty for them. The ancestry at the bottom will collapse to those few initial particles, if any, that happened to start in the basin of a satisfying cluster, and the neutral model will overpredict by a large factor. That collapse, measured against the neutral prediction, would be the first direct Monte Carlo observation of the mechanism that the whole program says must be there. It needs the reduction implemented, and Chapter~\ref{ch:experiments2} says why we have not done it; it is the next thing to do.
+
+\section{Summary of the three experiments}
+
+The three experimental chapters now say the following. The ladder counts the unconditioned queens correctly to $N = 16$, at a cost that has been measured only up to that size; polynomial scaling is extrapolated. The bottom rung chain has autocorrelation time growing like $N^{1.8}$ to $N = 32$. The genealogy shows coalescence close to neutral, which is consistent with connected level sets, to $N = 22$ unconditioned and $N = 18$ randomly conditioned; at $M = 400$ the bottom predictions are only 6 to 19 ancestors, so it cannot exclude a block loss of half, and the mixing of the chain between rungs, run for a few sweeps, is assumed rather than tested. Together with the exact giant component computations to $N = 17$, the evidence that the Monte Carlo program works on boards that encode nothing is suggestive. The evidence that it fails on boards that encode something is, as yet, the consensus of complexity theory and the overlap gap theorems for the problems the boards would encode, and no measurement of our own.

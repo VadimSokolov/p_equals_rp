@@ -1,0 +1,12 @@
+N=9 maxE=36
+m=0 size=352 comps=304 largest=3 withsol=304 largestsol=3 sols=352
+m=1 size=3728 comps=69 largest=3636 withsol=5 largestsol=348 sols=352
+m=2 size=20376 comps=1 largest=20376 withsol=1 largestsol=352 sols=352
+N=10 maxE=45
+m=0 size=724 comps=612 largest=3 withsol=612 largestsol=3 sols=724
+m=1 size=15128 comps=253 largest=14824 withsol=1 largestsol=724 sols=724
+m=2 size=106056 comps=1 largest=106056 withsol=1 largestsol=724 sols=724
+N=11 maxE=55
+m=0 size=2680 comps=2128 largest=6 withsol=2128 largestsol=6 sols=2680
+m=1 size=70336 comps=1121 largest=69096 withsol=1 largestsol=2680 sols=2680
+m=2 size=584024 comps=1 largest=584024 withsol=1 largestsol=2680 sols=2680

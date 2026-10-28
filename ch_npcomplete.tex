@@ -1,0 +1,46 @@
+\chapter{NP Completeness}
+\label{ch:npcomplete}
+
+This chapter proves the Cook\index{Cook Levin theorem} Levin theorem in outline, works through a handful of Karp\index{Karp, Richard}'s reductions in enough detail to show how they go, and describes the reduction of Gent, Jefferson and Nightingale that places the queens completion problem among the complete ones. The point is not to be encyclopaedic but to make the reader see what completeness means: that a chessboard with some queens on it can encode any Boolean formula, and so any computation.
+
+\section{The Cook Levin theorem}
+
+\begin{theorem}[Cook, Levin]
+$\mathrm{SAT}$, the set of satisfiable Boolean formulas in conjunctive normal form, is $\NP$ complete.
+\end{theorem}
+
+\begin{proof}[Sketch]
+$\mathrm{SAT} \in \NP$ with the satisfying assignment as certificate. For completeness let $L \in \NP$ be decided by a nondeterministic machine $M$ in time $p(n)$. Given $x$ of length $n$, build a formula $\varphi_x$ that is satisfiable if and only if $M$ accepts $x$.
+
+The computation of $M$ on $x$ is a sequence of $p(n)$ configurations, each described by the contents of $p(n)$ tape cells, the head position and the state. Introduce Boolean variables $c_{t, i, \sigma}$ meaning that at time $t$ cell $i$ holds symbol $\sigma$, $h_{t, i}$ meaning the head is at cell $i$ at time $t$, and $s_{t, q}$ meaning the state is $q$ at time $t$. There are $O(p(n)^2)$ variables. The formula $\varphi_x$ is the conjunction of clauses expressing: at time $0$ the tape holds $x$, the head is at cell $1$ and the state is $q_0$; at each time exactly one symbol is in each cell, the head is in exactly one place and the state is unique; at each time $t+1$ the configuration follows from that at time $t$ by one of the allowed transitions, which involves only the cells near the head and so is a conjunction of local constraints of constant size; and at time $p(n)$ the state is $q_{acc}$ (which we take to be absorbing). Each local constraint is a formula on a constant number of variables and so is a conjunction of a constant number of clauses. The whole formula has size $O(p(n)^2)$ and is computable from $x$ in polynomial time. A satisfying assignment is exactly an accepting computation.
+\end{proof}
+
+The proof shows that the tableau of a computation, laid out in space and time, is a Boolean circuit of polynomial size, and that circuit satisfiability reduces to CNF satisfiability by introducing a variable for each gate. This is the layout that gives $\Pc \subseteq \Ppoly$ in Chapter~\ref{ch:turing}. Three literals per clause suffice, by splitting long clauses with auxiliary variables, so $3\mathrm{SAT}$ is complete; two literals do not unless $\Pc = \NP$, since $2\mathrm{SAT}$ is in $\Pc$ by a reduction to strongly connected components.
+
+\section{Karp's reductions}
+
+Karp's paper established the pattern that every subsequent completeness proof follows: take a known complete problem, usually $3\mathrm{SAT}$, and build a gadget that encodes its clauses in the target problem. Three examples.
+
+Clique. Given a $3\mathrm{SAT}$ formula with $m$ clauses, build a graph with a vertex for each occurrence of a literal in a clause, and an edge between two vertices if they lie in different clauses and are not negations of each other. A clique of size $m$ picks one literal from each clause, pairwise consistent, and so defines a satisfying assignment; conversely a satisfying assignment picks a true literal in each clause and these form a clique. So the formula is satisfiable if and only if the graph has an $m$ clique, and $\mathrm{CLIQUE}$ is $\NP$ complete. Vertex cover follows at once, since a set is a clique in $G$ if and only if its complement is a vertex cover in the complement graph.
+
+Subset sum. Given $3\mathrm{SAT}$ with $n$ variables and $m$ clauses, build numbers in base $10$ with $n + m$ digits. For each variable $x_i$ create two numbers $t_i$ and $f_i$, each with a $1$ in digit $i$, and with a $1$ in digit $n + j$ for each clause $j$ containing $x_i$ respectively $\neg x_i$. For each clause add two slack numbers with a $1$ in digit $n + j$. The target has $1$ in each of the first $n$ digits and $3$ in each of the last $m$. A subset summing to the target must pick exactly one of $t_i, f_i$ for each $i$, which is an assignment, and must reach $3$ in each clause digit, which with at most two slacks requires at least one true literal. No carries occur since each digit sums to at most $5$.
+
+Hamiltonian cycle. The gadget is more elaborate: a chain of vertices for each variable that can be traversed left to right or right to left, encoding true or false, and a vertex for each clause attached to the chains of the variables it contains in such a way that it can be visited only from a chain traversed in the direction corresponding to a true literal. The travelling salesman decision problem follows by setting edge weights to $1$ and non edges to $2$ and asking for a tour of weight equal to the number of vertices.
+
+Each reduction is a construction and a two sided argument, and each is checkable by a reader in an afternoon. The accumulated catalogue of several thousand such reductions is the strongest evidence that $\NP$ completeness is a real phenomenon rather than an artefact of the definition: problems from every area of discrete mathematics, operations research, logic, biology and physics turn out to be the same problem in disguise.
+
+\section{The queens completion reduction}
+
+Gent, Jefferson and Nightingale\index{Gent, Jefferson and Nightingale}'s proof that $\mathrm{QUEENS}$ is $\NP$ complete reduces from a problem they call signed $\mathrm{SAT}$ through an intermediate problem on the placement of pieces subject to line constraints. We describe the shape of the construction.
+
+The board is large, of size polynomial in the formula, and most of it is filled with fixed queens whose only role is to attack squares. The fixed queens are arranged so that the free squares, those not attacked by any fixed queen and not in a row or column already occupied, form a sparse pattern: a collection of short segments, one for each variable, together with connecting structures for each clause. A segment for variable $x_i$ offers a choice of two positions for a free queen, and the choice encodes the truth value. The clause structures are arranged so that a free queen placed to encode a false literal attacks a square that some other free queen must then occupy, with the attacks propagating along diagonals through regions of the board that the fixed queens leave open; a clause with all three literals false leaves some row with no available square, so that the placement cannot be completed. The rows and columns of the board are allocated so that the counting of queens, $N$ in total, forces exactly one free queen per segment and one per clause structure.
+
+The difficulty, and the reason the proof is long, is that queens attack along four directions and the attacks cannot be confined: a queen placed to encode a choice attacks squares far away along its diagonals, and the gadgets must be positioned so that these long range attacks land only on squares that are already blocked or that are meant to be blocked. The construction uses the fixed queens to build walls that absorb unwanted attacks, and the geometry of the walls is where the ingenuity lies.
+
+The result is that for every $3\mathrm{SAT}$ formula (composing the reductions) there is a board and a partial placement, computable in polynomial time, that can be completed if and only if the formula is satisfiable. The same construction, with a little care about the number of completions corresponding to each satisfying assignment, shows that $\#\mathrm{QUEENS}$ is $\sharpP$ complete under polynomial time counting reductions.
+
+\section{What completeness buys}
+
+The practical content of $\NP$ completeness is a licence to stop looking for a polynomial algorithm and start looking for something else: an approximation, a heuristic, an algorithm that is exponential but with a small base, a restriction of the problem that is easy, or a randomized method that works on typical instances. The theoretical content is a unification: every $\NP$ complete problem is a window on the same object, and progress on any is progress on all.
+
+For this book the licence is the last one listed, a randomized method. We do not look for a polynomial time algorithm for the queens completion problem. We look at a Monte Carlo algorithm whose running time is polynomial if a certain Markov chain mixes rapidly and the rung ratios of its ladder are at least inverse polynomial, and we use completeness to say what rapid mixing would mean: not merely a fast algorithm for the queens but a fast randomized algorithm for everything in $\NP$. The chain is the subject of Part IV, and a proof of both would prove $\NP = \RP$, and the question is that conjecture dressed as a question about chess pieces.

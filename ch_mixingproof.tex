@@ -1,0 +1,102 @@
+\chapter{Towards a Mixing Proof on Unconditioned Boards}
+\label{ch:mixingproof}
+
+The evidence of the last three experimental chapters and the exact computations of Chapter~\ref{ch:open} point to a theorem: on unconditioned boards the swap chain on $\{ S \le 1 \}$ mixes in polynomial time. This chapter lays out what a proof would need. One natural plan is a sequence of four lemmas, two of them conjectural and one of them, as the computations below show, false as stated. This chapter replaces the conjectural lemmas by exact measurements of the quantities they concerned, proves the reduction that remains, and leaves exactly one conjecture, which is equivalent to the theorem.
+
+\section{The statement}
+
+\begin{conjecture}
+\label{conj:mixing}
+There is a constant $c$ such that for all $N \ge 8$ the swap chain on $A_N = \{ x \in S_N : S(x) \le 1 \}$, restricted to the connected component $G_N$ of $A_N$ that contains the most solutions, has mixing time at most $N^c$. Moreover $|G_N \cap \{ S = 0 \}| \ge (1 - o(1)) Q(N)$.
+\end{conjecture}
+
+The second clause is what the exact computations show to $N = 13$, with the giant component holding all but a vanishing fraction of the solutions; the first is what the autocorrelation measurements suggest, though the exact relaxation times of Table~\ref{tab:gap} already force $c > 2.5$ for $N \le 12$. The restriction to $G_N$ is necessary because the stragglers, the solutions in small components, cannot be reached, and it is harmless for counting if the second clause holds.
+
+\section{What is proved about the chain}
+
+The chain is the following. From $x \in G_N$ choose a pair of rows uniformly among the $\binom{N}{2}$ pairs, swap their columns to obtain $y$, and move to $y$ if $S(y) \le 1$, otherwise stay. Three facts about it are elementary and we record them because the reduction below uses each.
+
+\begin{lemma}
+\label{lem:chainfacts}
+The swap chain on $G_N$ is reversible with respect to the uniform distribution on $G_N$, is irreducible on $G_N$ by definition of $G_N$, and is aperiodic for $N \ge 8$. Its transition probabilities are $0$ or $1 / \binom{N}{2}$ off the diagonal.
+\end{lemma}
+
+\begin{proof}
+The proposal is symmetric and the acceptance is an indicator, so $P(x, y) = P(y, x)$ for $x \ne y$ and the uniform distribution is reversible. Aperiodicity holds because some state has a rejected proposal: if every proposal from every state of $G_N$ were accepted, $G_N$ would be closed under transpositions, which generate $S_N$, so $G_N = S_N$; but the identity permutation has $S = \binom{N}{2} > 1$. One state with positive holding probability in an irreducible chain makes the chain aperiodic.
+\end{proof}
+
+\begin{lemma}
+\label{lem:four}
+Let $x$ be a solution and let $y$ be obtained by swapping rows $i$ and $j$. Then $S(y) \le 4$.
+\end{lemma}
+
+\begin{proof}
+The two moved queens do not attack each other after the swap, since the condition $|x_i - x_j| \ne |i - j|$ is symmetric in the columns. Each moved queen sits on two diagonals of its new square, and each diagonal contains at most one of the $N - 2$ unmoved queens, because $x$ is a solution. So at most four attacks are created.
+\end{proof}
+
+\section{What is measured about the landscape}
+
+One might conjecture that every solution has $\Omega(N)$ swaps creating at most one attack, that all but a $1/N$ fraction of near solutions can be repaired by a single swap, and that the graph $H_N$ on solutions, joining two solutions connected by a swap to a near solution and a swap back, has degree of order $N$ and is an expander. The exact computations say the following.
+
+Repairable swaps. Table~\ref{tab:repair} of Chapter~\ref{ch:open} gives the number of swaps of a solution that leave at most one attack, over every solution for $N \le 12$. The mean is $3.9, 4.0, 5.5, 6.5, 7.5$ for $N = 8$ to $12$, a constant fraction, between $0.11$ and $0.14$, of the $\binom{N}{2}$ swaps, so the repair neighbourhood grows quadratically on average. The minimum is $2$ for $8 \le N \le 11$ and $0$ at $N = 12$, where four solutions have no repairable swap at all; at $N = 13$ there are $56$. The heuristic that a swap creates at most one attack with probability about $5/16$ because roughly half the diagonals are empty, overestimates the fraction by a factor between two and three; the diagonals through the new squares are not independent of the solution's structure.
+
+Distance from near solutions to solutions. For every near solution in the giant component we computed, by a breadth first search from the solutions inside $A_N$, the number of swaps to the nearest solution along a path that stays in $A_N$. Table~\ref{tab:neardist} gives the distribution. The fraction at distance one, the near solutions that a single swap repairs, is $0.34$ at $N = 8$ and $0.28$ at $N = 13$, with no trend towards one; the conjecture that all but a $1/N$ fraction are repairable in one swap is false. The mean distance is between $1.9$ and $2.4$ and the maximum is $8$ from $N = 11$ on. More than $90\%$ of near solutions are within three swaps of a solution at $N = 12$ and $13$.
+
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{Near solutions in the giant component $G_N$: their number, the fraction at swap distance $1$, at most $2$ and at most $3$ from the nearest solution along paths inside $A_N$, the mean and maximum distance, and the mean, median and maximum degree of the two step solution graph $H_N$.}
+\label{tab:neardist}
+\begin{tabular}{rrrrrrrrrr}
+\toprule
+$N$ & near & $d{=}1$ & $d{\le}2$ & $d{\le}3$ & mean & max & deg & med & max \\
+\midrule
+8 & 888 & 0.342 & 0.770 & 0.973 & 1.91 & 4 & 0.52 & 0 & 2 \\
+9 & 3288 & 0.336 & 0.701 & 0.915 & 2.08 & 7 & 0.92 & 1 & 4 \\
+10 & 14100 & 0.242 & 0.569 & 0.843 & 2.38 & 6 & 0.86 & 1 & 8 \\
+11 & 66416 & 0.224 & 0.565 & 0.857 & 2.39 & 8 & 0.73 & 1 & 5 \\
+12 & 341664 & 0.262 & 0.638 & 0.907 & 2.21 & 8 & 1.09 & 1 & 8 \\
+13 & 1895632 & 0.281 & 0.678 & 0.934 & 2.12 & 8 & 1.46 & 1 & 9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The two step solution graph. The same table gives the degree of $H_N$: the number of other solutions reachable from a solution by a swap to a near solution followed by a swap to a solution. The mean degree is $0.52, 0.92, 0.86, 0.73, 1.09, 1.46$ for $N = 8$ to $13$, the median is $0$ at $N = 8$ and $1$ thereafter, and the maximum is $9$. The graph $H_N$ is nearly empty. A typical solution has one two step neighbour or none, and the giant component of $A_N$, which contains $99.9\%$ of the solutions at $N = 13$, is not held together by two step paths at all. It is held together by longer paths through near solutions, some of which lie eight swaps from the nearest solution at $N = 11$ to $13$. The lemma that $H_N$ has degree of order $N$ and inverse polynomial conductance, is therefore wrong in its premise and empty in its conclusion, and the expansion that a proof needs must be stated for the swap graph on $G_N$ itself, near solutions included.
+
+This is a different picture from the one the repair counts suggest. A solution has seven or eight repairable swaps at $N = 12$, but almost none of the near solutions they lead to can be repaired by a second swap into a different solution; the repairable swaps lead into the near solution sea and the chain must wander there before it finds another shore. The chain spends $97\%$ of its time in that sea at $N = 12$ by the measurements of Chapter~\ref{ch:experiments2}, and the conductance of $G_N$ is a property of the sea, not of the solutions.
+
+\section{The one conjecture}
+
+Let $\Phi_N$ be the conductance of the swap chain on $G_N$ in the sense of Chapter~\ref{ch:mixing}: the minimum over $A \subseteq G_N$ with $|A| \le |G_N|/2$ of the number of swap edges leaving $A$ divided by $\binom{N}{2} |A|$.
+
+\begin{conjecture}[Expansion of the bottom level set]
+\label{conj:expansion}
+There is a constant $c'$ such that $\Phi_N \ge N^{-c'}$ for all $N \ge 8$.
+\end{conjecture}
+
+\begin{theorem}
+\label{thm:reduction}
+Conjecture~\ref{conj:expansion} implies the first clause of Conjecture~\ref{conj:mixing} for the lazy version of the chain, with
+\[
+\tau(\epsilon) \le \frac{4}{\Phi_N^2} \Big( N \log N + \log \frac{1}{\epsilon} \Big) \le 4 N^{2c'} \Big( N \log N + \log \frac{1}{\epsilon} \Big)
+\]
+Conversely the first clause of Conjecture~\ref{conj:mixing} implies Conjecture~\ref{conj:expansion} with $c' = c + 1$.
+\end{theorem}
+
+\begin{proof}
+By Lemma~\ref{lem:chainfacts} the chain is reversible with uniform stationary distribution on $G_N$, so the Jerrum Sinclair form of Cheeger's inequality of Chapter~\ref{ch:mixing} gives a spectral gap at least $\Phi_N^2 / 4$ for the lazy chain, and the mixing time bound $\tau(\epsilon) \le (4 / \Phi_N^2) (\log |G_N| + \log(1/\epsilon))$ follows with $\log |G_N| \le \log N! \le N \log N$. For the converse, a chain with mixing time $\tau$ has conductance at least $1 / (4 \tau)$, since if a set $A$ of mass at most a half had conductance below $1/(4\tau)$ the chain started uniformly in $A$ would remain in $A$ with probability more than $3/4$ after $\tau$ steps, which contradicts total variation distance $1/4$ from a distribution giving $A$ mass at most a half. With $\tau \le N^c$ this gives $\Phi_N \ge N^{-c} / 4 \ge N^{-c-1}$ for $N \ge 4$.
+\end{proof}
+
+The theorem says that the first clause of the mixing conjecture and the expansion conjecture are the same conjecture, so nothing is lost by stating the program's target as expansion, and something is gained, since expansion is a property of a finite graph that can be bounded by canonical paths, by comparison, or by computation, and does not involve time.
+
+\section{What a proof would need}
+
+The canonical path method of Chapter~\ref{ch:mixing} would route, for each pair $x, y \in G_N$, a path of swaps inside $A_N$ and bound the congestion. The measured structure says what the paths must look like. A path cannot go from solution to solution in two steps, since $H_N$ is nearly empty; it must pass through runs of near solutions, some eight swaps from the nearest solution, and the encoding argument that bounds congestion, which charges each edge to the pairs whose paths use it and recovers the pair from the edge and a bounded amount of side information, must encode the position within such a run. The side information is then of order the run length times $\log N$ bits, which is still polynomial, so the method is not ruled out; but the paths cannot be built from the solutions alone, as one might imagine, and the interpolation must be designed in the near solution sea.
+
+The comparison method of Chapter~\ref{ch:symmetric} is the other route. The swap chain on $G_N$ is the transposition walk on $S_N$ restricted to a subset of density about $e^{-(\alpha - 1) N}$, and the restricted chain inherits the conductance of the free walk only if the restriction does not cut it into pieces, which is exactly the content of Conjecture~\ref{conj:expansion}. A block chain that resamples $k = O(\log N)$ rows exactly, as in Chapter~\ref{ch:swendsen}, moves in one step from a solution to any solution that agrees with it outside the block, and its graph on solutions, unlike $H_N$, might have large degree; comparing the swap chain with the block chain requires routing each block move along swaps inside $A_N$, which is the same question as the canonical paths with the end points restricted.
+
+A third route, which the exact computations make available, is to compute $\Phi_N$ or a certified lower bound for it. The spectral gap of the swap chain on $G_N$ has been computed exactly for $N = 8$ to $12$ (Table~\ref{tab:gap} of Chapter~\ref{ch:open}). The relaxation times are $301, 444, 549, 875, 1033$, a log log slope of about $3$ between $N = 8$ and $12$, steeper than the exponent $2$ suggested by the autocorrelation measurements. The conductance of the cut defined by the second eigenvector is flat, $0.0070, 0.0077, 0.0072, 0.0073, 0.0060$, and the slow eigenvector is odd under a symmetry of the board (a reflection for $N = 8$ to $10$, the half turn at $N = 11$), so the bottleneck is structured by the symmetries of the board rather than random. This does not prove the conjecture, since five values of $N$ cannot fix an asymptotic exponent, but it is consistent with it and gives the exponent $c'$ to aim at.
+
+\section{Where this leaves the conjecture}
+
+Lemma~\ref{lem:chainfacts} and Lemma~\ref{lem:four} are proved, Theorem~\ref{thm:reduction} is proved, and the repair conjecture and the one step repair lemma have been replaced by measurements that respectively exceed and refute them. One conjecture remains, the expansion of the bottom level set, and by Theorem~\ref{thm:reduction} it is equivalent to the mixing claim. Its proof would need a canonical path construction through the near solution sea, or a comparison with a chain whose mixing is proved by other means, and neither is available. The analogy with the KLS conjecture of Chapter~\ref{ch:volume} is close: a dimension free isoperimetric bound on a natural family of sets, believed since 1995 and now proved up to a factor $\sqrt{\log n}$ by the stochastic localisation of Eldan as developed by Chen, by Klartag and Lehec, and by Klartag \cite{Chen,KlartagLehec,Klartag2023}. Our conjecture is less ambitious, since it allows polynomial factors, and less structured, since there is no convexity to localise. The data to $N = 13$ are consistent with it, and no finite computation can settle it.

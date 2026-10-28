@@ -1,0 +1,166 @@
+\chapter{Sufficient Statistics for the Queens}
+\label{ch:sufficient}
+
+Is there a sufficient statistic\index{sufficient statistic} for the $N$ queens problem? The question has three readings, one for each of the three ways the book looks at the board, and each has a precise answer. For the Boltzmann family of Chapter~\ref{ch:rare} the energy is minimal sufficient for the temperature and the density of states determines the whole family, which is why the vertical walk needs nothing else. For the completion problem, where the data is a partial board and the unknown is a completion, the minimal sufficient statistic is the set of squares that every completion occupies, and the posterior mean matrix, which is the summary statistic that Jiang, Wu, Zheng and Wong\index{Jiang and Wong} \cite{JiangWong2017} proposed for approximate Bayesian computation and that generative Bayesian computation inherits, is sufficient as well, and for a reason that holds for every self reducible problem. And for a single solution the algorithmic sufficient statistic of Chapter~\ref{ch:kolmogorov} is the solution set itself. The second reading is the one that bears on the GBC implementation of Chapter~\ref{ch:gbc}, and the theorems of this chapter say what a learned summary statistic for the queens can and cannot be: it can be sufficient, it cannot be cheap unless $\NP = \RP$, and it cannot be used through its marginals.
+
+\section{Fisher sufficiency: the energy and the density of states}
+
+Let $\cX = S_N$ and let $\pi_\beta(x) = e^{-\beta S(x)} / Z(\beta)$ be the Boltzmann\index{Boltzmann distribution} family indexed by the inverse temperature $\beta \ge 0$ (so $\beta = 1/\gamma$ for the temperature $\gamma$ of the Notation chapter, and $Z(\beta)$ here is the Notation's $Z(1/\beta)$), where
+\[
+Z(\beta) = \sum_m N(m) \, e^{-\beta m}
+\]
+and $N(m)$ is the number of placements with $m$ attacks.
+
+\begin{theorem}
+\label{thm:fisher}
+The energy $S$ is a minimal sufficient statistic for $\beta$ in the Boltzmann family, and the family itself is determined by the density of states $(N(m))_{m \ge 0}$: every expectation $\EE_\beta f(S)$, every normalising constant and every ratio $Z(\beta) / Z(\beta')$ is a function of the density of states alone, and the Lorenz staircase of Chapter~\ref{ch:vertical} is a bijective recoding of it.
+\end{theorem}
+
+\begin{proof}
+The Fisher Neyman factorisation $\pi_\beta(x) = g_\beta(S(x)) \cdot 1$ gives sufficiency of $S$, and the likelihood ratio $\pi_\beta(x) / \pi_\beta(y) = e^{-\beta (S(x) - S(y))}$ depends on $(x, y)$ only through $S(x) - S(y)$, which is Lehmann and Scheff\'e's criterion \cite{LehmannScheffe} for minimality: two placements have the same likelihood ratio for every $\beta$ if and only if they have the same energy. The second claim is the identity $Z(\beta) = \sum_m N(m) e^{-\beta m}$, and the staircase at $\beta = 1$ has steps of height $e^{-m}$ and width $N(m) / N!$, from which $N(m)$ is read off.
+\end{proof}
+
+The theorem is elementary and it is the reason the program has the shape it has. The vertical walk never looks at a placement except to compute its energy, and it estimates the one object, the density of states, that determines the whole family; the ladder of level sets $\{ S \le m \}$ is the family of sets on which the sufficient statistic is constant or bounded, and the amortised generator $G(\tau, m)$ of Chapter~\ref{ch:gbc} conditions on a level bound $m$ of the minimal sufficient statistic and on nothing else. Where the walk is hard, it is hard because the distribution of the sufficient statistic is hard, not because anything has been thrown away.
+
+\section{Bayesian sufficiency: the board and the completion}
+
+The completion problem is a Bayesian problem with a flat prior. The data is a board $X_0$, a set of $k$ fixed queens in distinct rows and columns, the unknown is a completion $x$, and the posterior is the uniform distribution $\pi(\cdot \mid X_0)$ on the completion set $C(X_0)$. A statistic $T(X_0)$ is sufficient if $\pi(\cdot \mid X_0)$ depends on $X_0$ only through $T(X_0)$, that is, if boards with the same $T$ have the same completion set; it is minimal sufficient if it is a function of every sufficient statistic, equivalently if $T(X_0) = T(X_0')$ exactly when $C(X_0) = C(X_0')$.
+
+Define the closure of a board with completions as the set of squares occupied by every completion,
+\[
+\bar X_0 = \bigcap_{x \in C(X_0)} x ,
+\]
+the fixed queens together with the forced ones, and define the posterior mean matrix
+\[
+M(X_0)_{ic} = \PP\big( x_i = c \mid X_0 \big) = \frac{ N(0; X_0 \cup \{(i,c)\}) }{ N(0; X_0) } ,
+\]
+the probability under the uniform completion law that the queen of row $i$ stands in column $c$, which is a ratio of two completion counts.
+
+\begin{theorem}[Minimal sufficiency of the closure]
+\label{thm:closure}
+On boards with at least one completion, the closure $\bar X_0$ is a minimal sufficient statistic for the completion law, and the posterior mean matrix $M(X_0)$ is a sufficient statistic, with $\bar X_0 = \{ (i, c) : M(X_0)_{ic} = 1 \}$.
+\end{theorem}
+
+\begin{proof}
+A completion of $X_0$ contains every square of $\bar X_0$ by definition, so it is a completion of $\bar X_0$; a completion of $\bar X_0$ contains $X_0 \subseteq \bar X_0$, so it is a completion of $X_0$. Hence $C(X_0) = C(\bar X_0)$, and two boards with the same closure have the same completion set, which is sufficiency. For minimality, if $C(X_0) = C(X_0')$ then the intersections of the two completion sets coincide, so $\bar X_0 = \bar X_0'$; the closure is therefore a function of the completion set, hence of any sufficient statistic. For the matrix, $M_{ic} = 1$ exactly when every completion has the queen of row $i$ in column $c$, so the closure is the set of entries equal to one, and sufficiency of $M$ follows from that of the closure.
+\end{proof}
+
+The theorem has a general form, and the general form is the point of contact with Jiang and Wong. Their proposal for approximate Bayesian computation\index{approximate Bayesian computation} is to use the posterior mean $\EE[\theta \mid y]$, learned by regressing simulated parameters on simulated data with a deep network, as the summary statistic of the data; they show it is the summary that makes the ABC posterior mean correct as the tolerance goes to zero, and that it minimises the mean squared error among statistics of its dimension, which is Fearnhead and Prangle's \cite{FearnheadPrangle} semi automatic criterion made constructive; the companion paper \cite{JiangWong2018} replaces the summary by a Kullback Leibler discrepancy between simulated and observed data. In general the posterior mean is not sufficient: a posterior uniform on $\{00, 11\}$ and one uniform on $\{01, 10\}$ have the same mean. For completion problems it is.
+
+\begin{theorem}[Posterior mean sufficiency for completion problems]
+\label{thm:pmean}
+Let a problem have instances that are partial assignments $X_0$ of variables to values, with the posterior the uniform law on the complete assignments extending $X_0$ that satisfy a fixed constraint, and suppose that extending a partial assignment by a value assigned in every completion does not change the completion set. Then the posterior mean, the vector of probabilities $\PP(\text{variable } i = v \mid X_0)$, is a sufficient statistic for the posterior, and the set of its entries equal to one is minimal sufficient.
+\end{theorem}
+
+\begin{proof}
+Word for word the proof of Theorem~\ref{thm:closure}: the entries equal to one are the forced values, the forced values together with $X_0$ form a partial assignment with the same completion set, and that partial assignment is a function of the completion set.
+\end{proof}
+
+The hypothesis holds for every self reducible\index{self reducibility} problem in the sense of Chapter~\ref{ch:jvv}, where instances are partial assignments and the completions of an instance are the completions of its extensions, so the theorem covers satisfiability, colourings, matchings as edge sets, and the queens. For such problems the summary statistic of Jiang and Wong is sufficient, not merely correct for the posterior mean, and the question of what has been lost by summarising does not arise. What arises instead is the cost.
+
+\section{The cost of the statistic}
+
+\begin{theorem}[Hardness of the sufficient statistics]
+\label{thm:cost}
+Extend the closure to boards with forbidden squares, and to boards with no completion by declaring every square to be in the closure of such a board. Deciding whether a given square belongs to the closure is then $\mathrm{coNP}$ hard. Computing the posterior mean matrix exactly is $\sharpP$ hard. A randomized polynomial time algorithm that approximates every entry of the matrix within a factor $1 \pm 1/N^2$ on every board exists if and only if $\NP = \RP$.
+\end{theorem}
+
+\begin{proof}
+A square $(i, c)$ is in the closure if and only if the board $X_0$ with the square $(i, c)$ forbidden, that is, with the constraint $x_i \ne c$ added, has no completion; this shows only that membership is in $\mathrm{coNP}$. For hardness, let $B$ be a board with a queen in column $c_0$ and let $i$ be a free row: if $B$ has a completion, no completion has a queen at $(i, c_0)$, so $(i, c_0)$ is not in the closure, and if $B$ has none, every square is in the closure by convention. So $(i, c_0)$ is in the closure of $B$ if and only if $B$ has no completion, a many one reduction from the $\mathrm{coNP}$ complete complement of the completion problem. The entry $M_{ic}$ is a ratio of two completion counts, and the count $N(0; X_0)$ is recovered from the matrix by the chain rule $N(0; X_0) = \prod_j 1 / M^{(j)}_{j x_j}$ along any completion $x$, where $M^{(j)}$ is the matrix of the board extended by $x_1, \dots, x_{j-1}$; so exact matrices give exact counts, which are $\sharpP$ hard. For the third claim, a completion to follow is found greedily from the approximate matrices, since an entry approximated to within a relative factor is positive exactly when the true entry is, and the chain rule with $(1 \pm 1/N^2)$ approximate entries with each call amplified by the median trick, then gives the count within a factor $(1 \pm 1/N^2)^{N} = 1 \pm O(1/N)$, and a polynomial factor approximation of the completion count gives $\NP = \RP$ by Chapter~\ref{ch:theorems}; conversely $\NP = \RP$ gives an FPRAS for every count by the same equivalence, and $M_{ic}$ is a ratio of two counts.
+\end{proof}
+
+The theorem is the complexity theory of Jiang and Wong's statistic for the queens, and it says three things. The statistic a deep network would be asked to learn is well defined and sufficient. It cannot be computed, and it cannot be approximated to polynomial relative accuracy, unless $\NP = \RP$. And the learning problem is therefore the whole problem: a network that produced $M(X_0)$ to within a relative factor $1 \pm 1/N^2$ on every board in polynomial time would be a proof that $\NP = \RP$, by the theorem and Chapter~\ref{ch:theorems}. The simulated pairs are easy to produce given a uniform sampler of queens solutions (a uniform solution with $k$ queens removed is a pair, but no polynomial time uniform sampler is known), and this is exactly the planted conditioning of Chapter~\ref{ch:open}; the theorem says the difficulty is in the regression, not the data, and the shattering results of that chapter say where in the space of boards it sits.
+
+\section{What the marginals do not carry}
+
+A sufficient statistic can be useless if the posterior cannot be reconstructed from it cheaply, and the posterior mean matrix is a case in point. The natural reconstruction is the product of its rows, the mean field approximation, and Chapter~\ref{ch:ce} measured its divergence from the posterior: for the unconditioned problem it is $N \log N - d - \log Q(N) = \alpha N - d + o(N)$ nats with $d \approx 0.26$, about $20$ nats at $N = 12$. The matrix carries the whole posterior, by Theorem~\ref{thm:closure}, but it carries it in the pattern of its ones, which are the forced squares, and in the exact values of its fractional entries, from which the counts are recovered by the chain rule of Theorem~\ref{thm:cost}; it does not carry it in any factorised form. A generator $G(\tau, M)$ of the GBC kind that is uniform on completions must therefore be a function of the matrix that is far from a product over rows, and the Markov window computation of Chapter~\ref{ch:open} says it cannot be a function of local windows either: the conditionals must see the whole matrix.
+
+Where the forced squares are tells the story of the threshold. Table~\ref{tab:closure} gives, on one hundred random boards at each $(N, k)$, the fraction of boards whose closure is strictly larger than the board and the mean number of forced squares beyond the fixed ones. Below the satisfiability threshold of Chapter~\ref{ch:open}, at $k = 2$ and $3$, no random board has a forced square: the closure is the board, the minimal sufficient statistic is the data itself, and the posterior mean matrix has no ones outside the fixed queens. At $k = 4$ forced squares appear, on $61\%$ of boards at $N = 12$ and $15\%$ at $N = 13$, and from $k = 5$ on most boards have four to six of them, the unique completion boards having every square forced. The sufficient statistic collapses onto the data below the threshold and onto the solution above it, and in between, where the hard instances live, it is a mixture that no local rule computes.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Forced squares on random boards with $k$ fixed queens, one hundred boards with a completion per row: mean number of completions, fraction of boards with at least one forced square beyond the fixed queens, and mean number of forced squares.}
+\label{tab:closure}
+\begin{tabular}{rrrrr}
+\toprule
+$N$ & $k$ & mean $N(0)$ & with forced & mean forced \\
+\midrule
+12 & 2 & 117.8 & 0.00 & 0.00 \\
+12 & 3 & 17.1 & 0.00 & 0.00 \\
+12 & 4 & 3.4 & 0.61 & 2.87 \\
+12 & 5 & 1.7 & 0.90 & 4.94 \\
+12 & 6 & 1.1 & 0.99 & 5.59 \\
+13 & 2 & 521.8 & 0.00 & 0.00 \\
+13 & 3 & 60.2 & 0.00 & 0.00 \\
+13 & 4 & 9.3 & 0.15 & 0.48 \\
+13 & 5 & 2.3 & 0.80 & 4.24 \\
+13 & 6 & 1.5 & 0.92 & 5.55 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Theorems for GBC}
+
+The GBC implementation of Chapter~\ref{ch:gbc} learns a generator from simulated pairs, and the chapters since have measured what the learning is up against. The following statements collect what can be proved about a learned generator for the queens that conditions on a summary statistic, in the setting of Jiang and Wong.
+
+\begin{theorem}[Learned generators and the summary]
+\label{thm:gbcsuff}
+Let $T$ be any statistic of the board and $G(\tau, T(X_0))$ a generator, a measurable function of base noise $\tau$ and the statistic, whose output law is uniform on $C(X_0)$ for every board. Then $T$ is sufficient for the completion law, and hence determines the closure. If in addition $G$ is computable in polynomial time and $T$ is computable in randomized polynomial time with error probability at most $1/4$, then $\NP = \RP$. If $T$ is the posterior mean matrix and $G$ is of the form $G(\tau, M) = (G_1(\tau_1, M_{1 \cdot}), \dots, G_N(\tau_N, M_{N \cdot}))$ with independent coordinates, then the divergence $D(\pi(\cdot \mid X_0) \,\|\, P_G)$ of the uniform completion law from the output law $P_G$ of $G$ is at least $\sum_i H_i - \log N(0; X_0)$, where $H_i$ is the entropy of row $i$ of $M(X_0)$, the mean field gap, which for the unconditioned problem is $\alpha N - d + o(N)$ with $d$ the entropy deficit of Chapter~\ref{ch:ce}, linear in $N$ if $d / N$ stays below $\alpha$.
+\end{theorem}
+
+\begin{proof}
+If the output law of $G(\tau, T(X_0))$ is uniform on $C(X_0)$ then $C(X_0)$ is determined by $T(X_0)$, since it is the support of the output law, which is the definition of sufficiency; Theorem~\ref{thm:closure} gives the closure. If both are polynomial time then the composite is a polynomial time uniform generator for completions on every board, and the constant total variation theorem of Chapter~\ref{ch:theorems} gives $\NP = \RP$. For the last claim the output law is a product of its marginals, and the divergence of the uniform law on $C(X_0)$ from a product law is at least its divergence from the nearest product law, which is the entropy gap by the proof of Theorem~\ref{thm:product} of Chapter~\ref{ch:ce}.
+\end{proof}
+
+The theorem places the GBC programme for the queens exactly. A sufficient summary exists and has a name, the posterior mean matrix, and it is the summary Jiang and Wong would prescribe; a uniform generator conditioning on it exists, by sufficiency; but neither can be polynomial unless $\NP = \RP$, and the simplest architecture, a product of per row quantile functions driven by the row of the matrix, is off by the mean field gap however well it is trained. What a learned generator can achieve on random boards, where Chapter~\ref{ch:open} finds polynomial mixing and a shallow shattering depth, is the amortised ladder theorem of Chapter~\ref{ch:gbc} with the error $\delta$ measured rather than assumed, and the measurement, the divergence of a trained generator from the uniform completion law on the planted boards of that chapter, is the experiment that this chapter recommends. The quantity to report is $\delta$ as a function of $N$ and $k$, against the window divergences of Chapter~\ref{ch:open} as the baseline a local architecture cannot beat.
+
+\section{Three sufficiencies, one staircase}
+
+The three readings close on one object. The density of states determines the Boltzmann family and is the staircase. The closure is Bayes sufficient for the completion law and is the bottom of the conditioned staircase, the set that the ladder must reach. The solution set is Kolmogorov sufficient for a typical solution and is the model at which the structure function of Chapter~\ref{ch:kolmogorov} attains the solution's complexity. Each is small to describe, each is hard to compute, and each is estimated by the vertical walk if the walk is polynomial. Sufficiency is the statistician's word for the fact that nothing is lost by summarising; the theorems of this chapter say that for the queens nothing is lost and nothing is gained, since the summary is as hard as what it summarises, and that the one reconstruction that is cheap, the product of the marginals, is the one that loses the mean field gap.
+
+\section{The Jiang Wong route to NP = RP}
+\label{sec:jwroute}
+
+The last section said that a learned sufficient statistic for the queens would be a proof that $\NP = \RP$. This section follows the route to its end, states exactly what a proof along it would have to produce, and proves the one thing about the route that is not a restatement: that the data the learner sees are biased towards the boards on which the statistic is easy.
+
+\subsection*{Planted pairs and the regression target}
+
+Jiang and Wong learn the posterior mean by regression on simulated pairs. For the queens the simulation is the planted conditioning of Chapter~\ref{ch:open}: draw a uniform solution $x$ of the unconditioned problem (which we assume available as an oracle, since no polynomial time uniform sampler of queens solutions is known), draw a uniform $k$ subset of its rows, and keep the queens in those rows as the board $X_0$. Write $P_k$ for the joint law of $(x, X_0)$ so produced.
+
+\begin{theorem}[Planted sampling]
+\label{thm:planted}
+Under $P_k$, the conditional law of $x$ given $X_0$ is the uniform law on $C(X_0)$, so the regression function $\EE_{P_k}[\, \mathbf 1\{x_i = c\} \mid X_0 \,]$ is the posterior mean matrix $M(X_0)$ and the population minimiser of the squared loss under $P_k$ is $M(X_0)$ on every board with a completion. The marginal law of the board is
+\[
+P_k(X_0) = \frac{ N(0; X_0) }{ Q(N) \binom{N}{k} } ,
+\]
+proportional to the number of completions, so that among boards with $k$ queens the learner sees a board with probability proportional to how many completions it has, and the expected number of planted pairs needed to see a given board once is $Q(N) \binom{N}{k} / N(0; X_0)$.
+\end{theorem}
+
+\begin{proof}
+$P_k(x, X_0) = Q(N)^{-1} \binom{N}{k}^{-1} \mathbf 1\{ X_0 \subseteq x \}$. Summing over $x$ gives the marginal of $X_0$ as the number of solutions containing $X_0$, which is $N(0; X_0)$, times the constant; dividing gives the conditional law, which is constant on $C(X_0)$ and zero elsewhere.
+\end{proof}
+
+The theorem is the planted versus random distinction of Chapter~\ref{ch:open} as a statement about training data. The boards on which the posterior mean matrix is hardest, those with few completions near and above the satisfiability threshold, are exactly the boards the planted simulator produces least often; a board with one completion among the boards with $k = 5$ queens at $N = 12$ is seen once in $14200 \binom{12}{5} \approx 10^7$ pairs, and a board with no completion, where the statistic is undefined and the decision problem lives, is never seen at all. A learner trained on $P_k$ is therefore trained on the easy end of the distribution of Table~\ref{tab:closure}, where the closure is the board and the matrix has no ones, and any guarantee it earns is an average over $P_k$, which weights each board by $N(0; X_0)$. To learn the statistic on the hard boards the learner must be shown them, and showing it a hard board means producing a board with few completions and knowing one of them, which is the problem itself.
+
+\subsection*{The equivalence}
+
+\begin{theorem}[The learning problem is the problem]
+\label{thm:jwequiv}
+The following are equivalent.
+\begin{enumerate}
+\item $\NP = \RP$.
+\item There is a randomized algorithm which, given any board $X_0$ with completions, outputs in time polynomial in $N$ a matrix $\tilde M$ with $\tilde M_{ic} \in (1 \pm 1/N^2) M(X_0)_{ic}$ for every entry, with probability at least $\tfrac34$.
+\item There is a uniform family of circuits $C_N$ of size polynomial in $N$, produced from $N$ by a polynomial time algorithm, which, given a board $X_0$ with completions and a random string, outputs such a matrix with probability at least $\tfrac34$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) implies (2) by Theorem~\ref{thm:cost}. (2) implies (3) by the standard simulation of a randomized polynomial time algorithm by uniform polynomial size randomized circuits (cf.\ Chapter~\ref{ch:classes}). (3) implies (1): a circuit that produces the approximate matrix on every board gives, by the chain rule of Theorem~\ref{thm:cost}, an approximation of every completion count within a factor $1 \pm O(1/N)$, once each call is amplified by the median trick, and a polynomial factor approximation of the counts gives $\NP = \RP$ by Chapter~\ref{ch:theorems}. Uniformity of the family is what makes the scheme an algorithm; without it the same argument gives only randomized circuits for the completion problem, that is, $\NP \subseteq \mathrm{P/poly}$, and we do not claim that this implies $\NP = \RP$.
+\end{proof}
+
+The theorem says what a proof of $\NP = \RP$ by the Jiang Wong route would consist of: a uniform polynomial size circuit family, or a polynomial time learner that produces one, computing the posterior mean matrix of every board to within a relative factor $1 \pm 1/N^2$. It also says what such a proof would not be. It would not be a new kind of argument, since (3) is a restatement of a polynomial factor randomized approximation of a $\sharpP$ complete count, and every barrier of Chapter~\ref{ch:barriers} that applies to the scheme applies to the circuit. And it would not be obtained by training on planted pairs, by Theorem~\ref{thm:planted}, unless the training distribution is supplemented with hard boards, which cannot be produced without solving them.
+
+\subsection*{What the route can and cannot show}
+
+We state plainly what this chapter establishes and what it does not. It establishes that the queens have a sufficient statistic, that the statistic is the one Jiang and Wong would compute, that it is sufficient for every self reducible completion problem, that computing it to polynomial accuracy is equivalent to $\NP = \RP$, and that the natural training distribution avoids the boards on which it is hard. It does not establish $\NP = \RP$, and no argument in this book does. What would establish it along the present route is the uniform circuit family of Theorem~\ref{thm:jwequiv}, and the honest expectation of the authors, set out in Chapter~\ref{ch:program}, is that the family does not exist: that on the reduction boards of Gent, Jefferson and Nightingale the matrix entries encode the satisfying assignments of a hard formula at a resolution no polynomial size circuit attains, and that the shattering depth of those boards, which Section~\ref{sec:round4} found moving by about one between $N = 12$ and $16$ on random boards, is the geometric form of that resolution. A reader who wants to attempt the route should take Theorem~\ref{thm:jwequiv} as the specification and the window divergences of Chapter~\ref{ch:open} as the first obstacle: whatever architecture computes $\tilde M$, its conditionals cannot be local, and a window of half the board is needed before the divergence falls below a nat on the easy boards alone.

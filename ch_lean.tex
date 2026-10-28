@@ -1,0 +1,211 @@
+\chapter{Lean Statements of the Main Results}
+\label{ch:lean}
+
+The open problem on formalisation asks for the main results in a proof assistant. This chapter takes the first step: it writes the statements, in Lean 4 with Mathlib conventions, of the Lorenz identity, the product estimator variance bound, the stratified quadrature bound, the main equivalence and the vertical form of $\Pc = \RP$. The statements are given as sketches in Lean style (pseudo-Lean: there is no Lean source in the repository, the code below has not been typechecked, and several identifiers are left undefined), with most proofs left as sorry; the work of making them precise and discharging them is the project. We have chosen the formulations to match Mathlib's existing probability and measure theory libraries where possible, and we comment on the choices.
+
+\section{Why formalise}
+
+The main equivalence of Chapter~\ref{ch:theorems} is an assembly of a few published theorems (Bellare, Goldreich and Petrank; Jerrum, Valiant and Vazirani; Gent, Jefferson and Nightingale), reductions of the book's own, and elementary steps. Each piece is a published theorem or a short argument, and the assembly is short, but the assembly is also the entire content of the thesis, and the gap between a sound assembly and a formally verified one is the gap between confidence and certainty. A formal statement also forces the hypotheses into the open: what exactly is a polynomial level set sampler, what does total variation $\delta$ mean for a sampler that may fail, and what is the promise under which the median theorem holds. Those are the places where an informal argument can hide a mismatch, and the exercise of writing them in Lean is worth doing even if the proofs are never completed.
+
+\section{The Lorenz identity}
+
+Mathlib has the Lebesgue integral, the measure of a set, and the layer cake formula, which is the Lorenz identity's first form. The statement:
+
+\begin{footnotesize}
+\begin{verbatim}
+import Mathlib.MeasureTheory.Integral.Layercake
+import Mathlib.MeasureTheory.Integral.Lebesgue
+
+open MeasureTheory ENNReal
+
+variable {X : Type*} [MeasurableSpace X] (P : Measure X)
+  [IsProbabilityMeasure P] (L : X -> ENNReal) (hL :
+      Measurable L)
+
+/-- The survival function Z(y) = P{L > y}. -/
+def survival (y : ENNReal) : ENNReal := P {x | y < L x}
+
+/-- The quantile function Lambda(s) = sup{y : Z(y) > s}. -/
+def quantile (s : ENNReal) : ENNReal :=
+  sSup {y | s < survival P L y}
+
+/-- Lorenz identity, first form: the layer cake formula. -/
+theorem lorenz_layercake :
+    lintegral P L = lintegral volume (fun y => survival P L
+        y) := by
+  sorry
+
+/-- Lorenz identity, second form: integral of the quantile
+    function over the unit interval. -/
+theorem lorenz_quantile :
+    lintegral P L = lintegral (volume.restrict (Set.Icc 0
+        1)) (fun s => quantile P L s) := by
+  sorry
+\end{verbatim}
+\end{footnotesize}
+
+The two statements are schematic: in Mathlib the integral of an \texttt{ENNReal} valued function against \texttt{volume} needs the survival function as a real valued function integrated over \texttt{Set.Ioi 0} with \texttt{ENNReal.ofReal}, and the measurability hypothesis \texttt{hL} must be included explicitly in the theorems. The first theorem is Mathlib's \texttt{lintegral\_eq\_lintegral\_meas\_lt} adapted to $L$; the second needs the equivalence $s < Z(y) \iff y < \Lambda(s)$, which holds for the generalised inverse of a nonincreasing right continuous function and is the only real content.
+
+\section{The product estimator}
+
+The product estimator's variance bound is a statement about independent random variables. Mathlib has independence and variance.
+
+\begin{footnotesize}
+\begin{verbatim}
+import Mathlib.Probability.Variance
+import Mathlib.Probability.Independence.Basic
+
+open ProbabilityTheory
+
+variable {Omega : Type*} [MeasureSpace Omega]
+    [IsProbabilityMeasure (volume : Measure Omega)]
+
+/-- Relative variance of a product of independent unbiased
+    estimators. -/
+theorem relvar_product (T : Nat) (theta : Fin T -> Real)
+    (htheta : forall t, 0 < theta t)
+    (c : Fin T -> Real) (Y : Fin T -> Omega -> Real) (hind : iIndepFun (fun _
+        => inferInstance) Y)
+    (hmean : forall t, (integral volume fun w => Y t w) =
+        theta t)
+    (hvar : forall t, variance (Y t) volume = (c t)^2 *
+        (theta t)^2) :
+    variance (fun w => Finset.prod Finset.univ fun t => Y t
+        w) volume / (Finset.prod Finset.univ fun t => theta
+        t)^2
+      = (Finset.prod Finset.univ fun t => (1 + (c t)^2)) -
+          1 := by
+  sorry
+\end{verbatim}
+\end{footnotesize}
+
+The statement is exact rather than an inequality, since for independent factors the relative variance of the product is exactly the product of one plus the relative variances minus one. The Bernoulli case specialises $c_t^2 = (1 - \theta_t)/(M \theta_t)$.
+
+\section{Stratified quadrature}
+
+The stratified midpoint bound is unbiasedness plus a variance bound from the oscillation on each stratum.
+
+\begin{footnotesize}
+\begin{verbatim}
+/-- Stratified midpoint rule on n strata with one uniform
+    point
+    each is unbiased for the integral of a bounded
+        measurable f. -/
+theorem stratified_unbiased (n : Nat) (hn : 0 < n) (f :
+    Real -> Real)
+    (hf : Measurable f) (hb : exists B, forall s, |f s| <=
+        B)
+    (V : Fin n -> Omega -> Real) (hV : forall i, volume.map
+        (V i) = volume.restrict (Set.Icc 0 1))
+    (hind : iIndepFun (fun _ => inferInstance) V) :
+    integral volume fun w => (1 / n) * Finset.sum
+        Finset.univ fun i => f ((i + V i w) / n)
+      = integral (volume.restrict (Set.Icc 0 1)) fun s => f
+          s := by
+  sorry
+
+/-- For a step function with K jumps and values in [0,
+    lam1],
+    the variance is at most K lam1^2 / (4 n^2). -/
+theorem stratified_staircase_var (n K : Nat) (lam1 : Real)
+    (f : Real -> Real)
+    (hstep : IsStepFunctionWithJumps f K) (hrange : forall
+        s, 0 <= f s /\ f s <= lam1)
+    (V : Fin n -> Omega -> Real) (hV : forall i, volume.map
+        (V i) = volume.restrict (Set.Icc 0 1))
+    (hind : iIndepFun (fun _ => inferInstance) V) :
+    variance (fun w => (1 / n) * Finset.sum Finset.univ fun
+        i => f ((i + V i w) / n)) volume
+      <= K * lam1^2 / (4 * n^2) := by
+  sorry
+\end{verbatim}
+\end{footnotesize}
+
+The predicate IsStepFunctionWithJumps is not in Mathlib and would need to be defined: a function that is piecewise constant on a partition of $[0, 1]$ into at most $K + 1$ intervals.
+
+\section{The main equivalence}
+
+The complexity theoretic statements require a model of computation. Mathlib has Turing machines and a notion of polynomial time computable functions in Mathlib.Computability, but no randomized classes, no $\NP$ completeness library, and no Markov chain mixing. The honest Lean statement of the main equivalence therefore takes the cited theorems and the book's own reductions as hypotheses and proves only the assembly (in an ASCII transliteration: \texttt{in} stands for $\in$, \texttt{<\_, hred>} for an anonymous constructor, and \texttt{-} for the Lean 4 bullet):
+
+\begin{footnotesize}
+\begin{verbatim}
+/-- Abstract complexity classes as predicates on decision
+    problems. -/
+structure ComplexityWorld where
+  NP : Set DecisionProblem
+  RP : Set DecisionProblem
+  RP_sub_NP : RP <= NP
+  RP_closed : forall A B, Reduces A B -> B in RP -> A in RP
+  prRP : Set PromiseProblem
+  prP : Set PromiseProblem
+
+/-- Hypotheses about the queens completion problem Q.
+    Literature: Q_NPcomplete (Gent, Jefferson, Nightingale).
+    Consequences of published results with a short argument:
+    FPRAS_to_RP (self reducibility, JVV, plus checking a
+    sample) and BGP (Bellare, Goldreich, Petrank, plus the
+    oracle replacement argument of Chapter theorems), and
+    sampler_to_FPRAS (m = 0 plus JVV).
+    Book definitions or results: FPAUS_to_sampler. -/
+structure QueensHypotheses (W : ComplexityWorld) where
+  Q : DecisionProblem
+  Q_NPcomplete : Q in W.NP /\ forall A in W.NP, Reduces A Q
+  FPRAS_to_RP : HasFPRAS (count Q) -> Q in W.RP
+  BGP : (W.NP = W.RP) -> HasFPAUS Q
+  sampler_to_FPRAS : HasLevelSetSampler Q -> HasFPRAS
+      (count Q)
+  FPAUS_to_sampler : HasFPAUS Q -> HasLevelSetSampler Q
+
+/-- The main equivalence, as an assembly of the hypotheses.
+    -/
+theorem main_equivalence (W : ComplexityWorld) (H :
+    QueensHypotheses W) :
+    (W.NP = W.RP) <-> HasLevelSetSampler H.Q := by
+  constructor
+  - intro h
+    exact H.FPAUS_to_sampler (H.BGP h)
+  - intro h
+    have hf := H.sampler_to_FPRAS h
+    have hr := H.FPRAS_to_RP hf
+    exact Set.Subset.antisymm
+      (fun A hA => by
+        obtain <_, hred> := H.Q_NPcomplete
+        exact W.RP_closed A H.Q (hred A hA) hr)
+      W.RP_sub_NP
+\end{verbatim}
+\end{footnotesize}
+
+This is a sketch of a Lean proof, in ASCII transliteration and untested, modulo the definitions of the predicates (\texttt{DecisionProblem}, \texttt{Reduces}, \texttt{HasFPAUS}, \texttt{HasFPRAS}, \texttt{count}, \texttt{HasLevelSetSampler}); closure of $\RP$ under reductions is an added field of \texttt{ComplexityWorld}, since \texttt{RP} is otherwise an arbitrary set. The assembly uses five hypotheses besides \texttt{Q} itself, two directions. One of them is a theorem in the literature (\texttt{Q\_NPcomplete}, see Chapter~\ref{ch:theorems}); \texttt{FPRAS\_to\_RP} follows from Jerrum, Valiant and Vazirani and a short checking argument, and \texttt{BGP} from Bellare, Goldreich and Petrank and the oracle replacement argument, both as in the proof of the main equivalence; and \texttt{sampler\_to\_FPRAS} follows from the case $m = 0$ and the same Jerrum, Valiant and Vazirani argument, while \texttt{FPAUS\_to\_sampler} is a result or definition of this book, so a doubt about the thesis can be located in any of the five, and not only in published theorems. The vertical walk itself is not part of the equivalence.
+
+\section{The vertical form of prRP = prP}
+
+\begin{footnotesize}
+\begin{verbatim}
+/-- The median form: prRP = prP iff medians of polynomial
+    time
+    Boolean functions are computable on the RP promise.
+    Here median (f x) is 1 if the density of f x is at least
+    1/2 and 0 otherwise. -/
+theorem median_form (W : ComplexityWorld) :
+    (W.prRP = W.prP) <->
+      forall f : PolyTimeBool, exists D : PolyTimeAlg,
+        forall x, RPpromise f x -> D x = median (f x) := by
+  sorry
+
+/-- The hitting form: prRP = prP iff dense level sets of
+    polynomial time Boolean functions can be hit
+        deterministically. -/
+theorem hitting_form (W : ComplexityWorld) :
+    (W.prRP = W.prP) <->
+      forall f : PolyTimeBool, exists D : PolyTimeAlg,
+        forall x, (density (f x) >= 1/2) -> f x (D x) =
+            true := by
+  sorry
+\end{verbatim}
+\end{footnotesize}
+
+The proofs are the prBPP based search argument of Chapter~\ref{ch:theorems}, modulo the promise version of the Buhrman and Fortnow theorem, which that chapter assumes (the naive bit fixing search does not stay within the promise), which is elementary but requires the machinery of promise problems, prefix extension and amplification, none of which is in Mathlib.
+
+\section{The state of the project}
+
+The Lorenz identity and the quadrature bounds look formalisable with Mathlib as it stands, after the statements above are made precise (see the remarks on the real valued formulation), and the first may be close to a one liner. The product estimator bound needs only independence and variance, which exist. The complexity theoretic statements need a library of randomized complexity classes that does not exist, and building it is a project of the kind that the Lean community undertakes; the statements above are a specification for what it would need to contain. We have written the assembly proof of the main equivalence as a sketch because it is the place where the book's logic could be checked by machine, with the cited theorems as axioms; it has not been checked, and once the predicates are defined, its typechecking would demonstrate that the thesis is an assembly and not a claim.

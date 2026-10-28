@@ -1,0 +1,45 @@
+board 1 fixed: (5,5) (7,13) N0=2444 ms=1 mc=3 sizes: 2444 72954 834657 5021475 ratio=4.867e-04
+board 2 fixed: (1,11) (6,8) N0=1876 ms=1 mc=4 sizes: 1876 60813 730927 4579439 17565716 ratio=1.068e-04
+board 3 fixed: (4,7) (13,13) N0=829 ms=2 mc=4 sizes: 829 35226 483284 3349544 13827690 ratio=5.995e-05
+board 4 fixed: (13,6) (5,12) N0=3797 ms=1 mc=4 sizes: 3797 103790 1119122 6408093 22964880 ratio=1.653e-04
+board 5 fixed: (2,12) (0,6) N0=3244 ms=2 mc=3 sizes: 3244 92052 1019932 5983760 ratio=5.421e-04
+board 6 fixed: (6,11) (11,1) N0=1789 ms=1 mc=4 sizes: 1789 59641 736447 4652066 17932470 ratio=9.976e-05
+board 7 fixed: (7,10) (8,4) N0=1646 ms=1 mc=3 sizes: 1646 59513 755887 4862174 ratio=3.385e-04
+board 8 fixed: (1,4) (6,8) N0=1878 ms=1 mc=4 sizes: 1878 61476 749177 4730232 18216461 ratio=1.031e-04
+board 9 fixed: (10,2) (8,6) N0=2256 ms=1 mc=3 sizes: 2256 68778 815786 5015175 ratio=4.498e-04
+board 10 fixed: (11,2) (1,11) N0=2242 ms=1 mc=3 sizes: 2242 68101 776288 4695791 ratio=4.774e-04
+board 11 fixed: (2,9) (11,3) N0=2344 ms=1 mc=3 sizes: 2344 70346 808810 4943031 ratio=4.742e-04
+board 12 fixed: (0,11) (5,12) N0=2400 ms=2 mc=3 sizes: 2400 74789 880720 5399866 ratio=4.445e-04
+board 13 fixed: (5,4) (0,0) N0=851 ms=2 mc=3 sizes: 851 35808 493065 3447908 ratio=2.468e-04
+board 14 fixed: (6,9) (11,6) N0=1816 ms=1 mc=3 sizes: 1816 65472 811401 5131080 ratio=3.539e-04
+board 15 fixed: (10,5) (1,7) N0=2035 ms=1 mc=3 sizes: 2035 65635 790103 4936233 ratio=4.123e-04
+board 16 fixed: (5,5) (6,0) N0=3037 ms=1 mc=4 sizes: 3037 92294 1028501 6017301 21850160 ratio=1.390e-04
+board 17 fixed: (1,11) (4,3) N0=1857 ms=1 mc=4 sizes: 1857 61704 741057 4648691 17824971 ratio=1.042e-04
+board 18 fixed: (4,0) (7,6) N0=2050 ms=2 mc=4 sizes: 2050 66263 775535 4748284 17924791 ratio=1.144e-04
+board 19 fixed: (2,7) (12,10) N0=1839 ms=1 mc=3 sizes: 1839 64085 781870 4917493 ratio=3.740e-04
+board 20 fixed: (13,2) (7,12) N0=2119 ms=1 mc=3 sizes: 2119 70107 840545 5197223 ratio=4.077e-04
+N=14 k=2 boards=20 ms_hist: 0 15 5 0 0 0 0 0 mc_hist: 0 0 0 12 8 0 0 0 mean_ratio=2.950e-04
+board 1 fixed: (4,9) (10,5) (9,11) N0=105 ms=1 mc=3 sizes: 105 4217 55959 373853 ratio=2.809e-04
+board 2 fixed: (12,3) (10,10) (2,12) N0=283 ms=1 mc=3 sizes: 283 7711 85328 496533 ratio=5.700e-04
+board 3 fixed: (0,1) (8,8) (9,5) N0=102 ms=1 mc=3 sizes: 102 4019 53763 360050 ratio=2.833e-04
+board 4 fixed: (5,0) (10,12) (7,5) N0=169 ms=1 mc=3 sizes: 169 5770 69908 436131 ratio=3.875e-04
+board 5 fixed: (3,13) (8,11) (10,2) N0=196 ms=1 mc=4 sizes: 196 6020 74161 462302 1757580 ratio=1.115e-04
+board 6 fixed: (3,10) (12,7) (9,12) N0=372 ms=1 mc=3 sizes: 372 10138 104505 583019 ratio=6.381e-04
+board 7 fixed: (2,13) (8,1) (11,3) N0=196 ms=1 mc=3 sizes: 196 6727 81601 508184 ratio=3.857e-04
+board 8 fixed: (0,4) (13,8) (9,5) N0=345 ms=1 mc=3 sizes: 345 9214 99806 574459 ratio=6.006e-04
+board 9 fixed: (8,8) (1,13) (12,0) N0=39 ms=2 mc=4 sizes: 39 2889 43896 317198 1315932 ratio=2.964e-05
+board 10 fixed: (6,10) (8,6) (10,9) N0=222 ms=1 mc=4 sizes: 222 7016 83979 515260 1931000 ratio=1.150e-04
+board 11 fixed: (2,12) (1,3) (4,8) N0=257 ms=1 mc=4 sizes: 257 7944 92530 551649 2015244 ratio=1.275e-04
+board 12 fixed: (11,2) (9,11) (0,0) N0=87 ms=2 mc=4 sizes: 87 3460 46655 313576 1261828 ratio=6.895e-05
+board 13 fixed: (4,2) (7,3) (10,5) N0=358 ms=1 mc=3 sizes: 358 9418 100177 580190 ratio=6.170e-04
+board 14 fixed: (12,12) (7,13) (6,5) N0=151 ms=2 mc=4 sizes: 151 4615 55233 352457 1366804 ratio=1.105e-04
+board 15 fixed: (11,6) (12,2) (7,5) N0=187 ms=1 mc=4 sizes: 187 5841 68986 429149 1647004 ratio=1.135e-04
+board 16 fixed: (6,13) (9,3) (12,12) N0=176 ms=2 mc=3 sizes: 176 6474 77724 475274 ratio=3.703e-04
+board 17 fixed: (7,13) (13,12) (12,5) N0=296 ms=2 mc=4 sizes: 296 8534 96109 558324 2012137 ratio=1.471e-04
+board 18 fixed: (6,8) (3,4) (1,5) N0=343 ms=1 mc=3 sizes: 343 9970 109739 637216 ratio=5.383e-04
+board 19 fixed: (13,12) (0,13) (7,0) N0=57 ms=2 mc=4 sizes: 57 2483 36266 265910 1135441 ratio=5.020e-05
+board 20 fixed: (1,12) (0,0) (2,7) N0=67 ms=2 mc=4 sizes: 67 3463 49009 346488 1421545 ratio=4.713e-05
+N=14 k=3 boards=20 ms_hist: 0 13 7 0 0 0 0 0 mc_hist: 0 0 0 10 10 0 0 0 mean_ratio=2.796e-04
+board 1 fixed: (15,8) (9,6) (2,15) (10,9) N0=417 ms=2 mc=-1 sizes: 417 16276 239803 1822806
+board 2 fixed: (11,3) (9,9) (4,7) (14,15) N0=478 ms=1 mc=-1 sizes: 478 15709 218480 1653392
+board 3 fixed: (2,12) (8,14) (12,4) (4,13) N0=871 ms=1 mc=-1 sizes: 871 25983 324192 2218022

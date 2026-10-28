@@ -1,0 +1,56 @@
+\chapter{Nondeterminism and the Classes P and NP}
+\label{ch:pnp}
+
+This chapter defines $\NP$ three times, by certificates, by nondeterministic machines and by projections of polynomial time relations, shows the definitions agree, and sets out the structure that surrounds the class: $\mathrm{co}\NP$, the intersection $\NP \cap \mathrm{co}\NP$, Ladner\index{Ladner's theorem}'s theorem on intermediate problems, oracles and the polynomial hierarchy. The queens completion problem is used throughout as the running example.
+
+\section{Three definitions of NP}
+
+The first definition is by certificates, as in Chapter~\ref{ch:summary}. A language $L$ is in $\NP$ if there is a polynomial time decidable relation $R(x, w)$ and a polynomial $q$ such that $x \in L$ if and only if there exists $w$ with $|w| \le q(|x|)$ and $R(x, w)$. The string $w$ is the certificate, witness or proof. For the queens completion problem, $x = (N, X_0)$ is a partial placement and $w$ is a full placement extending it; $R$ checks that $w$ extends $x$ and that no two queens attack, which takes $O(N^2)$ time.
+
+The second definition is by nondeterministic machines, due to Rabin and Scott in 1959 for finite automata and later carried over to Turing\index{Turing, Alan} machines. A nondeterministic Turing machine has a transition relation rather than a function: from a configuration there may be several successors. The machine accepts $x$ if some sequence of choices leads to $q_{acc}$, and runs in time $T(n)$ if every sequence of choices halts within $T(n)$ steps. $\mathrm{NTIME}(T(n))$ is the class so decided and $\NP = \bigcup_k \mathrm{NTIME}(n^k)$. The equivalence with the certificate definition is immediate in both directions: the certificate is the sequence of choices, and a certificate can be guessed by a nondeterministic machine one bit at a time and then verified.
+
+The third definition is by projection. A language is in $\NP$ if it is the projection $\{ x : \exists w \, (x, w) \in R \}$ of a language $R$ in $\Pc$ onto its first coordinate, with $|w|$ polynomially bounded. This formulation makes the logical structure visible: $\NP$ is $\Pc$ with one existential quantifier in front, and $\mathrm{co}\NP$ is $\Pc$ with one universal quantifier. Fagin's theorem of 1974 makes this exact in a different way: $\NP$ is precisely the class of properties of finite structures definable in existential second order logic. This is the first result of descriptive complexity, and it shows that $\NP$ is a natural class independent of any machine model.
+
+\section{The class coNP and the intersection}
+
+$\mathrm{co}\NP$ consists of complements of $\NP$ languages: those with short refutations rather than short proofs. Tautology, the set of Boolean formulas true under every assignment, is $\mathrm{co}\NP$ complete. Whether $\NP = \mathrm{co}\NP$ is open, and a negative answer would imply $\Pc \neq \NP$ since $\Pc$ is closed under complement. The polynomial hierarchy is nontrivial only if they differ.
+
+$\NP \cap \mathrm{co}\NP$ contains the problems with both short proofs and short refutations. Linear programming was known to be in this class by duality long before Khachiyan placed it in $\Pc$. Primality was in it by Pratt's 1975 certificates, which give a short proof of primality via the structure of the multiplicative group, long before AKS. Factoring, in its decision version, is in it, since a factorisation can be checked and primality of all factors certified, and it is not known to be in $\Pc$ nor believed to be $\NP$ complete. Edmonds\index{Edmonds, Jack}'s conjecture that $\NP \cap \mathrm{co}\NP = \Pc$ is believed by some and disbelieved by others; its failure would not contradict $\Pc \neq \NP$ and its truth would place factoring in $\Pc$ and break RSA.
+
+For the queens the completion problem is in $\NP$ and not known to be in $\mathrm{co}\NP$: there is no obvious short certificate that a partial placement cannot be completed. Since it is $\NP$ complete (as stated in the last section of this chapter), a short refutation certificate would imply $\NP = \mathrm{co}\NP$.
+
+\section{Polynomial time reductions}
+
+A language $A$ reduces to $B$ in polynomial time, written $A \le_p B$, if there is a polynomial time computable $f$ with $x \in A$ if and only if $f(x) \in B$. This is the Karp\index{Karp, Richard} reduction, many to one. The Cook\index{Cook Levin theorem} reduction, or Turing reduction, allows a polynomial time algorithm for $A$ to make many calls to an oracle for $B$. Both are transitive, both preserve membership in $\Pc$ downward, and $\NP$ completeness is defined with Karp reductions: $B$ is $\NP$ complete if $B \in \NP$ and $A \le_p B$ for every $A \in \NP$. If any $\NP$ complete problem is in $\Pc$ then $\Pc = \NP$, and if any is not then $\Pc \neq \NP$; the complete problems are the hardest in the class and they are all equally hard.
+
+\section{Ladner's theorem}
+
+If $\Pc \neq \NP$, is every problem in $\NP$ either in $\Pc$ or $\NP$ complete?
+
+\begin{theorem}[Ladner]
+If $\Pc \neq \NP$ then there is a language in $\NP$ that is neither in $\Pc$ nor $\NP$ complete.
+\end{theorem}
+
+The proof is a delayed diagonalisation. One constructs a language $L$ by padding satisfiability: $L$ agrees with $\mathrm{SAT}$ on inputs of certain lengths and is empty on the others, with the lengths chosen by a slowly growing function that is adjusted, as $n$ increases, to defeat each polynomial time machine and each polynomial time reduction in turn. The result is a language that is too hard to be in $\Pc$ because it contains infinitely much of $\mathrm{SAT}$, and too thin to be $\NP$ complete because it is empty on most lengths. The languages so constructed are artificial; no natural problem is known to be $\NP$ intermediate, though factoring, graph isomorphism and the discrete logarithm are candidates, and Babai's 2015 quasipolynomial algorithm for graph isomorphism makes it unlikely to be $\NP$ complete.
+
+For the queens, Ladner's theorem says that if completion on boards of size $N$ is hard, then there are intermediate versions, for instance completion restricted to instances whose length lies in a carefully chosen set, that are neither easy nor complete. Whether any natural restriction of the queens is intermediate is unknown.
+
+\section{Oracles and the polynomial hierarchy}
+
+An oracle machine has access to a language $A$ that it may query at unit cost. $\Pc^A$ and $\NP^A$ are the classes decided in polynomial time with oracle $A$, and the polynomial hierarchy of Meyer and Stockmeyer\index{polynomial hierarchy} is defined by
+\[
+\Sigma_0^p = \Pi_0^p = \Pc , \qquad \Sigma_{k+1}^p = \NP^{\Sigma_k^p} , \qquad \Pi_{k+1}^p = \mathrm{co}\Sigma_{k+1}^p ,
+\]
+so that $\Sigma_1^p = \NP$ and $\Pi_1^p = \mathrm{co}\NP$. Equivalently $\Sigma_k^p$ is $\Pc$ with $k$ alternating quantifiers beginning with an existential one. The hierarchy is believed to be strict at every level; if $\Sigma_k^p = \Pi_k^p$ for some $k$ then it collapses to that level, and $\Pc = \NP$ collapses it to $\Pc$. The whole hierarchy is contained in $\mathrm{PSPACE}$, which is characterised by polynomially many alternations, and by Toda\index{Toda's theorem}'s theorem in $\Pc^{\sharpP}$.
+
+Natural problems live at the second level. The minimum equivalent formula problem, whether a given formula has an equivalent one of size at most $k$, is $\Sigma_2^p$ complete under Turing reductions (Buchfuhrer and Umans 2011). Chapter~\ref{ch:pseudo} shows $\BPP \subseteq \Sigma_2^p \cap \Pi_2^p$, and Chapter~\ref{ch:approx} shows approximate counting is in $\Sigma_3^p$. We do not offer a natural second level problem for the queens: the obvious local optimality variants are vacuous, since distinct solutions differ in more than one queen, and reduce to the completion problem itself.
+
+\section{Search versus decision}
+
+$\NP$ is defined by decision problems, but one usually wants the certificate. For $\NP$ complete problems the two are equivalent: a polynomial time decision algorithm yields a polynomial time search algorithm by self reducibility\index{self reducibility}, fixing one bit of the certificate at a time and asking whether a solution with that prefix exists. The queens are self reducible in the natural way, by fixing the column of the queen in the first free row. For problems not known to be complete the equivalence may fail; it is not known, for instance, whether factoring search reduces to factoring decision, although it does for the specific decision problem of whether a number has a factor below a given bound.
+
+Self reducibility is the property that links approximate counting to sampling in the Jerrum Valiant\index{Valiant, Leslie} Vazirani theorem of Chapter~\ref{ch:jvv}, and it is the property that lets the Monte Carlo program of Part IV convert a sampler into a decision procedure. Without it an FPRAS\index{FPRAS} for a counting problem still places the decision problem in $\BPP$, since a relative approximation separates zero from nonzero; with it, the FPRAS finds a witness that can be checked, which places the decision problem in $\RP$.
+
+\section{The queens completion problem formally}
+
+Let us state the problem as a language. An instance is a pair $(N, X_0)$ where $X_0 \subseteq \{1, \dots, N\}^2$ is a set of squares with no two in the same row, column or diagonal, encoded in $\Theta(N \log N)$ bits, one column index or blank for each row. The instance is in $\mathrm{QUEENS}$ if there is a set $X \supseteq X_0$ of $N$ squares with no two in the same row, column or diagonal. The relation $R((N, X_0), X)$ is decidable in time $O(N^2)$, and $X$ has encoding length $O(N \log N)$, so $\mathrm{QUEENS} \in \NP$. Gent, Jefferson and Nightingale\index{Gent, Jefferson and Nightingale} proved $\mathrm{QUEENS}$ is $\NP$ complete, and the counting function $\#\mathrm{QUEENS}$ is $\sharpP$ complete. The unconditioned problem, with $X_0 = \emptyset$, is in $\Pc$ in the degenerate sense that it is always solvable for $N \ge 4$, by an explicit construction known since Pauls in 1874; the hardness is entirely in the conditioning.

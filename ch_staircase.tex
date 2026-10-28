@@ -1,0 +1,174 @@
+\chapter{Exact Yakowitz Theory for Staircases}
+\label{ch:staircase}
+
+The bounds of the last two chapters for staircase integrands carry a factor $K$, the number of steps, in root mean square for the trapezoid and $\sqrt K$ for the stratified rule, and the bounded variation bound of Chapter~\ref{ch:yakowitz} carries a factor $\log n$. This chapter removes all of them. The tool is an exact representation of the quadrature error of the trapezoidal rule on random nodes as an integral against the jump measure of the integrand, which reduces every question about staircases to a question about the spacing that contains a fixed point. That spacing has an exact theory, and the theory gives the mean squared error of the trapezoid on a single step in closed form, a bound for any integrand of bounded variation with no logarithm and no dependence on the number of steps, an asymptotically exact constant for separated steps, and the same for the stratified rule. For the Boltzmann\index{Boltzmann distribution} staircase of the queens, whose step heights are geometric, the constants are free of the number of levels: the quadrature error at a rung is at most $0.71 / n$ in root mean square for the trapezoid and at most $0.5 / n$ for the stratified rule, whatever $N$ and whatever the number of energy levels, and the sharper constants $0.48$ and $0.34$ hold asymptotically for a fixed staircase with separated steps, once $n$ is large relative to the inverse of the location of its smallest step. The chapter ends with the computations that check each statement on the exact queens staircase.
+
+\section{The error as an integral against the jump measure}
+
+Let $\Lambda$ be of bounded variation on $[0, 1]$, right continuous on $(0, 1)$, and write $\mu$ for the signed measure $-d\Lambda$ on $(0, 1)$, so that
+\[
+\Lambda(s) = \Lambda(1) + \mu\big( (s, 1) \big) , \qquad |\mu|\big( (0,1) \big) = V ,
+\]
+with $V$ the total variation. For a nonincreasing staircase $\mu$ is the sum of point masses $h_k \delta_{p_k}$ at the jump locations with the jump heights as weights, and $V = \Lambda(0) - \Lambda(1)$. Let $U_{(1)} < \dots < U_{(n)}$ be the order statistics of $n$ independent uniforms, set $U_{(0)} = 0$ and $U_{(n+1)} = 1$, and let $\hat Z_T$ be the trapezoidal rule on these nodes. For $s \in (0, 1)$ let $A(s) = s - \max\{ U_{(i)} \le s \}$ and $B(s) = \min\{ U_{(i)} > s \} - s$ be the distances from $s$ to the nodes on either side, so that $A(s) + B(s)$ is the length of the spacing containing $s$, and let
+\[
+D(s) = \frac{ B(s) - A(s) }{2}
+\]
+be the signed distance from $s$ to the midpoint of that spacing.
+
+\begin{theorem}[Error representation]
+\label{thm:errrep}
+Almost surely,
+\[
+\hat Z_T - Z = \int_0^1 D(s) \, \mu(ds) .
+\]
+\end{theorem}
+
+\begin{proof}
+On a spacing $(U_{(i)}, U_{(i+1)})$ of length $L$ the trapezoid contributes $L \, (\Lambda(U_{(i)}) + \Lambda(U_{(i+1)})) / 2$ and the integral contributes the integral of $\Lambda$ over the spacing. Writing $\Lambda(s) = \Lambda(U_{(i+1)}) + \mu((s, U_{(i+1)}))$ on the spacing, Fubini gives for the integral and the trapezoid
+\[
+L \Lambda(U_{(i+1)}) + \int (t - U_{(i)}) \, \mu(dt), \qquad L \Lambda(U_{(i+1)}) + \frac{L}{2} \, \mu\big( (U_{(i)}, U_{(i+1)}) \big) ,
+\]
+both integrals over $t$ in the spacing. The difference is $\int (L/2 - (t - U_{(i)})) \, \mu(dt) = \int D(t) \, \mu(dt)$ over the spacing, since the midpoint is $U_{(i)} + L/2$. Summing over spacings gives the claim; the nodes have atomless laws, so almost surely none coincides with an atom of $\mu$.
+\end{proof}
+
+The representation says that the trapezoid is exact except at the jumps, and that each jump is charged the signed distance to the midpoint of its spacing times its height. Everything below is the moment theory of $D(s)$.
+
+\section{The spacing containing a point}
+
+\begin{lemma}
+\label{lem:spacing}
+For fixed $s \in (0, 1)$, $\PP( A(s) > a, \, B(s) > b ) = (1 - a - b)^n$ for $0 \le a < s$, $0 \le b < 1 - s$, $a + b \le 1$. Consequently
+\begin{gather*}
+\EE D(s) = \frac{ (1-s)^{n+1} - s^{n+1} }{ 2 (n+1) } , \\
+\EE D(s)^2 = \frac{ 1 - (n+2) \, s (1-s) \big( s^n + (1-s)^n \big) }{ 2 (n+1)(n+2) } .
+\end{gather*}
+In particular $|\EE D(s)| \le 1 / (2(n+1))$ and $\EE D(s)^2 \le 1 / (2 (n+1)(n+2))$, with the second attained asymptotically at every interior $s$.
+\end{lemma}
+
+\begin{proof}
+The event is that no node falls in $(s - a, s + b]$, which has probability $(1 - a - b)^n$. Integrating the survival function, $\EE A = \int_0^s (1-a)^n \, da = (1 - (1-s)^{n+1}) / (n+1)$ and $\EE B = (1 - s^{n+1}) / (n+1)$, which gives $\EE D$. For the second moment, $\EE A^2 = \int_0^s 2a (1-a)^n \, da$, $\EE B^2$ likewise with $1 - s$, and $\EE AB = \int_0^s \int_0^{1-s} (1 - a - b)^n \, db \, da$; the three integrals are elementary, and $\EE D^2 = (\EE A^2 + \EE B^2 - 2 \EE AB) / 4$ collects to the displayed form. The bound follows because $s(1-s)(s^n + (1-s)^n) \ge 0$, and the term it multiplies is exponentially small for fixed interior $s$.
+\end{proof}
+
+The exact second moment is the heart of the chapter. It says that the squared distance from a fixed point to the midpoint of the spacing containing it has mean $1 / (2(n+1)(n+2))$ up to an exponentially small boundary correction, which is a quarter of the second moment $2/((n+1)(n+2))$ of an ordinary spacing and a twelfth of the second moment $6/((n+1)(n+2))$ of the size biased spacing that contains the point. The quarter is the midpoint; the twelfth is the uniform position of the point inside the size biased spacing.
+
+\section{A single step}
+
+\begin{theorem}[One step, exactly]
+\label{thm:onestep}
+Let $\Lambda = \lambda_1$ on $[0, p)$ and $\lambda_2$ on $[p, 1]$, a single step of height $h = \lambda_1 - \lambda_2$ at $p$. Then
+\begin{gather*}
+\EE (\hat Z_T - Z) = h \, \frac{ (1-p)^{n+1} - p^{n+1} }{ 2 (n+1) } , \\
+\EE (\hat Z_T - Z)^2 = h^2 \, \frac{ 1 - (n+2) \, p (1-p) \big( p^n + (1-p)^n \big) }{ 2 (n+1)(n+2) } .
+\end{gather*}
+\end{theorem}
+
+\begin{proof}
+Theorem~\ref{thm:errrep} with $\mu = h \delta_p$ gives $\hat Z_T - Z = h D(p)$, and Lemma~\ref{lem:spacing} gives the moments.
+\end{proof}
+
+The mean squared error is $h^2 / (2 n^2)$ to leading order, against the bound $3 h^2 / ((n+1)(n+2))$ that the staircase theorem of Chapter~\ref{ch:yakowitz} gives for the trapezoid with $K = 1$; the exact constant is a sixth of the earlier one, and the bias is exponentially small unless the step is within $O(1/n)$ of an endpoint, where the trapezoid's use of $\Lambda(0)$ and $\Lambda(1)$ makes it see the step from one side only.
+
+\section{Bounded variation without the logarithm}
+
+\begin{theorem}[Bounded variation]
+\label{thm:bv}
+Let $\Lambda$ have total variation $V$ on $[0, 1]$. Then
+\[
+|\EE (\hat Z_T - Z)| \le \frac{V}{2(n+1)} , \qquad
+\EE (\hat Z_T - Z)^2 \le \frac{ V^2 }{ 2 (n+1)(n+2) } ,
+\]
+and for a nonincreasing staircase whose jumps all lie in $[\delta, 1 - \delta]$ the bias is at most $V (1 - \delta)^{n+1} / (2(n+1))$.
+\end{theorem}
+
+\begin{proof}
+By Theorem~\ref{thm:errrep} and Fubini, $\EE(\hat Z_T - Z) = \int \EE D(s) \, \mu(ds)$, and $|\EE D(s)| \le 1/(2(n+1))$ with the sharper bound $(1-\delta)^{n+1} / (2(n+1))$ when $s \in [\delta, 1 - \delta]$, since then $\max(s, 1-s) \le 1 - \delta$. For the second moment, by Cauchy Schwarz against the finite measure $|\mu|$,
+\[
+(\hat Z_T - Z)^2 = \Big( \int D \, d\mu \Big)^2 \le V \int D(s)^2 \, |\mu|(ds) ,
+\]
+and taking expectations and using $\EE D(s)^2 \le 1 / (2(n+1)(n+2))$ uniformly in $s$ gives $V \cdot V / (2(n+1)(n+2))$.
+\end{proof}
+
+The theorem replaces three earlier statements at once. For bounded variation integrands Chapter~\ref{ch:yakowitz} had $O(V^2 \log^2 n / n^2)$ by the maximal spacing; the logarithm is gone, and the constant is explicit. For staircases with $K$ jumps and top height $\lambda_1$ it had $3 \lambda_1^2 K^2 / ((n+1)(n+2))$ for the trapezoid; since $V \le \lambda_1$ the new bound is smaller by a factor at least $6K^2$, and it does not know what $K$ is. And for monotone integrands with no further regularity the root mean squared error is at most $V / (\sqrt 2 \, n)$ and not $V \log n / n$. The improvement comes from charging each jump the distance to the midpoint of its own spacing, which has second moment of order $1/n^2$, instead of charging all jumps the largest spacing, which is of order $\log n / n$.
+
+\section{Separated steps}
+
+The bound $V^2 / (2(n+1)(n+2))$ is attained only if all the variation sits at one point. When the jumps are separated the errors at different jumps are nearly uncorrelated and the squares add.
+
+\begin{proposition}[Asymptotic constant]
+\label{prop:asym}
+Let $\Lambda$ be a staircase with jumps of heights $h_1, \dots, h_K$ at fixed interior locations. Then
+\[
+\EE (\hat Z_T - Z)^2 = \frac{ \sum_k h_k^2 }{ 2 n^2 } \Big( 1 + O\Big( \frac{1}{n} \Big) \Big) ,
+\]
+where the constant in the $O$ depends on $K$ and on the minimum gap between jumps.
+\end{proposition}
+
+\begin{proof}
+By Theorem~\ref{thm:errrep},
+\[
+\EE(\hat Z_T - Z)^2 = \sum_k h_k^2 \, \EE D(p_k)^2 + \sum_{k \ne l} h_k h_l \, \EE D(p_k) D(p_l) .
+\]
+The diagonal terms are $h_k^2 / (2(n+1)(n+2))$ up to exponentially small corrections by Lemma~\ref{lem:spacing}. For a cross term with $p_k < p_l$, condition on the numbers of nodes in $(0, p_k)$, $(p_k, p_l)$ and $(p_l, 1)$; given the counts, the nodes in the three intervals are independent uniform samples on them. $A(p_k)$ is a function of the left sample, $B(p_l)$ of the right sample, and $B(p_k)$ and $A(p_l)$ are the distances from the ends of the middle interval to its extreme nodes. The only dependent pair is $(B(p_k), A(p_l))$, and with $m$ nodes in the middle interval of length $w$ their covariance is $- \mathrm{Cov}(\min, \max) = - w^2 / ((m+1)^2 (m+2))$, so that the conditional covariance of $D(p_k)$ and $D(p_l)$ is $w^2 / (4 (m+1)^2 (m+2))$, which is $O(1 / n^3)$ since $m$ is of order $n w$ with overwhelming probability. The conditional means $\EE[D(p_k) \mid \text{counts}]$ are differences of two terms of the form $\text{length} / (\text{count} + 1)$ whose unconditional means cancel to exponential order; their fluctuations are $O(n^{-3/2})$ by the binomial variance of the counts, so the product of the two conditional means has expectation $O(n^{-3})$. Both contributions to the cross term are $O(n^{-3})$, and there are $K(K-1)$ of them.
+\end{proof}
+
+For the Boltzmann staircase the heights are geometric. If $\Lambda$ takes the values $e^{-m}$, $m = 0, 1, \dots$, the jumps are $h_m = e^{-m} (1 - e^{-1})$ and
+\[
+\sum_m h_m^2 = \frac{ (1 - e^{-1})^2 }{ 1 - e^{-2} } = 0.4621 \ldots
+\]
+however many levels there are. The trapezoid on the Boltzmann staircase of any system therefore has root mean squared error $0.481 / n$ asymptotically (for a fixed staircase, with separated steps and $n$ large relative to the inverse of the smallest step location), with no dependence on the number of energy levels in the constant, against the $O(K/n)$ of the earlier bound. The same holds at every rung of the vertical walk with the integer ladder: between two rungs the integrand, renormalised by the height at the upper rung, is a Boltzmann staircase with top height one, and the quadrature error of the rung is asymptotically $0.481 / n$ in root mean square under the same conditions, for any number of levels within it; uniformly in $n$ and the number of levels, Theorem~\ref{thm:bv} gives at most $0.71 / n$.
+
+\section{The stratified rule}
+
+\begin{theorem}[Stratified rule, $K$ free]
+\label{thm:stratbv}
+Let $\hat Z_S$ be the stratified midpoint estimator of Chapter~\ref{ch:beyond} on $n$ strata. For any $\Lambda$ of bounded variation $V$,
+\[
+\Var(\hat Z_S) \le \frac{ V^2 }{ 4 n^2 } ,
+\]
+and for a staircase no two of whose jumps lie in the same stratum,
+\[
+\Var(\hat Z_S) \le \frac{ \sum_k h_k^2 }{ 4 n^2 } .
+\]
+\end{theorem}
+
+\begin{proof}
+The variance is $n^{-2} \sum_i \Var \Lambda(U_i)$ with $U_i$ uniform on the $i$th stratum, and $\Var \Lambda(U_i) \le \mathrm{osc}_i^2 / 4$ with $\mathrm{osc}_i$ the oscillation of $\Lambda$ on the stratum, which is at most the variation $V_i$ of $\Lambda$ on it. Since $\sum_i V_i \le V$ and the $V_i$ are nonnegative, $\sum_i V_i^2 \le (\sum_i V_i)^2 \le V^2$. For a staircase with at most one jump per stratum, $V_i$ is the height of the jump in the stratum or zero, and $\sum_i V_i^2 = \sum_k h_k^2$.
+\end{proof}
+
+For the Boltzmann staircase this is $\Var(\hat Z_S) \le 0.116 / n^2$, an asymptotic root mean square of $0.340 / n$ (and at most $V/(2n)$ uniformly, by the theorem), against the $K \lambda_1^2 / (4 n^2)$ of Chapter~\ref{ch:beyond}. The stratified rule remains unbiased, and it remains better than the trapezoid by the factor $\sqrt 2$ in root mean square that the comparison of $1/(4 n^2)$ with $1 / (2 n^2)$ predicts.
+
+\section{What this does to the walk}
+
+Chapter~\ref{ch:yakowitz} bounded the absolute quadrature error of a rung by $O(K \lambda_1 / n)$ with the trapezoid and Chapter~\ref{ch:beyond} by $O(\sqrt K \lambda_1 / n)$ with stratification, where $K$, the number of jumps, is one less than the number of nonempty levels, which is 21 to 36 for $N = 8$ to $11$ in the exact density of states (so $K$ is 20 to 35). The theorems of this chapter bound the absolute quadrature error of a rung with top height one by $O(1/n)$ for either rule, with constants $0.71$ and $0.5$ uniformly and $0.48$ and $0.34$ asymptotically, so that the absolute error is independent of $N$. A relative error is this divided by the rung integral, and no lower bound on that integral independent of $N$ is proved here: on the computed staircases it is $0.0338$ at $N = 8$ and $0.0130$ at $N = 10$ and decreases with $N$. The conversion to a cost in nodes for relative error $\epsilon$ therefore still carries a factor $1/Z$ that we do not bound. The earlier accounting of the walk's cost, $O(K^2 \epsilon^{-2} C(N, \epsilon/K))$ in the conditional FPRAS theorem of Chapter~\ref{ch:program}, is therefore not changed by the results here. The $K^2$ in that theorem comes from the product estimator across rungs and the $K$ inside $C$ from the bias budget, and neither is touched; the positional error of Chapter~\ref{ch:nested} is likewise untouched. What is touched is the claim, made in Chapter~\ref{ch:yakowitz}, that the quadrature is the one part of the walk on which numerical analysis has purchase. It has more purchase than was claimed. For the Boltzmann staircase the absolute quadrature error has an explicit constant free of the number of levels, and the remaining cost of the walk is probability, together with the unbounded ratio of the rung integral to that error.
+
+\section{Computations}
+
+Table~\ref{tab:yak2} checks the theorems on the exact staircase of the queens at $N = 8$ and $N = 10$, computed from the density of states of Chapter~\ref{ch:rare}: $K = 20$ and $K = 32$ jumps, $\Lambda(0) = 1$ and $V = 1 - e^{-m_{\max}}$. Each row is the mean over $4000$ random grids of the squared error of the trapezoid on $n$ sorted uniforms and of the stratified rule on $n$ strata, beside the bounds of Theorems~\ref{thm:bv} and~\ref{thm:stratbv}, the asymptotic constant of Proposition~\ref{prop:asym}, and the earlier bounds with $K$. The new bounds hold at every $n$, the asymptotic constant $0.462 / (2 n^2)$ is within a factor $1.6$ of the measured trapezoid error from $n = 50$ on (the ratio of measured to asymptotic lies between $0.63$ and $1.45$), and the earlier bounds are too large by factors between $3500$ and $17000$. The single step formula of Theorem~\ref{thm:onestep} was checked separately by simulation at $(p, n) = (0.3, 5), (0.5, 20), (0.9, 20), (0.05, 50)$, and the measured mean squared errors and biases agreed with the formulas to within one percent for the mean squared errors and within two Monte Carlo standard errors for the biases; for instance at $(0.9, 20)$ the measured mean squared error was $0.000823$ against $0.000822$ and the measured bias $-0.00260$ against $-0.00261$.
+
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{Trapezoid and stratified rules on the exact queens staircase. Mean squared errors over $4000$ grids, the $K$ free bounds of this chapter, the asymptotic constant $\sum h_k^2 / (2 n^2)$ (tabulated with $n^2$ replaced by $(n+1)(n+2)$), and the earlier bounds carrying $K$.}
+\label{tab:yak2}
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{rrrrrrrr}
+\toprule
+$N$ & $n$ & trapezoid & bound & asympt. & old & stratified & bound \\
+\midrule
+8 & 10 & $2.6 \times 10^{-3}$ & $3.8 \times 10^{-3}$ & $1.8 \times 10^{-3}$ & $9.1$ & $2.4 \times 10^{-4}$ & $2.5 \times 10^{-3}$ \\
+8 & 50 & $8.6 \times 10^{-5}$ & $1.9 \times 10^{-4}$ & $8.7 \times 10^{-5}$ & $0.45$ & $2.0 \times 10^{-5}$ & $1.0 \times 10^{-4}$ \\
+8 & 100 & $1.7 \times 10^{-5}$ & $4.9 \times 10^{-5}$ & $2.2 \times 10^{-5}$ & $0.12$ & $8.7 \times 10^{-6}$ & $2.5 \times 10^{-5}$ \\
+8 & 500 & $5.8 \times 10^{-7}$ & $2.0 \times 10^{-6}$ & $9.2 \times 10^{-7}$ & $4.8 \times 10^{-3}$ & $2.3 \times 10^{-7}$ & $1.0 \times 10^{-6}$ \\
+8 & 1000 & $1.9 \times 10^{-7}$ & $5.0 \times 10^{-7}$ & $2.3 \times 10^{-7}$ & $1.2 \times 10^{-3}$ & $9.6 \times 10^{-8}$ & $2.5 \times 10^{-7}$ \\
+10 & 10 & $3.3 \times 10^{-3}$ & $3.8 \times 10^{-3}$ & $1.8 \times 10^{-3}$ & $23$ & $6.4 \times 10^{-5}$ & $2.5 \times 10^{-3}$ \\
+10 & 50 & $1.3 \times 10^{-4}$ & $1.9 \times 10^{-4}$ & $8.7 \times 10^{-5}$ & $1.2$ & $7.3 \times 10^{-6}$ & $1.0 \times 10^{-4}$ \\
+10 & 100 & $3.1 \times 10^{-5}$ & $4.9 \times 10^{-5}$ & $2.2 \times 10^{-5}$ & $0.30$ & $2.5 \times 10^{-6}$ & $2.5 \times 10^{-5}$ \\
+10 & 500 & $7.9 \times 10^{-7}$ & $2.0 \times 10^{-6}$ & $9.2 \times 10^{-7}$ & $1.2 \times 10^{-2}$ & $1.6 \times 10^{-7}$ & $1.0 \times 10^{-6}$ \\
+10 & 1000 & $1.8 \times 10^{-7}$ & $5.0 \times 10^{-7}$ & $2.3 \times 10^{-7}$ & $3.1 \times 10^{-3}$ & $7.2 \times 10^{-8}$ & $2.5 \times 10^{-7}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The measured trapezoid error at $N = 8$ and small $n$ exceeds the asymptotic constant because the bottom step, at $s = 92 / 40320 = 0.0023$, is within $O(1/n)$ of the origin and carries the boundary bias of Theorem~\ref{thm:onestep}; the bias is $0.037$ at $n = 10$ and $0.0026$ at $n = 100$, and its square accounts for the excess. At $N = 10$ the stratified error is well below $\sum h_k^2 / (4 n^2)$ because many of the $32$ levels have widths far below $1/n$ and the dominant jumps sit at positions $s$ near the bottom step, far below $1/n$, so that their position within their stratum is small: a jump at relative position $q$ in its stratum contributes $h^2 q (1-q) / n^2$ and not $h^2 / (4 n^2)$, and $q$ is tiny there. (Where several jumps share a stratum the second bound of Theorem~\ref{thm:stratbv} does not apply as stated, and the column is the bound $V^2/(4n^2)$.)
+
+A second computation isolates the independence of $K$. A rung was built with $k + 1$ equal width steps of heights $e^{-j}$, $j = 0, \dots, k$, on the unit interval, for $k = 1, 2, 5, 10, 20, 50$, and the trapezoid was run with $n = 100$ nodes. The root mean squared errors were $0.0044, 0.0048, 0.0048, 0.0047, 0.0046, 0.0036$: flat in $k$ to within the Monte Carlo error, at the value $0.0047$ that $\sqrt{0.462 / (2 \cdot 101 \cdot 102)}$ predicts, with a lower value at $k = 50$ that we do not explain.

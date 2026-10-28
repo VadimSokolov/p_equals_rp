@@ -1,0 +1,1587 @@
+\documentclass[11pt,twoside,openany]{book}
+\usepackage{cmap}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[paperwidth=7in,paperheight=10in,inner=0.75in,outer=0.75in,top=0.85in,bottom=0.9in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\urlstyle{same}
+\usepackage{enumitem}
+\usepackage{makeidx}
+\makeindex
+\setlist{nosep}
+\setlength{\emergencystretch}{3em}
+\input{bookmeta}
+
+\setlength{\parskip}{0pt}
+\setlength{\parindent}{1.2em}
+\linespread{1.0}
+
+\titleformat{\chapter}[display]
+  {\normalfont\Large\scshape\centering}{\normalsize\scshape Chapter \thechapter}{0.6em}{\Large\scshape}
+\titlespacing*{\chapter}{0pt}{10pt}{22pt}
+\titleformat{\section}{\normalfont\large\scshape}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\normalfont\normalsize\itshape}{\thesubsection}{0.8em}{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\itshape\small Polson and Sokolov}
+\fancyhead[RO]{\itshape\small\leftmark}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{problem}[theorem]{Open Problem}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\Ind}{\mathbb{I}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\RP}{\mathrm{RP}}
+\newcommand{\coRP}{\mathrm{coRP}}
+\newcommand{\BPP}{\mathrm{BPP}}
+\newcommand{\ZPP}{\mathrm{ZPP}}
+\newcommand{\NP}{\mathrm{NP}}
+\newcommand{\Pc}{\mathrm{P}}
+\newcommand{\sharpP}{\#\mathrm{P}}
+\newcommand{\PH}{\mathrm{PH}}
+\newcommand{\Ppoly}{\mathrm{P}/\mathrm{poly}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\supp}{supp}
+
+\begin{document}
+
+\frontmatter
+\thispagestyle{empty}
+\begin{center}
+\vspace*{3in}
+{\Large\scshape P = RP}
+\end{center}
+\clearpage
+
+
+\thispagestyle{empty}
+\begin{center}
+\vspace*{1.6in}
+{\LARGE\scshape P = RP}\\[0.6em]
+{\large\itshape A Monte Carlo Program for P versus NP}\\[2.2in]
+{\large Nick Polson}\\
+{\small\itshape Booth School of Business, University of Chicago}\\[1.0em]
+{\large Vadim Sokolov}\\
+{\small\itshape Operations Research, George Mason University}\\[1.6in]
+{\small October 2026}
+\end{center}
+\clearpage
+
+\thispagestyle{empty}
+\vspace*{4.2in}
+\begin{flushleft}
+\small
+Copyright \copyright\ \BookYear\ Nick Polson and Vadim Sokolov.\\
+First edition, \BookYear.%
+\ifx\BookISBNline\empty\else\\[0.6em]\BookISBNline\fi
+\ifx\BookDOIline\empty\else\\[0.6em]\BookDOIline\fi
+\\[0.6em]License: distributed under the Creative Commons Attribution 4.0 International License (CC BY 4.0), \url{https://creativecommons.org/licenses/by/4.0/}: you may copy, share and adapt this book for any purpose, provided you credit the authors. The code is released under the MIT License.\\[0.6em]
+Code and data: \url{https://github.com/VadimSokolov/p_equals_rp}.\\[0.6em]
+Typeset in \LaTeX.
+\end{flushleft}
+\clearpage
+
+\thispagestyle{empty}
+\vspace*{3in}
+\begin{center}
+\itshape For the clerk who follows the rule, and the coin that does not.
+\end{center}
+\clearpage
+
+\tableofcontents
+
+\chapter*{Preface}
+\addcontentsline{toc}{chapter}{Preface}
+\markboth{Preface}{}
+
+This book grew out of a short paper we wrote in 2024 on counting the solutions of the $N$ queens problem. Nauck asked, in 1850, for the number of ways to place $N$ queens on an $N \times N$ chessboard so that no two attack each other. The question looks like a parlour puzzle. It is nothing of the sort. The exact count is known only up to $N = 27$, the completion version of the problem is NP complete, and counting the completions is $\sharpP$ complete. Behind a board and a handful of pieces lies the whole architecture of computational complexity.
+
+Our 2024 paper made a simple observation. Counting solutions is the same as computing a rare event probability. A rare event probability is an expectation of an indicator. An expectation of a nonnegative integrand can always be written, by Fubini, as a one dimensional integral of the quantile function of the integrand: this is the Lorenz curve identity at the heart of nested sampling and of vertical likelihood Monte Carlo. Once the sum is reordered by quantiles, the exponentially large state space collapses onto the unit interval, and the only thing left to control is how the integrand steps down as one moves along that interval. The algorithmic question of whether a count can be found in random polynomial time becomes the analytic question of whether a one dimensional quantile function can be traversed in polynomially many steps.
+
+The present book takes that observation as far as we are able to take it, and turns it into a program: a Monte Carlo attack on the $\Pc$ versus $\NP$ problem, stated as a sequence of theorems and conjectures with the gaps marked. One of the gaps should be named at the outset. The sampling half of the program, which asks whether $\NP = \RP$, contains new theorems and new computations. The derandomization half, which asks whether $\Pc = \RP$ and gives the book its title, contains no new mathematics: it restates the known hitting set formulation on the quantile axis and shows where the single random draw of a randomized algorithm sits. We think the restatement is clarifying. We do not claim it is progress on the conjecture, and a reader who expects the title to be defended by a proof will not find one. The subject of the title is the relationship between $\Pc$, the class of problems solvable in deterministic polynomial time, and $\RP$, the class solvable in random polynomial time with one sided error. Almost every complexity theorist believes that $\Pc = \RP$, and indeed that $\Pc = \BPP$. The belief rests on the hardness versus randomness paradigm of Nisan, Wigderson and Impagliazzo: if there exist functions in exponential time that need exponential size circuits, then randomness can be removed from every polynomial time algorithm at a polynomial cost. What is not known is whether such hard functions exist, and the belief, however strongly held, remains a conjecture.
+
+Our thesis is that vertical likelihood sampling gives the right coordinate system in which to look at the problem. Every randomized decision procedure accepts with a probability $p(x)$, and $p(x)$ is the integral of a step function $\Lambda_x(s)$ on the unit interval. For a problem in $\RP$, with the algorithm amplified once so that members are accepted with probability more than a half, deciding membership is the same as evaluating $\Lambda_x$ at the single point $s = \tfrac12$, which is to say computing the median of a Boolean function of the random bits. In these coordinates the content of $\Pc = \RP$ is that medians of polynomial time computable Boolean functions are themselves polynomial time computable whenever the function satisfies the one sided $\RP$ condition on every input. This is not a proof. It is, we think, the cleanest statement of what a proof must deliver, and it tells us exactly where the difficulty sits. For structured problems such as $N$ queens the quantile function has only polynomially many steps, one for each energy level, so the exponential sum is already a polynomial sum; the entire hardness of the problem is concentrated in the widths of those steps.
+
+We have tried to write at the highest level we can sustain while keeping the book self contained. Part I sets out the problem: Hilbert, Turing and the Entscheidungsproblem, the complexity classes, NP completeness, circuits, the barriers, quantum computation, the exponential time hypothesis, Shannon and von Neumann on the costs of computation, Kolmogorov complexity and Cover's enumerative coding, the history of randomized computation from Valiant's counting classes to the hardness versus randomness programme, and the classical theorems on randomized classes, Adleman, Sipser and Lautemann, Valiant and Vazirani, that the thesis rests on. Part II is the queens: Gauss, the rare event reformulation, Simkin's theorem and the queenon, entropy and rate functions, and the Latin square relatives. Part III develops the Monte Carlo machinery: product estimators, mixing times and conductance, the equivalence of counting and sampling, rare event simulation and Rubinstein's cross entropy methods, Lorenz curves and majorization, vertical likelihood, the Polson Scott algorithms, nested and split sampling, Yakowitz bounds and their improvements, sequential Monte Carlo, Bayesian computation and generative Bayesian computation. Part IV states the program and the thesis precisely, proves the theorems that can be proved, reports the numerical experiments and exact computations on the queens, places the program against Stockmeyer's approximate counting, the overlap gap property, the case its opponents would make for $\NP = \RP$, and the other laboratories of the permanent, the Ising model, convex volume and satisfiability, sets out what a mixing proof would need, and ends with the open problems and their current status, which record what has been computed and what has not.
+
+We are grateful to James Scott, with whom the vertical likelihood idea was first worked out, and to John Birge and Changgee Chang, who developed split sampling\index{split sampling} with one of us. Any errors are ours.
+
+\bigskip
+\noindent Nick Polson, Chicago\\
+Vadim Sokolov, Fairfax\\
+October 2026
+
+\chapter*{Notation}
+\addcontentsline{toc}{chapter}{Notation}
+\markboth{Notation}{}
+
+\begin{description}[style=nextline]
+\item[$N$] The size of the board; the number of queens.
+\item[$Q(N)$] The number of solutions of the $N$ queens problem; $Q(N; X_0)$ the number of completions of a partial placement $X_0$.
+\item[$x = (x_1, \dots, x_N)$] A placement, $x_i$ the column of the queen in row $i$; a permutation when every row and column holds one queen.
+\item[$\cX$] The configuration space, usually the symmetric group $S_N$ with $|\cX| = N!$, sometimes the row placements with $|\cX| = N^N$.
+\item[$S(x)$] The energy, the number of attacking pairs of queens in $x$. Solutions are $\{ S = 0 \}$.
+\item[$N(s)$] The density of states, the number of configurations with $S(x) = s$.
+\item[$Z_m$] The level set probability $\PP_p(S \le m)$ under the uniform $p$; $Z_0 = \rho$ is the rare event probability.
+\item[$Z(\gamma)$] The partition function $\sum_x e^{-S(x)/\gamma}$ at temperature $\gamma$.
+\item[$\pi_\gamma$] The Boltzmann distribution $e^{-S/\gamma} / Z(\gamma)$.
+\item[$L(x)$] A likelihood or nonnegative integrand on $\cX$; $Y = L(X)$ the likelihood ordinate.
+\item[$Z$] The evidence or normalising constant $\EE_P[L(X)]$.
+\item[$Z(y)$] The survival function $\PP_P(L(X) > y)$ of the likelihood ordinate.
+\item[$\Lambda(s)$] The quantile function $\sup\{ y : Z(y) > s \}$, nonincreasing on $[0,1]$; the staircase.
+\item[$\cL(u)$] The Lorenz curve $Z^{-1} \int_0^u \Lambda$, richest first; Lorenz's original poorest first curve is $\cL_0$ of Chapter~\ref{ch:lorenz}, with $\cL(u) = 1 - \cL_0(1-u)$.
+\item[$\Omega(s)$] A weight function or importance density on the quantile axis.
+\item[$\omega(m)$] A weight function on the level axis in split sampling; $\Omega(y) = \int_0^y \omega$ is its integral, a different function from $\Omega(s)$ above, which lives on the quantile axis.
+\item[$m_t, \theta_t$] The levels of a ladder and the ratios between consecutive levels: $\theta_t = Z_{m_{t-1}} / Z_{m_t}$ for a ladder increasing in $t$ (Chapter~\ref{ch:product}), and $\theta_t = Z_{m_t} / Z_{m_{t-1}}$ for the descending ladders of Chapters~\ref{ch:gbc} and~\ref{ch:experiments}. In both cases $\theta_t \le 1$ is the smaller level set probability over the larger.
+\item[$A(x, r)$] A randomized algorithm on input $x$ with random string $r \in \{0,1\}^m$.
+\item[$p(x)$] The acceptance probability $\PP_r(A(x, r) = 1)$.
+\item[$L_x(r)$] The acceptance indicator $\Ind\{ A(x, r) = 1 \}$; $\Lambda_x$ its quantile function, a single step at $p(x)$.
+\item[$\tau$] The mixing time of a Markov chain; $\Phi$ its conductance; and its spectral gap, written $\gamma$ in Chapters~\ref{ch:mixing} and~\ref{ch:symmetric} and in the spectral gap table of Chapter~\ref{ch:open}, where it is defined locally; in the Boltzmann setting $\gamma$ is the temperature, and it is also the cross entropy level $\gamma_t$ of Chapter~\ref{ch:ce} and the Feynman Kac measure $\gamma_t$ of Chapter~\ref{ch:smc}.
+\item[$\alpha$] Simkin's constant, $1.942 \pm 0.003$, with $Q(N) = ((1 \pm o(1)) N e^{-\alpha})^N$.
+\item[$\Pc, \NP, \RP, \BPP$] Complexity classes; see Chapter~\ref{ch:classes} and Appendix~\ref{app:glossary}.
+\end{description}
+
+\chapter*{How to Read This Book}
+\addcontentsline{toc}{chapter}{How to Read This Book}
+\markboth{How to Read This Book}{}
+
+The book has four parts and can be read in several orders.
+
+A reader who wants the argument and nothing else should read the summary chapter, then Chapters~\ref{ch:vertical}, \ref{ch:program}, \ref{ch:reorder}, \ref{ch:prp} and \ref{ch:theorems}, and the epilogue. This is about thirty five pages and states the argument and its main theorems. The proofs and computations behind the headline results of the summary are in Chapters~\ref{ch:mixingproof}, \ref{ch:ce} and~\ref{ch:open}, about thirty six pages more.
+
+A reader from statistics who knows Monte Carlo but not complexity should read Part I in full, skim Part II, read Part III quickly since much of it will be familiar, and then read Part IV with care. Chapter~\ref{ch:classes} and Chapter~\ref{ch:pseudo} are the ones to work through with a pencil.
+
+A reader from computer science who knows complexity but not Monte Carlo should skim Part I, read Part II for the queens, read Part III in full, and then read Part IV. Chapters~\ref{ch:vertical}, \ref{ch:yakowitz} and \ref{ch:beyond} are the ones that will be new, and Chapter~\ref{ch:mixing} is the bridge.
+
+A reader who wants to compute should go to Chapters~\ref{ch:experiments} and~\ref{ch:experiments2}, the exact computations of Chapter~\ref{ch:open}, especially the shattering depth of Section~\ref{sec:depth}, the measured landscape of Chapter~\ref{ch:mixingproof}, the cross entropy experiment of Chapter~\ref{ch:ce}, and the code in Appendix~\ref{app:code}. Every number computed for this book was produced by a script in the code directory, of which Appendix~\ref{app:code} prints the core; numbers quoted from the literature are cited, or attributed in the text. Some figures tell their curves apart by colour; the printed edition shows them in gray, and the digital edition (the PDF of the book's DOI) has them in colour.
+
+The dependence between chapters is as follows. Everything in Part IV uses Chapter~\ref{ch:vertical}. Chapters~\ref{ch:reorder} and~\ref{ch:prp} use Chapters~\ref{ch:classes} and~\ref{ch:pseudo}. Chapter~\ref{ch:theorems} uses Chapters~\ref{ch:jvv}, \ref{ch:npcomplete} and~\ref{ch:prp}. Chapter~\ref{ch:beyond} uses Chapter~\ref{ch:yakowitz}. The historical chapters, \ref{ch:hilbert}, \ref{ch:shannon} and~\ref{ch:history}, can be read at any point or skipped. The Bayesian chapters, \ref{ch:bayes} and~\ref{ch:gbc}, are for readers who want to see the method in its native habitat and are not needed for the thesis.
+
+A word on the dictionary between the two fields, since the same objects go by different names. A normalising constant or evidence is a partition function is a count. A likelihood level set is an energy level set is a set of configurations with at most $m$ violated constraints. A posterior sampler is a Boltzmann\index{Boltzmann distribution} sampler is a level set sampler. Nested sampling is the product estimator is multilevel splitting. The quantile function of the likelihood is the Lorenz curve is the staircase whose widths are the density of states. An FPRAS is a Monte Carlo estimator with bounded relative error and polynomial cost. Rapid mixing is polynomial relaxation time is a conductance bound. We have tried to use the names from both fields and to say which is which.
+
+\mainmatter
+
+\part{The Problem of P versus NP}
+
+\input{ch_summary}
+
+\input{ch_hilbert}
+
+\input{ch_turing}
+
+\input{ch_pnp}
+
+\input{ch_npcomplete}
+
+\input{ch_circuits}
+
+\input{ch_barriers}
+
+\input{ch_quantum}
+
+\input{ch_consequences}
+
+\input{ch_eth}
+
+\input{ch_shannon}
+
+\input{ch_kolmogorov}
+
+\input{ch_history}
+
+\input{ch_proofcomplexity}
+
+\chapter{P, NP, RP and \#P}
+\label{ch:classes}
+
+This chapter sets out the complexity classes we shall need and the known relations among them. Readers who are fluent in complexity theory may skim; readers coming from statistics should not, since the precise definitions matter for the thesis of Part IV.
+
+\section{Decision problems and P}
+
+A decision problem is a language $L \subseteq \{0,1\}^*$. A deterministic algorithm $A$ decides $L$ if $A(x) = 1$ for $x \in L$ and $A(x) = 0$ otherwise. The class $\Pc$ consists of the languages decided by some algorithm whose running time on inputs of length $n$ is bounded by a polynomial in $n$. Primality is in $\Pc$ by the theorem of Agrawal\index{Agrawal, Kayal and Saxena}, Kayal and Saxena; linear programming is in $\Pc$ by Khachiyan's ellipsoid method; sorting, shortest paths, matching and the determinant are in $\Pc$.
+
+\section{NP and the Cook Levin theorem}
+
+The class $\NP$ consists of languages with polynomial time verifiable certificates: $L \in \NP$ if there is a polynomial time $V$ and a polynomial $q$ such that $x \in L$ if and only if there exists $w$ with $|w| \le q(|x|)$ and $V(x, w) = 1$. Satisfiability of Boolean formulas, the travelling salesman decision problem, graph colouring, subset sum, and the queens completion problem are all in $\NP$: the certificate is a satisfying assignment, a short tour, a colouring, a subset, or a completed board.
+
+Cook\index{Cook Levin theorem} in 1971 and, independently, Levin in 1973 showed that satisfiability is $\NP$ complete: every problem in $\NP$ reduces to it in polynomial time. Karp\index{Karp, Richard}'s list of 21 problems followed in 1972 and the list now runs to thousands. The question $\Pc = \NP$ asks whether every problem whose solutions can be checked quickly can also be solved quickly. It is open, and it is the central problem of theoretical computer science.
+
+Gent, Jefferson and Nightingale\index{Gent, Jefferson and Nightingale} proved that the queens completion problem is $\NP$ complete by reduction from a variant of satisfiability, through an intermediate problem on the placement of pieces in a grid. The reduction is delicate because the queens problem has so little freedom in its structure, but the conclusion is clean: given a partial placement of queens on an $N \times N$ board, deciding whether it extends to a solution is as hard as any problem in $\NP$.
+
+\section{Counting and \#P}
+
+Valiant introduced $\sharpP$ in 1979 as the class of functions that count the certificates of an $\NP$ relation: $f \in \sharpP$ if there is a polynomial time $V$ and polynomial $q$ with $f(x) = \#\{ w : |w| \le q(|x|), V(x, w) = 1 \}$. Counting satisfying assignments, counting perfect matchings, computing the permanent\index{permanent} of a zero one matrix, and counting queens completions are all $\sharpP$ complete. Valiant's theorem that the permanent is $\sharpP$ complete was the first surprise: the determinant, which differs from the permanent only in signs, is in $\Pc$.
+
+Counting is at least as hard as deciding, since $f(x) > 0$ if and only if $x \in L$, and it is apparently much harder. Toda\index{Toda's theorem}'s theorem of 1991 states that $\PH \subseteq \Pc^{\sharpP}$: a single call to a $\sharpP$ oracle suffices to decide every problem in the polynomial hierarchy. Counting queens exactly is, in this precise sense, at least as hard as every problem obtained by alternating existential and universal quantifiers a bounded number of times.
+
+The number of queens solutions $Q(N)$ itself, with no partial placement, is a function of the single parameter $N$ and so, with a single number as input, is not a natural object of complexity theory (any finite range is a table lookup); the sensible object is the completion count, which has a genuine input. Throughout the book, when we say the queens counting problem is hard, it is the completion count we mean, and the unconditioned count is the special case where no queens are placed.
+
+\section{Randomized classes}
+
+Now introduce randomness. A randomized algorithm $A(x, r)$ takes the input $x$ and a string $r$ of uniformly random bits, of length polynomial in $|x|$, and runs in polynomial time.
+
+\begin{definition}
+A language $L$ is in $\RP$ if there is such an $A$ with
+\[
+x \in L \implies \PP_r\big( A(x, r) = 1 \big) \ge \tfrac12, \qquad
+x \notin L \implies \PP_r\big( A(x, r) = 1 \big) = 0 .
+\]
+$L$ is in $\coRP$ if its complement is in $\RP$. $\ZPP = \RP \cap \coRP$. $L$ is in $\BPP$ if there is an $A$ with $\PP_r(A(x,r) = \Ind_L(x)) \ge \tfrac23$ for every $x$.
+\end{definition}
+
+The error in $\RP$ is one sided: the algorithm never accepts a string outside $L$, and it accepts a string inside $L$ with probability at least a half. The constant $\tfrac12$ is immaterial; $k$ independent repetitions reduce the failure probability to $2^{-k}$. $\ZPP$ consists of problems solvable by algorithms that are always correct and run in expected polynomial time, the Las Vegas algorithms. The inclusions
+\[
+\Pc \subseteq \ZPP \subseteq \RP \subseteq \NP \cap \BPP
+\]
+are immediate: $\RP \subseteq \NP$ because any accepting random string is a certificate.
+
+The canonical problem in $\RP$ not known to be in $\Pc$ is polynomial identity testing: given an arithmetic circuit, decide whether it computes a nonzero polynomial. The Schwartz Zippel\index{Schwartz Zippel lemma} lemma shows that evaluating at a random point detects a nonzero polynomial with high probability, and no deterministic polynomial time algorithm is known. Primality was in $\coRP$ by the Solovay Strassen and Miller Rabin tests for 25 years before Agrawal, Kayal and Saxena placed it in $\Pc$. Their proof is a derandomization: it replaces random bases in a Fermat type test by a deterministic polynomial size set of polynomials, and it is the most celebrated example of the phenomenon that this book is about.
+
+\section{What is known about P versus RP}
+
+Adleman proved in 1978 that $\RP \subseteq \Ppoly$: for each input length there is a polynomial size circuit deciding the problem. The proof is a counting argument. Amplify the success probability to $1 - 2^{-(n+1)}$; then a single random string $r$ works for all $2^n$ inputs with positive probability, and that $r$ can be hard wired. Adleman's argument is nonconstructive and produces a different circuit for every $n$, which is why it gives $\Ppoly$ and not $\Pc$. The same argument extends to $\BPP$.
+
+Sipser, with an improvement by G\'acs, and independently Lautemann, proved that $\BPP \subseteq \Sigma_2^p \cap \Pi_2^p$, the second level of the polynomial hierarchy. In particular $\BPP \subseteq \PH$, and if $\Pc = \NP$ then $\Pc = \BPP$.
+
+Valiant and Vazirani \cite{ValiantVazirani} proved in 1986 that $\NP$ is no harder than detecting unique solutions: there is a randomized polynomial time map taking a Boolean formula $\varphi$ to a formula $\varphi'$ such that if $\varphi$ is unsatisfiable so is $\varphi'$, and if $\varphi$ is satisfiable then with probability at least $1/(8(n+1))$ the formula $\varphi'$ has exactly one satisfying assignment. Consequently, if satisfiability promised to have at most one solution can be decided in $\RP$, then $\NP = \RP$. Chapter~\ref{ch:pseudo} proves this isolation lemma.
+
+The decisive results are the hardness versus randomness theorems. Nisan and Wigderson\index{Nisan and Wigderson} showed in 1994 that if some function in exponential time has no subexponential size circuits then $\BPP$ can be simulated in subexponential time; Impagliazzo and Wigderson sharpened this in 1997.
+
+\begin{theorem}[Impagliazzo and Wigderson]
+If there is a language in $\mathrm{E} = \mathrm{DTIME}(2^{O(n)})$ that requires Boolean circuits of size $2^{\Omega(n)}$, then $\Pc = \BPP$.
+\end{theorem}
+
+The hypothesis is widely believed. It says that there are exponential time problems that cannot be solved by circuits much smaller than the trivial lookup table. If it holds, pseudorandom generator\index{pseudorandom generator}s exist that stretch $O(\log n)$ truly random bits into polynomially many bits indistinguishable from random by circuits of any fixed polynomial size, the constant in the seed length depending on that size, and running a $\BPP$ algorithm on all $2^{O(\log n)} = n^{O(1)}$ outputs of the generator and taking a majority vote derandomizes it.
+
+Kabanets\index{Kabanets and Impagliazzo} and Impagliazzo showed in 2004 that the implication partially reverses: a deterministic polynomial time algorithm for polynomial identity testing would imply either that $\mathrm{NEXP} \not\subseteq \Ppoly$ or that the permanent has no polynomial size arithmetic circuits. Derandomization and circuit lower bounds are, in this sense, closely related problems.
+
+For $\RP$ specifically there is a cleaner statement. Andreev, Clementi and Rolim, and later Goldreich, Vadhan and Wigderson, showed that a hitting set\index{hitting set} generator suffices: a deterministic polynomial time procedure that, for each $n$, outputs a polynomial size set $H_n \subseteq \{0,1\}^{m(n)}$ that intersects every set of density at least $\tfrac12$ recognisable by a polynomial size circuit. Given such an $H_n$, an $\RP$ algorithm is derandomized by running it on every $r \in H_n$: if $x \in L$ the accepting set has density at least a half and $H_n$ hits it; if $x \notin L$ nothing is accepted. We shall return to hitting sets in Chapter~\ref{ch:reorder}, because the quantile reordering produces something that looks very much like one.
+
+\section{Three worlds}
+
+In the spirit of Impagliazzo's five worlds of 1995 (Chapter~\ref{ch:history}), we distinguish three worlds for randomness.
+
+In the first, $\Pc = \NP$. Then $\Pc = \BPP$ by Sipser's theorem, and all of our questions dissolve: counting is in $\Pc^{\sharpP}$, which is not known to become easy, but decision and randomized decision coincide.
+
+In the second, $\Pc \neq \NP$ but $\Pc = \BPP$. This is the world almost everyone expects. Randomness is a convenience and not a resource. Every randomized algorithm has a deterministic cousin with polynomial overhead, found by plugging in the outputs of a pseudorandom generator. In this world the queens completion problem is not in $\RP$, since $\NP \neq \Pc = \RP$ would be contradicted.
+
+In the third, $\Pc \neq \BPP$. Randomness is a genuine resource, some efficiently computable function of random bits cannot be approximated by any deterministic polynomial time computation, and the circuit lower bounds of the Impagliazzo Wigderson hypothesis fail. Nobody has been able to rule this world out.
+
+Our thesis in Part IV is addressed to the second world. We claim that vertical likelihood\index{vertical likelihood} Monte Carlo gives the natural coordinates in which to see what $\Pc = \RP$ asserts, that in those coordinates it is a statement about the computability of medians of Boolean functions, and that the structure which makes counting the completions of a partial board a hard $\sharpP$ problem is the same structure, the step widths of a quantile function, that stands between a randomized algorithm and its derandomization.
+
+\input{ch_pseudo}
+
+\input{ch_pcp}
+
+\part{The Queens}
+
+\chapter{Gauss and the Queens}
+\label{ch:gauss}
+
+\section{A question from 1850}
+
+In 1848 the chess composer Max Bezzel asked how many ways eight queens can be placed on an ordinary chessboard so that no two share a row, a column, or a diagonal. Franz Nauck published the complete answer, 92, in 1850, and in the same year Carl Friedrich Gauss took up the problem in correspondence with the astronomer Heinrich Schumacher. Gauss, characteristically, took the eight by eight case seriously enough to work through it himself; the generalisation to an $N \times N$ board, with the question of how many solutions it has, is due to Nauck. Gauss found the counting harder than he expected: his letters to Schumacher record several attempts before the correct 92, in the account usually given an undercount of 72 first (Campbell~\cite{Campbell}, 1977, \emph{Historia Mathematica} 4, sorts out how much of that account is historical error), together with a method, essentially backtracking, for producing all of them.
+
+Let us fix notation. A placement is a vector $x = (x_1, \dots, x_N)$ with $x_i \in \{1, \dots, N\}$, where $x_i$ is the column of the queen in row $i$. Since a solution must have exactly one queen in each row and each column, $x$ must be a permutation of $\{1, \dots, N\}$. The diagonal constraint says that for all $i < j$,
+\[
+|x_i - x_j| \neq j - i .
+\]
+Figure~\ref{fig:board} shows the solution $x = (6, 4, 7, 1, 8, 2, 5, 3)$ for $N = 8$.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[scale=0.42]
+\foreach \r in {0,...,7} {
+  \foreach \c in {0,...,7} {
+    \pgfmathparse{mod(\r+\c,2)==0 ? "gray!35" : "white"}
+    \edef\col{\pgfmathresult}
+    \fill[\col] (\c,\r) rectangle (\c+1,\r+1);
+  }
+}
+\draw[thick] (0,0) rectangle (8,8);
+\foreach \r/\c in {0/5,1/3,2/6,3/0,4/7,5/1,6/4,7/2} {
+  \node at (\c+0.5,\r+0.5) {\large $\mathrm{Q}$};
+}
+\foreach \c/\l in {0/a,1/b,2/c,3/d,4/e,5/f,6/g,7/h} { \node at (\c+0.5,-0.5) {\small \l}; }
+\foreach \r in {1,...,8} { \node at (-0.5,\r-0.5) {\small \r}; }
+\end{tikzpicture}
+\caption{A solution to the eight queens problem, $x = (6,4,7,1,8,2,5,3)$ reading rows from the bottom.}
+\label{fig:board}
+\end{figure}
+
+Let $Q(N)$ denote the number of solutions. The known values begin
+\[
+1, 0, 0, 2, 10, 4, 40, 92, 352, 724, 2680, 14200, 73712, 365596, 2279184, \dots
+\]
+for $N = 1, 2, \dots, 15$. The sequence is irregular. There is no closed formula and none is expected. The count has been pushed by exhaustive computation to $N = 27$, where $Q(27) = 234907967154122528$, a calculation (the Q27 project, Preusser and Engelhardt~\cite{PreusserEngelhardt}, 2017) that took a cluster of field programmable gate arrays the better part of a year. Beyond that the exact numbers are unknown.
+
+\section{Symmetry}
+
+The 92 solutions for $N = 8$ are not all essentially different. The dihedral group of the square, of order eight, acts on placements, and a solution maps to a solution. Under this action the 92 solutions fall into 12 orbits. Eleven of the orbits have the full eight elements; one, the solution $(3, 5, 2, 8, 1, 7, 4, 6)$ and its images under the dihedral group, is symmetric under rotation by a half turn and so has only four. Thus
+\[
+92 = 11 \times 8 + 1 \times 4 .
+\]
+Symmetry reduces the counting problem by a constant factor of at most eight and no more. It does not change the asymptotic character of the problem, and we shall ignore it except when it serves as a check.
+
+\section{Asymptotics: Simkin's theorem}
+
+How fast does $Q(N)$ grow? Rivin, Vardi and Zimmermann \cite{RVZ} conjectured in 1994 that $\log Q(N)$ grows like $N \log N$. Luria \cite{Luria2017} proved an upper bound and Luria and Simkin \cite{LuriaSimkin} a lower bound of the form $(cN)^N$, the lower bound confirming the conjecture, and Michael Simkin\index{Simkin's theorem} \cite{Simkin} then proved (posted in 2021, published in 2023) the sharper asymptotics $Q(N) = ((1 + o(1)) N e^{-\alpha})^N$ for an explicit constant $\alpha$, which implies that $Q(N)^{1/N} / N$ converges.
+
+\begin{theorem}[Simkin \cite{Simkin}]
+There is a constant $\alpha = 1.942 \pm 3 \times 10^{-3}$ such that
+\[
+Q(N) = \big( (1 \pm o(1)) \, N e^{-\alpha} \big)^{N} .
+\]
+\end{theorem}
+
+Simkin's proof is a tour de force. The lower bound comes from a random greedy construction analysed through a differential equation, and the upper bound comes from an entropy argument. The constant $\alpha$ is characterised as the solution of a variational problem over a space of probability measures on the square with uniform marginals and a constraint on the mass near each diagonal, the so called queenon\index{queenon}s, the limiting objects for queen configurations in the same sense that graphons are the limiting objects for graphs. The optimising measure is not uniform, its mass being displaced towards the midpoints of the edges, and the deviation from uniformity is exactly what makes the constant hard to compute.
+
+For our purposes two consequences matter. First, $Q(N)$ grows like $N!$ times an exponentially small factor:
+\[
+\frac{Q(N)}{N!} = \exp\big( -(\alpha - 1) N + o(N) \big) \approx e^{-0.942 N} .
+\]
+Second, the number of permutations is $N! \approx (N/e)^N$ and the number of row placements is $N^N$, so the fraction of row placements that are solutions is
+\[
+\frac{Q(N)}{N^N} = \exp\big( -\alpha N + o(N) \big) \approx e^{-1.942 N} .
+\]
+For $N = 25$ there are roughly $10^{15}$ solutions; for $N = 10\,000$ there are roughly $10^{31\,566}$. In both cases the solutions, though astronomically numerous, are an exponentially small fraction of the configurations. A solution is a rare event.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{fig_rarity.pdf}
+\caption{The probability that a uniformly random permutation, or a uniformly random row placement, is a solution, on a logarithmic scale, for $N$ up to 15 (the values $N = 2, 3$, where there are no solutions, are omitted), together with Simkin's asymptotic (dashed, without the $o(1)$ correction).}
+\label{fig:rarity}
+\end{figure}
+
+\section{Why the queens}
+
+Several other problems could have served as our laboratory: the permanent of a zero one matrix, the number of perfect matchings in a graph, the number of satisfying assignments of a Boolean formula, the volume of a convex body. We chose the queens for three reasons.
+
+The first is that it is a permutation problem with a natural energy. If $S(x)$ counts the number of attacking pairs in a placement, then $S$ takes integer values between zero and $\binom{N}{2}$, solutions are exactly the states of zero energy, and the whole structure of the problem is captured by the density of states\index{density of states} $N(s) = \#\{x : S(x) = s\}$. This makes the queens a Boltzmann system of exactly the kind studied in statistical physics, and we shall borrow freely from that field.
+
+The second is that the problem is hard in every formal sense. The completion problem, in which some queens are already placed and one asks whether the placement extends to a solution, was shown by Gent, Jefferson and Nightingale \cite{GJN} in 2017 to be NP complete, and the corresponding counting problem to be $\sharpP$ complete. So a polynomial time algorithm for counting completions would be a polynomial time algorithm for everything in $\sharpP$, and since $\PH \subseteq \Pc^{\sharpP}$ by Toda's theorem \cite{Toda}, the whole polynomial hierarchy would collapse to $\Pc$.
+
+The third is that the problem is concrete enough to compute with. For $N \le 9$ we can enumerate every permutation and tabulate the density of states exactly; for larger $N$ we have Simkin's asymptotics and decades of numerical experience. A theory of Monte Carlo counting that cannot be tested on the queens is not worth much.
+
+\chapter{Counting as a Rare Event}
+\label{ch:rare}
+
+\section{The reformulation}
+
+Let $\cX$ be a finite set of configurations and let $p$ be the uniform distribution on $\cX$. Let $S: \cX \to \{0, 1, 2, \dots\}$ be an energy, with the solutions being the states of zero energy. Then the number of solutions is
+\[
+Q = \#\{x : S(x) = 0\} = |\cX| \cdot \PP_p\big( S(x) = 0 \big) = |\cX| \cdot \EE_p\big[ \Ind_{\{S(x) = 0\}} \big] .
+\]
+Since $|\cX|$ is known analytically, counting is equivalent to computing a probability. For the queens with $\cX$ the set of row placements, $|\cX| = N^N$ and
+\[
+\rho_N = \PP_p\big( S(x) = 0 \big) = \frac{Q(N)}{N^N} ,
+\]
+so that for $N = 8$, $\rho_8 = 92 / 16\,777\,216 \approx 5.48 \times 10^{-6}$, while on the smaller space of permutations $\rho_8 = 92 / 40\,320 \approx 2.28 \times 10^{-3}$. This is the first key insight, used in this form by Diaconis\index{Diaconis and Holmes} and Holmes \cite{DiaconisHolmes} and to Rubinstein \cite{Rubinstein2006}: replace a counting problem with a rare event probability.
+
+\section{Why naive Monte Carlo fails}
+
+The obvious estimator draws $x^{(1)}, \dots, x^{(M)}$ independently from $p$ and sets
+\[
+\hat\rho = \frac{1}{M} \sum_{i=1}^{M} \Ind_{\{S(x^{(i)}) = 0\}} .
+\]
+It is unbiased with relative variance
+\[
+\frac{\Var(\hat\rho)}{\rho^2} = \frac{1 - \rho}{M \rho} ,
+\]
+so to achieve relative error $\epsilon$ one needs $M \approx 1/(\epsilon^2 \rho)$ samples. Since $\rho_N \approx e^{-1.942 N}$ this is exponential in $N$. Naive Monte Carlo is a correct algorithm with an exponential running time. The art of rare event simulation is the art of replacing this by something polynomial.
+
+\section{The embedding principle}
+
+One immediate improvement is to shrink the ambient space. Every solution is a permutation, so we may take $\cX$ to be the symmetric group $S_N$ with $|\cX| = N!$ and gain a factor of $N^N / N! \approx e^N$ in the rare event probability. This is the embedding principle: when the counting problem can be embedded in a smaller problem whose count is known, embed it. Rubinstein and Kroese \cite{RubinsteinKroese} embed the queens in the rooks problem, where any permutation is a solution, and ask for the fraction of rook solutions that are also queen solutions. The gain is exponential but the problem remains exponential, since $\rho_N \approx e^{-0.942 N}$ on permutations.
+
+\section{The density of states}
+
+The energy $S(x)$ for a permutation $x$ counts the attacking pairs,
+\[
+S(x) = \#\{ (i, j) : i < j, \; |x_i - x_j| = j - i \} .
+\]
+Table~\ref{tab:dos} records the density of states $N(s)$ for $N = 4$ to $9$, obtained by exhaustive enumeration. Several features will matter. The number of distinct energy levels is small, at most $1 + \binom{N}{2}$ and in practice much smaller. The distribution of energy has its mode near $N/2$ and a long, irregular right tail; the maximum energy $\binom{N}{2}$, in which every pair attacks, is attained only by the two main diagonals, and the levels just below it are empty. And the zero energy level, which is the one we want, sits at the far left of the distribution with an exponentially small share of the mass.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Density of states $N(s)$, the number of permutations of $\{1,\dots,N\}$ with exactly $s$ attacking pairs, for $N = 4$ to $9$. Empty levels omitted.}
+\label{tab:dos}
+\begin{tabular}{rl}
+\toprule
+$N$ & $(s : N(s))$ \\
+\midrule
+4 & $0{:}2, \; 1{:}8, \; 2{:}6, \; 4{:}6, \; 6{:}2$ \\
+5 & $0{:}10, \; 2{:}56, \; 4{:}42, \; 6{:}10, \; 10{:}2$ \\
+6 & $0{:}4, \; 1{:}60, \; 2{:}160, \; 3{:}128, \; 4{:}188, \; 5{:}96, \; 6{:}24, \; 7{:}26, \; 8{:}8, \; 9{:}20, \; 11{:}4, \; 15{:}2$ \\
+7 & $0{:}40, \; 1{:}152, \; 2{:}680, \; 3{:}1116, \; 4{:}960, \; 5{:}1000, \; 6{:}296, \; 7{:}498, \; 8{:}72,$ \\
+  & $9{:}132, \; 11{:}66, \; 13{:}22, \; 15{:}4, \; 21{:}2$ \\
+8 & $0{:}92, \; 1{:}888, \; 2{:}2864, \; 3{:}6872, \; 4{:}7892, \; 5{:}7552, \; 6{:}5658, \; 7{:}3448,$ \\
+  & $8{:}2454, \; 9{:}968, \; 10{:}676, \; 11{:}496, \; 12{:}162, \; 13{:}72, \; 14{:}102, \; 15{:}16,$ \\
+  & $16{:}62, \; 17{:}8, \; 18{:}32, \; 22{:}4, \; 28{:}2$ \\
+9 & $0{:}352, \; 1{:}3376, \; 2{:}16648, \; 3{:}41016, \; 4{:}61980, \; 5{:}68728, \; 6{:}58864,$ \\
+  & $7{:}41528, \; 8{:}30222, \; 9{:}15464, \; 10{:}11704, \; 11{:}4384, \; 12{:}4424, \; 13{:}968,$ \\
+  & $14{:}1860, \; 15{:}144, \; 16{:}694, \; 17{:}104, \; 18{:}280, \; 20{:}22, \; 22{:}76, \; 24{:}36,$ \\
+  & $28{:}4, \; 36{:}2$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_dos8.pdf}
+\caption{Left: the density of states for $N = 8$. Right: the quantile function $\Lambda(s)$ of the Boltzmann likelihood $L(x) = e^{-S(x)}$ under the uniform distribution on permutations. The solutions occupy the interval $[0, 92/40320)$ at the extreme left.}
+\label{fig:dos8}
+\end{figure}
+
+\section{The Boltzmann view}
+
+Attach to each permutation the Boltzmann weight $e^{-S(x)/\gamma}$ at temperature $\gamma$ and define the partition function
+\[
+Z(\gamma) = \sum_{x \in \cX} e^{-S(x)/\gamma} = \sum_{s \ge 0} N(s) e^{-s/\gamma} .
+\]
+As $\gamma \to 0$ the Boltzmann distribution $\pi_\gamma(x) = e^{-S(x)/\gamma} / Z(\gamma)$ concentrates on the ground states, which are the solutions, and $Z(\gamma) \to Q$. Counting is therefore computing a zero temperature limit of a partition function, and any method that computes partition functions, from simulated annealing\index{simulated annealing} to Wang and Landau, is a method for counting queens. The physicist's phrase for $\log N(s)$ is the microcanonical entropy; the complexity theorist's phrase for computing $N(0)$ is $\sharpP$. They are the same object seen from two sides, and the central claim of this book is that the quantile function of Monte Carlo is the bridge between them.
+
+\input{ch_simkin}
+
+\input{ch_entropy}
+
+\input{ch_latin}
+
+\part{Monte Carlo Counting}
+
+\chapter{Product Estimators and Annealing}
+\label{ch:product}
+
+\section{Splitting a rare event}
+
+If a rare event cannot be hit directly, approach it in stages. Let $S$ be the energy and define, for each level $m$,
+\[
+Z_m = \PP_p\big( S(x) \le m \big) , \qquad Z_\infty = 1, \quad Z_0 = \rho .
+\]
+Choose a ladder of levels $m_0 = 0 < m_1 < \dots < m_T = \infty$ and write the telescoping product
+\[
+\rho = Z_0 = \prod_{t=1}^{T} \frac{Z_{m_{t-1}}}{Z_{m_t}} .
+\]
+Each ratio $Z_{m_{t-1}} / Z_{m_t} = \PP_p(S \le m_{t-1} \mid S \le m_t)$ is a conditional probability which, if the levels are well spaced, is not small, and so can be estimated by ordinary Monte Carlo from samples of $p$ conditioned on $\{S \le m_t\}$. This is the product estimator of Jerrum, Valiant and Vazirani\index{Jerrum, Valiant and Vazirani} in the counting literature and the splitting method of Kahn and Harris in rare event simulation; Diaconis and Holmes give a clear account of it with the queens in mind.
+
+For the queens with $N = 8$ the exact values $Z_m$ on permutations, from Table~\ref{tab:dos}, run
+\[
+\begin{gathered}
+Z_0 = 0.00228, \; Z_1 = 0.0243, \; Z_2 = 0.0953, \; Z_3 = 0.266, \\ Z_4 = 0.462, \; Z_5 = 0.649, \; Z_6 = 0.789, \dots
+\end{gathered}
+\]
+so that with every integer level used, the first ratio $Z_0 / Z_1 = 0.094$ is the smallest and the rest are between $0.25$ and $1$. Nothing is rare any more; the difficulty has moved into producing samples from the conditioned distributions.
+
+\section{Variance of the product}
+
+Suppose each ratio $\theta_t = Z_{m_{t-1}} / Z_{m_t}$ is estimated by an independent $\hat\theta_t$ with mean $\theta_t$ and relative variance $c_t^2 = \Var(\hat\theta_t) / \theta_t^2$. Then $\hat\rho = \prod_t \hat\theta_t$ is unbiased and
+\[
+\frac{\Var(\hat\rho)}{\rho^2} = \prod_{t=1}^{T} (1 + c_t^2) - 1 .
+\]
+If each ratio is estimated by $M_t$ Bernoulli samples then $c_t^2 = (1 - \theta_t) / (M_t \theta_t)$, and if all $\theta_t$ are bounded below by a constant and $M_t = M$ then the relative variance is at most $e^{T C / M} - 1$, which is $O(\epsilon^2)$ when $M$ is of order $T / \epsilon^2$. The total sample size is $O(T^2 / \epsilon^2)$.
+
+The length $T$ of the ladder is therefore the governing quantity. Since each ratio is at most one and the product is $\rho$, a ladder with all ratios at least $\tfrac12$ has length at least $\log_2(1/\rho)$, and the analysis above needs a ladder of length $O(\log(1/\rho))$ with every ratio bounded below by a constant. For the queens $\log(1/\rho_N) \approx 0.942 N$ on permutations, so a ladder with ratios at least $\tfrac12$ has at least $1.36 N$ rungs, and if one of length $T = O(N)$ exists the total sample complexity is $O(N^2 / \epsilon^2)$ times the cost of producing one conditioned sample. We have not shown that such a ladder exists. For the integer ladder the bottom ratio is not bounded below: the exact values of $Z_0 / Z_1$ are $0.094$, $0.094$, $0.048$, $0.038$ for $N = 8, \dots, 11$, and about $0.01$ at $N = 16$. Keeping every ratio bounded below would require splitting the bottom rung by non integer or tempered levels, at a cost we do not analyse. Granting such a ladder, and a polynomial cost for producing one conditioned sample, the scheme is polynomial.
+
+\section{Well balanced schedules}
+
+The classical analysis, with Chebyshev's inequality in place of exact variances, gives a sample complexity of $O\big( (\ln(1/\rho))^2 \epsilon^{-2} \big)$ for a ladder in which every ratio is bounded away from zero and one, the well balanced schedule of Dyer and Frieze. \v{S}tefankovi\v{c}, Vempala and Vigoda showed in 2009 that an adaptive schedule can do better: for the partition function $Z(\beta) = \sum_s N(s) e^{-\beta s}$ a cooling schedule of length $O^*\big( \sqrt{\ln Z(0)} \big)$ suffices, where $O^*$ hides logarithmic factors, and Huber \cite{Huber} later reduced the logarithmic overhead in the total number of samples to a $\ln \ln$ factor with a paired product estimator\index{product estimator}. The improvement of \v{S}tefankovi\v{c}, Vempala and Vigoda does not come from ratios close to one (with a schedule that short the typical ratio is far from one); it comes from bounding the relative variance of the estimator of each step even when the mean ratio is small.
+
+The point to retain is that the ladder length is governed by the logarithm of the rare event probability, which is linear in $N$ for the queens, and is not the obstruction once a ladder with every ratio bounded below is granted. What may be the obstruction, and in general is, is the cost of each conditioned sample.
+
+\section{Simulated annealing and the Boltzmann ladder}
+
+Instead of conditioning on hard level sets one may soften them. The Boltzmann distribution $\pi_\gamma(x) \propto e^{-S(x)/\gamma}$ interpolates between the uniform distribution at $\gamma = \infty$ and the uniform distribution on solutions at $\gamma = 0$, and
+\[
+\frac{Q}{|\cX|} = \lim_{\gamma \to 0} \frac{Z(\gamma)}{Z(\infty)} = \lim_{\gamma \to 0} \prod_{k} \frac{Z(\gamma_k)}{Z(\gamma_{k-1})}
+\]
+along any sequence $\gamma_0 = \infty > \gamma_1 > \dots \to 0$. Each ratio is
+\[
+\frac{Z(\gamma_k)}{Z(\gamma_{k-1})} = \EE_{\pi_{\gamma_{k-1}}}\Big[ e^{-S(x)(1/\gamma_k - 1/\gamma_{k-1})} \Big] ,
+\]
+an expectation under the previous Boltzmann distribution that is estimated by sampling from it, typically by Metropolis\index{Metropolis algorithm} or Gibbs moves that swap two queens. This is simulated annealing in the sense of Kirkpatrick, Gelatt and Vecchi used for estimation rather than optimisation, and it is the route taken by Rubinstein and Kroese, who define $S$ as a threat count and run a Gibbs sampler to its minimum.
+
+Annealing can meet a phase transition. As $\gamma$ decreases the Boltzmann distribution shifts from the bulk of the density of states, around $s \approx N/2$, towards the ground state, and at some temperature the number of low energy states that the chain can reach may change abruptly. Controlling the rate at which $\gamma$ decreases through this transition is exactly the problem of choosing the ladder, and is the problem that the vertical likelihood weight function $\Omega$ of Chapter~\ref{ch:vertical} is designed to solve.
+
+\section{The cross entropy method}
+
+Rubinstein's cross entropy\index{cross entropy method} method is an adaptive importance sampling scheme for the same problem. One seeks, within a parametric family $h_v$, the density closest in Kullback Leibler divergence to the optimal zero variance importance density
+\[
+g^*(x) = \frac{p(x) \, \Ind_{\{S(x) \le m\}}}{Z_m} .
+\]
+The divergence $D(g^* \| h_v) = \EE_{g^*} \log( g^* / h_v )$ is minimised over $v$, which for exponential families reduces to matching sufficient statistics on the elite samples, those with $S \le m$. The level $m$ and the parameter $v$ are then updated together, with $m$ lowered to a fixed quantile of the current sample at each stage. The method is elegant and effective in practice; its theoretical guarantees are weaker than those of the product estimator because the parametric family may not be rich enough to approximate $g^*$ as $m \to 0$.
+
+\input{ch_mixing}
+
+\input{ch_witchhat}
+
+\input{ch_symmetric}
+
+\input{ch_volume}
+
+\chapter{Sampling versus Counting}
+\label{ch:jvv}
+
+\section{Jerrum, Valiant and Vazirani}
+
+The fundamental theorem of Monte Carlo counting is that, for a large class of problems, approximate counting and approximately uniform sampling are polynomially equivalent. The class is that of self reducib\index{self reducibility}le problems: those in which the set of solutions of an instance can be partitioned by the value of the first coordinate into the solution sets of smaller instances of the same problem. The queens are self reducible in the obvious way, by fixing the column of the queen in the first row and asking for completions.
+
+\begin{theorem}[Jerrum, Valiant and Vazirani]
+For a self reducible $\NP$ relation, the following are equivalent. (i) There is a fully polynomial randomized approximation scheme for the number of solutions. (ii) There is a fully polynomial almost uniform sampler for the solutions.
+\end{theorem}
+
+A fully polynomial randomized approximation scheme, an FPRAS\index{FPRAS}, is a randomized algorithm which, given $x$ and $\epsilon$, produces in time polynomial in $|x|$ and $1/\epsilon$ a number within a factor $(1 \pm \epsilon)$ of the true count with probability at least $\tfrac34$. An almost uniform sampler produces, in time polynomial in $|x|$ and $\log(1/\delta)$, a sample whose distribution is within total variation $\delta$ of uniform on the solutions.
+
+The direction from sampling to counting is the product estimator of Chapter~\ref{ch:product}, with the self reducibility tree supplying the ladder: the ratio of the number of solutions with first coordinate $j$ to the total is estimated by sampling, the most popular $j$ is fixed, and one recurses. The direction from counting to sampling uses approximate counts to compute approximate conditional probabilities of each first coordinate, samples accordingly, and corrects the accumulated bias by rejection, a procedure sometimes called the method of conditional probabilities when it is derandomized.
+
+A consequence is that for self reducible problems an FPRAS is as much as one can hope for short of $\Pc = \NP$: an FPRAS for a self reducible counting problem whose decision version is $\NP$ complete gives a polynomial time randomized algorithm, with one sided error, for that decision problem, and hence $\NP = \RP$: by the theorem the FPRAS yields an almost uniform sampler, on a satisfiable instance the sampler returns a solution with probability at least $\tfrac12$, and a returned solution can be checked, so an unsatisfiable instance is never accepted (an approximation scheme alone has two sided error and would give only $\BPP$). This is the stake in the queens problem. A polynomial time almost uniform sampler for queens completions would imply $\NP = \RP$, which combined with the expected $\Pc = \RP$ would give $\Pc = \NP$.
+
+\section{Successes}
+
+The theorem does not say that samplers exist; it says what they are worth. Some exist. Jerrum and Sinclair gave in 1989 an FPRAS for the permanent of dense zero one matrices and in 1993 one for the ferromagnetic Ising partition function, by analysing the mixing time of a Markov chain through its conductance. Dyer, Frieze and Kannan gave in 1991 the first polynomial time randomized algorithm for the volume of a convex body, by a random walk whose mixing is controlled by an isoperimetric inequality; Applegate\index{Applegate, Kannan and Polson}, Kannan and Polson extended the random walk to sampling and integrating log concave functions. Jerrum, Sinclair and Vigoda gave in 2004 an FPRAS for the permanent of an arbitrary nonnegative matrix, settling a problem that had stood for 15 years. In every case the engine is a rapidly mixing Markov chain on an exponentially large state space, and the analytic content is a bound on its spectral gap.
+
+Every one of these problems is $\sharpP$ complete to solve exactly, and none of them is $\NP$ hard to approximate; the permanent, the volume and the ferromagnetic Ising model all have decision versions in $\Pc$. That is no accident. Approximate counting for a problem whose decision version is $\NP$ complete would collapse $\NP$ to $\RP$, so for such problems rapid mixing must fail, and fail it does: the natural chains for the antiferromagnetic Ising model, for independent sets at high density, and for proper colourings with few colours are all torpid\index{torpid mixing}ly mixing, taking exponential time to cross between modes.
+
+\section{Swendsen and Wang}
+
+The queens may be written as a binary Markov random field. The board is an $N \times N$ binary matrix $b_{ij}$, with $b_{ij} = 1$ when a queen stands on square $(i, j)$, subject to one queen per row and column and no two on a diagonal. The permutation representation $x$ is the sparse encoding of the same matrix. Sampling such fields is the daily work of statistical physics, and the most powerful tool is the cluster algorithm of Swendsen and Wang.
+
+Edwards and Sokal\index{Edwards and Sokal} identified the structure underneath. Let $s$ be a configuration of colours on the vertices of a graph $G = (V, E)$, with $q$ colours, and let $d$ be a configuration of bonds, $d_{ij} \in \{0, 1\}$ on each edge. The joint distribution
+\[
+P(s, d) = \frac{1}{Z} \prod_{(i,j) \in E} \Big( (1 - p) \, \delta_{d_{ij}, 0} + p \, \delta_{d_{ij}, 1} \, \delta_{s_i, s_j} \Big)
+\]
+has as its marginal over colours the Potts distribution
+\[
+P(s) \propto \exp\Big( J \sum_{(i,j) \in E} \delta(s_i, s_j) \Big), \qquad p = 1 - e^{-J},
+\]
+and as its marginal over bonds the random cluster model of Fortuin and Kasteleyn,
+\[
+P(d) = \frac{1}{Z} \, p^{D} (1 - p)^{|E| - D} q^{C(d)} ,
+\]
+where $D$ is the number of open bonds and $C(d)$ the number of connected components. The Swendsen Wang algorithm is block Gibbs sampling on the joint: given colours, open each edge between like coloured vertices independently with probability $p$; given bonds, recolour each connected component uniformly and independently. A single sweep can flip macroscopic clusters, which is why the algorithm reduces critical slowing down in the ferromagnetic Ising and Potts models, where single site Metropolis takes time polynomial in the system size with a dynamic exponent near two at the critical point.
+
+Higdon placed Swendsen and Wang in the family of auxiliary variable methods, and in particular showed it to be a form of slice sampling\index{slice sampling}. The bond variable $d_{ij}$ is a slice variable for the factor $e^{J \delta(s_i, s_j)}$: writing $e^{J \delta} = 1 + (e^{J} - 1) \delta$ and introducing $u_{ij}$ uniform on $(0, e^{J \delta(s_i, s_j)})$, the event $u_{ij} > 1$ forces $s_i = s_j$ and is the open bond. This is the Damien, Wakefield and Walker construction specialised to a Potts interaction.
+
+For the queens the natural interaction is repulsive: two queens on a common diagonal pay a penalty rather than earning a reward. One writes $\pi_\gamma(x) \propto \prod_k e^{-S_k(x)/\gamma}$ with $S_k$ the number of attacking pairs on the $k$th diagonal, introduces slice variables $u_k$ uniform on $(0, e^{-S_k(x)/\gamma})$, and alternates. Given the slices, the constraint $u_k < e^{-S_k(x)/\gamma}$ caps the number of queens allowed on each diagonal, and sampling a permutation subject to such caps is a constrained assignment problem that can be attacked by the clustering moves of Swendsen and Wang on the bipartite graph of rows and columns. The chain is valid; its mixing time\index{mixing time} is not known.
+
+\section{Mixing at the transition}
+
+Gore and Jerrum\index{Gore and Jerrum} showed in 1999 that the Swendsen Wang chain mixes torpidly for the Potts model with $q \ge 3$ on the complete graph at the critical temperature. The lesson generalises: cluster algorithms are not immune to phase transitions, they merely move the slow mode from the single spin level to the cluster level. For the queens we expect, and the density of states in Table~\ref{tab:dos} suggests, a transition in the annealing parameter $\gamma$ at which the Boltzmann distribution moves from the bulk to the ground state. Whether a Swendsen Wang chain for the queens mixes in polynomial time across that transition on every partially filled board is one of the open problems of Chapter~\ref{ch:open}, and a positive answer would, by the Jerrum Valiant Vazirani theorem and Gent, Jefferson and Nightingale, imply $\NP = \RP$.
+
+\input{ch_rareevent}
+
+\input{ch_crossentropy}
+
+\input{ch_lorenz}
+
+\chapter{Vertical Likelihood Monte Carlo}
+\label{ch:vertical}
+
+This chapter is the technical heart of the book. It develops the quantile reordering of a sum, the Lorenz curve identity, and the family of estimators, nested sampling\index{nested sampling}, split sampling and the energy level samplers of physics, that it unifies.
+
+\section{The Lorenz identity}
+
+Let $X \sim P$ on a space $\cX$ and let $L: \cX \to [0, \infty)$ be a likelihood, or more generally a nonnegative integrand. The quantity of interest is
+\[
+Z = \EE_P[L(X)] = \int_\cX L(x) \, P(dx) .
+\]
+Define the survival function of the likelihood ordinate $Y = L(X)$,
+\[
+Z(y) = \PP_P\big( L(X) > y \big) = \int_{\{L(x) > y\}} P(dx) ,
+\]
+a nonincreasing function from $[0, \infty)$ to $[0, 1]$ with $Z(0) \le 1$ and $Z(y) \to 0$ as $y \to \infty$. By Fubini,
+\begin{equation}
+Z = \int_\cX \int_0^\infty \Ind_{\{y < L(x)\}} \, dy \, P(dx) = \int_0^\infty Z(y) \, dy .
+\label{eq:fubini}
+\end{equation}
+Now let $\Lambda$ be the generalised inverse of $Z(\cdot)$,
+\[
+\Lambda(s) = \sup\{ y : Z(y) > s \} , \qquad s \in [0, 1] ,
+\]
+which is also nonincreasing, and observe that, $Z$ being right continuous, $s < Z(y)$ if and only if $y < \Lambda(s)$. Then
+\begin{equation}
+Z = \int_0^\infty \int_0^1 \Ind_{\{s < Z(y)\}} \, ds \, dy = \int_0^1 \int_0^\infty \Ind_{\{y < \Lambda(s)\}} \, dy \, ds = \int_0^1 \Lambda(s) \, ds .
+\label{eq:lorenz}
+\end{equation}
+This is the Lorenz identity. It says that an expectation over an arbitrary space, of arbitrary dimension and cardinality, is the integral of a monotone function over the unit interval. The function $\Lambda$ is the quantile function of the likelihood ordinate: $\Lambda(s)$ is the value $y$ such that a fraction $s$ of the draws from $P$ have likelihood above $y$. Two distributional facts follow immediately. If $U \sim \mathrm{Unif}(0, 1)$ then $\Lambda(U) \overset{D}{=} L(X)$, and $Z(L(X)) \overset{D}{=} U$ whenever $L(X)$ is continuous.
+
+The identity is old. It is the statement that the mean of a nonnegative random variable is the integral of its survival function, or equivalently of its quantile function, and the Lorenz curve of economics, $\cL(u) = Z^{-1} \int_0^u \Lambda(s) \, ds$, is its normalised cumulative version. Yakowitz, Krimmel and Szidarovszky showed in 1978 that the trapezoidal rule on ordered random nodes has lower variance than the naive average; applied to $\Lambda$ this is Monte Carlo integration in the quantile coordinate. Skilling\index{Skilling, John} made the identity the basis of nested sampling in 2006. Polson and Scott\index{Polson and Scott} named the general approach vertical likelihood Monte Carlo in 2014, since one integrates over the vertical axis of the likelihood rather than the horizontal axis of the parameter, and showed that several sequential Monte Carlo schemes for normalising constants are instances of it.
+
+\section{Vertical importance sampling}
+
+The identity suggests an importance sampling scheme on the unit interval. Choose a density $\Omega$ on $[0, 1]$, draw $s_1, \dots, s_n$ from it, and set
+\[
+\hat Z = \frac{1}{n} \sum_{i=1}^{n} \frac{\Lambda(s_i)}{\Omega(s_i)} .
+\]
+The variance is zero if $\Omega(s) \propto \Lambda(s)$, that is, if the importance density is the normalised quantile function itself. This is the vertical analogue of the familiar fact that the optimal importance density in the horizontal coordinate is proportional to $L(x) P(x)$. Since $\Lambda$ is unknown, the practical scheme learns $\Omega$ adaptively, and the choice of $\Omega$ is exactly a choice of annealing schedule: $\Omega$ puts mass where $\Lambda$ is large, which is near $s = 0$, the high likelihood region, and it must not move there too fast or too slowly. In terms of a weight $W$ on the likelihood axis (Chapter~\ref{ch:polsonscott}) the density on the quantile axis is $\Omega(s) \propto W(\Lambda(s))$. Polson and Scott show that the choice $\Omega(s) \propto 1$ recovers naive Monte Carlo, and that $\Omega(s) \propto 1/s$, truncated at a small $\eta$ since $1/s$ is not integrable on $[0, 1]$, is the weight $W = 1/Z$ of nested sampling, with $\Omega$ supported on a geometric grid as its discretisation; in energy terms it is the cumulative weight $1/\mathcal{Z}$ of the $1/k$ ensemble. The multicanonical\index{multicanonical sampler} ensemble, whose weight is inverse to the density of states, is discussed under energy domain samplers below.
+
+\section{Evaluating the quantile function}
+
+The identity moves the difficulty rather than removing it: $\Lambda(s)$ is not available in closed form. What is available is the following. For a fixed level $y$, the survival $Z(y) = \PP_P(L > y)$ is the fraction of prior draws exceeding $y$, estimable by sampling. For a fixed fraction $s$, the quantile $\Lambda(s)$ is the $(1 - s)$ quantile of $L(X)$ under $P$, estimable by the order statistics of a sample. And, crucially, if one can sample from $P$ restricted to $\{L > y\}$, which is the conditioned distribution of the product estimator, one can from such a sample estimate the next quantile down. This restricted draw is an assumption, an oracle, and not something the identity supplies: for the queens it is exactly as hard as $\NP = \RP$ (Chapter~\ref{ch:polsonscott}), and its cost is the open question of the program. Every vertical likelihood algorithm is a method of walking down the quantile function from $s = 1$ to $s = 0$ using such conditioned samples.
+
+\section{Nested sampling}
+
+Skilling's nested sampling is the simplest such walk. Maintain a population of $n$ live points drawn from $P$ restricted to $\{L > y_k\}$. At step $k$ discard the point with the smallest likelihood, call it $y_{k+1}$, and replace it by a fresh draw from $P$ restricted to $\{L > y_{k+1}\}$. The key observation is that the prior mass above $y_{k+1}$, namely $Z(y_{k+1})$, is the prior mass above $y_k$ times the maximum of $n$ uniforms, which has mean $n / (n+1)$ and whose logarithm has mean $-1/n$. Thus
+\[
+\log Z(y_k) \approx -k / n , \qquad s_k = e^{-k/n} ,
+\]
+and the evidence is approximated by the quadrature rule
+\[
+\hat Z = \sum_k y_k \, ( s_{k-1} - s_k )
+\]
+with the deterministic geometric grid $s_k = e^{-k/n}$. The grid is deterministic; the randomness is entirely in the conditioned draws that supply the $y_k$. Polson and Scott observed that one may take the grid as given and view nested sampling as a Riemann sum for $\int_0^1 \Lambda(s) \, ds$ on a geometric mesh.
+
+The number of steps needed to reach the region where $\Lambda$ has its mass is $k \approx n \log(1 / Z(y_*))$ where $y_*$ is the level at which the likelihood begins to matter; for a rare event indicator this is $n \log(1/\rho)$, linear in $N$ for the queens. So nested sampling, like the product estimator, has a polynomial ladder; its cost is in the conditioned draws.
+
+\section{Rates of convergence}
+
+A striking feature of integration in the quantile coordinate is the rate of convergence. For a smooth integrand on $[0, 1]$ the trapezoidal rule on ordered uniform draws $u_{(1)} < \dots < u_{(n)}$,
+\[
+\hat Z = u_{(1)} \Lambda(u_{(1)}) + \sum_{i=1}^{n-1} \big( u_{(i+1)} - u_{(i)} \big) \frac{\Lambda(u_{(i+1)}) + \Lambda(u_{(i)})}{2} + (1 - u_{(n)}) \Lambda(u_{(n)}) ,
+\]
+with the end pieces on $[0, u_{(1)}]$ and $[u_{(n)}, 1]$ included (without them the omitted mass is a bias of order $1/n$), has mean squared error $O(n^{-4})$ when $\Lambda$ is twice differentiable with bounded second derivative, by the results of Yakowitz\index{Yakowitz, Krimmel and Szidarovszky}, Krimmel and Szidarovszky, against $O(n^{-1})$ for the naive average. Masry and Cambanis extended the analysis to the trapezoidal rule with random nodes. The gain is that of a deterministic quadrature rule in one dimension applied at random ordered nodes (ordered uniforms are not a low discrepancy sequence, and sorting does not change discrepancy), and it needs smoothness of $\Lambda$, not merely monotonicity. It also assumes that $\Lambda$ can be evaluated at the nodes, which is the catch noted above. In the original coordinate, of dimension $N$ or $N^2$, no such rate is available; the Lorenz identity would buy it by collapsing the dimension to one, if the quantile function were available. For a step function such as the quantile of an indicator the rate is governed by the discontinuities and is $O(n^{-2})$ in mean square, still better than naive Monte Carlo.
+
+\section{Split sampling}
+
+Birge, Chang and Polson's~\cite{BCP} split sampling is the vertical scheme with an adaptively estimated weight function. Write, by Fubini, with $Z_m = \PP_P(L > m)$,
+\[
+Z = \int_\cX L(x) \, P(dx) = \int_0^\infty Z_m \, dm ,
+\]
+and introduce a weight $\omega(m)$ on the levels. The importance sampling blanket is the family of conditioned distributions $\pi(x \mid m) = P(x \mid L(x) > m)$ together with the marginal
+\[
+\pi_{IS}(m) = \frac{\omega(m) Z_m}{\int \omega(m) Z_m \, dm} ,
+\]
+and the joint $\pi_{IS}(x, m) \propto \omega(m) \, \Ind_{\{L(x) > m\}} \, P(x)$ has a conditional in $m$ that does not depend on $Z_m$:
+\[
+\pi(m \mid x) = \frac{\omega(m) \, \Ind_{\{m < L(x)\}}}{\Omega(L(x))} , \qquad \Omega(y) = \int_0^y \omega(m) \, dm .
+\]
+One runs a Gibbs or Metropolis chain on the joint, alternating $x \mid m$ and $m \mid x$, estimates the marginal $\hat\pi_{IS}(m)$ from the visitation frequencies, and recovers $\hat Z_m = \omega(0) \hat\pi_{IS}(m) / (\omega(m) \hat\pi_{IS}(0))$, assuming $L > 0$ almost surely so that $Z_0 = 1$. The weight is then rebalanced towards the flat histogram condition in which every level is visited equally often, by the update
+\[
+\log \omega_{k+1}(m) \leftarrow \log \omega_k(m) - \gamma_k \big( \hat\pi_k(m) - \phi(m) \big) ,
+\]
+which is the Wang Landau\index{Wang Landau algorithm} update, and the final estimate of $Z$ is
+\[
+\hat Z = \sum_{i=1}^{n} \frac{1/\Omega(L(x^{(i)}))}{\sum_j 1/\Omega(L(x^{(j)}))} \, L(x^{(i)}) .
+\]
+With a discrete ladder $\omega(m) = \sum_t \omega_t \delta_{m_t}(m)$ the scheme reduces to the product estimator with the ladder chosen by quantiles: at each stage the next level $m_{t+1}$ is set to the $(1 - r)$ quantile of the likelihoods at the current level, so that each ratio is approximately $r$ by construction. This is the quantile reordering of our 2024 paper, and the choice of $r$ is the choice of ladder spacing.
+
+\section{Energy domain samplers}
+
+Statistical physics computes the same objects by a family of methods that we may place in the vertical framework, with the caveat made precise below. Let $h(x)$ be an energy and let $h(X)$ be the random energy of a draw from the Boltzmann distribution at unit temperature. Then
+\[
+\PP(h(X) = s) = N(s) \, e^{-s} / Z ,
+\]
+where $N(s)$ is the density of states. The multicanonical sampler of Berg and Neuhaus samples states with weight $1 / N(s)$ so that the energy distribution is flat; the Wang Landau algorithm estimates $N(s)$ by the iterative rebalancing above; and the $1/k$ ensemble of Hesselbo and Stinchcombe samples with weight $1 / \mathcal{Z}(s)$ where $\mathcal{Z}(s) = \sum_{t \le s} N(t)$, which gives $\PP(h(X) = s) \propto N(s) / \mathcal{Z}(s)$ .
+
+Polson and Scott observed that these are, with one restriction made precise below, instances of a single auxiliary variable construction. Consider the joint
+\[
+p(x, u) \propto w(u) \, \Ind_{\{u \ge h(x)\}} .
+\]
+Integrating out $u$, its implied energy distribution is $p(h(X) = s) \propto N(s) \, G(s)$ with the tail weight $G(s) = \int_{u \ge s} w(u) \, du$, so the construction realises any nonincreasing state weight $G$, with $w = -G'$. With $G(s) = e^{-s}$ this is the canonical ensemble; with $G(s) = 1 / \mathcal{Z}(s)$, which is nonincreasing because $\mathcal{Z}$ is cumulative, the $1/k$ ensemble, and this is the weight $W = 1/Z$ of nested sampling. The multicanonical weight $G(s) = 1 / N(s)$ is an instance only where $1/N$ is nonincreasing, that is, up to the mode of $N$ (for the queens the density of states is unimodal), so beyond the mode the multicanonical sampler is not an instance of this joint as written. The tail weight $G$ on the energy axis is the weight $W$ of Chapter~\ref{ch:polsonscott} composed with the energy, and the slice variable $u$ is the level $m$ of split sampling. The canonical and $1/k$ ensembles are slice samplers on the likelihood ordinate in this sense.
+
+\section{The concentration function}
+
+One further identity will be useful later in this part. Let $P$ and $Q$ be probability measures on $\cX$ with $P \ll Q$ and let $\ell(x) = P(x) / Q(x)$ be the likelihood ratio, a random variable with $\EE_Q[\ell] = 1$. Let $m(t) = Q\{ \ell \le t \}$ be its distribution function under $Q$ and $m^{-1}$ its generalised inverse. The concentration function\index{concentration function} of $P$ relative to $Q$ is the Lorenz curve of $\ell$,
+\[
+\phi_P(u) = \int_0^u m^{-1}(1 - z) \, dz , \qquad \phi_P(0) = 0, \quad \phi_P(1) = 1 .
+\]
+It is the maximal probability that $P$ can assign to a set of $Q$ measure $u$, and it carries the whole information of the pair $(P, Q)$ up to measure preserving rearrangement. For a tilted measure $Q^L(x) = L(x) Q(x) / \int L \, dQ$, let $m_L$ be the distribution function of $\ell$ under $Q^L$ and define the unnormalised curve $\psi(u) = \int_0^u m_L^{-1}(1 - z) \, dz$. Its endpoint is $\psi(1) = \EE_{Q^L}[\ell] = \int L \, dP / \int L \, dQ = Z / Z_Q$, with $Z_Q = \int L \, dQ$, whereas a concentration function proper, of a pair of probability measures, has endpoint one. Thus a ratio of normalising constants, which is what every rung of the product estimator computes, is the endpoint of such an unnormalised concentration curve; the vertical likelihood walk computes it by traversing the Lorenz curve from the origin.
+
+\input{ch_polsonscott}
+
+\input{ch_rates}
+
+\input{ch_yakowitz}
+
+\input{ch_beyond}
+
+\input{ch_staircase}
+
+\input{ch_nested}
+
+\input{ch_smc}
+
+\input{ch_bayes}
+
+\input{ch_gbc}
+
+\input{ch_sufficient}
+
+\part{The Monte Carlo Program for P versus NP}
+
+\input{ch_program}
+
+\chapter{The Quantile Reordering of a Randomized Algorithm}
+\label{ch:reorder}
+
+We now turn the machinery of Part III on the complexity classes of Part I. The move is simple. A randomized algorithm is a function of its random bits; its acceptance probability is an expectation; the expectation is the integral of a quantile function. So every randomized algorithm has a Lorenz curve, and the question of derandomization is a question about that curve.
+
+\section{Setup}
+
+Let $A(x, r)$ be a randomized polynomial time algorithm with random string $r \in \{0, 1\}^{m}$, $m = m(|x|)$ polynomial, and let $P$ be the uniform distribution on $\{0,1\}^m$. Fix the input $x$ and define the likelihood
+\[
+L_x(r) = \Ind\{ A(x, r) = 1 \} .
+\]
+The acceptance probability is
+\[
+p(x) = \EE_P[ L_x(r) ] = 2^{-m} \, \#\{ r : A(x, r) = 1 \} .
+\]
+The acceptance set $\mathcal{A}_x = \{ r : A(x, r) = 1 \}$ is recognised by a polynomial time algorithm, and $p(x)$ is $2^{-m}$ times a $\sharpP$ function. Computing $p(x)$ exactly is therefore a $\sharpP$ computation, and $\sharpP$ hard for a suitable $A$; this is Valiant's observation that counting accepting computations is complete for $\sharpP$.
+
+\section{The Lorenz curve of an algorithm}
+
+Apply the identities of Chapter~\ref{ch:vertical}. The survival function of the likelihood ordinate is
+\[
+Z_x(y) = \PP_P\big( L_x(r) > y \big) =
+\begin{cases}
+p(x) & 0 \le y < 1, \\
+0 & y \ge 1,
+\end{cases}
+\]
+and its generalised inverse, the quantile function, is
+\[
+\Lambda_x(s) = \sup\{ y : Z_x(y) > s \} =
+\begin{cases}
+1 & 0 \le s < p(x), \\
+0 & p(x) \le s \le 1 .
+\end{cases}
+\]
+The Lorenz identity gives
+\[
+p(x) = \int_0^1 \Lambda_x(s) \, ds ,
+\]
+which is trivial for a step function with a single step, and is nonetheless the entire content of the reordering: the $2^m$ dimensional sum over random strings has become the location of a single step on the unit interval.
+
+\begin{proposition}
+\label{prop:median}
+Let $L \in \RP$ with an algorithm $A$ that accepts every $x \in L$ with probability $p(x) > \tfrac12$ (one round of amplification gives one). Then for every input $x$,
+\[
+x \in L \iff \Lambda_x(\tfrac12) = \operatorname{med}_P L_x(r) = 1 .
+\]
+\end{proposition}
+
+\begin{proof}
+If $x \in L$ then $p(x) > \tfrac12$ and $\Lambda_x(s) = 1$ for $s < p(x)$, in particular at $s = \tfrac12$. If $x \notin L$ then $p(x) = 0$ and $\Lambda_x \equiv 0$. The median of a Bernoulli with parameter $p > \tfrac12$ is one and with parameter zero is zero.
+\end{proof}
+
+In words: deciding an $\RP$ language is evaluating the quantile function of its algorithm at the median. The promise of $\RP$, that $p(x)$ is either zero or (after one round of amplification) more than a half, is exactly the promise that the step of $\Lambda_x$ lies either at the origin or beyond the midpoint, so that a single evaluation at $s = \tfrac12$ resolves the question.
+
+\section{Medians of Boolean functions}
+
+The proposition reformulates $\Pc = \RP$ as a statement about medians.
+
+\begin{theorem}
+\label{thm:medians}
+$\Pc = \RP$ if and only if the following holds. For every polynomial time computable Boolean function $f(x, r)$, $r \in \{0,1\}^{m(|x|)}$, such that for every $x$ either $f(x, \cdot) \equiv 0$ or $\PP_r(f(x, r) = 1) > \tfrac12$, the median $\operatorname{med}_r f(x, r)$ is computable in deterministic polynomial time.
+\end{theorem}
+
+\begin{proof}
+If $\Pc = \RP$ then the language $\{ x : \PP_r(f(x,r) = 1) > \tfrac12 \}$, which is in $\RP$ with algorithm $f$, is in $\Pc$, and its indicator is the median. Conversely if medians are computable then every $\RP$ language is decided by computing the median of its acceptance indicator.
+\end{proof}
+
+The theorem is not deep; it is a change of coordinates. Its value is that it isolates the object. A median of a Boolean function of $m$ uniform bits is the one bit answer to the question: does more than half of the cube $\{0,1\}^m$ satisfy $f$? Every pseudorandom generator, every hitting set, every derandomization is a method of answering that question, for functions of the type in the theorem, without visiting more than polynomially many points of the cube. The quantile function $\Lambda_x$ is the device that makes the question one dimensional.
+
+\section{The vertical hitting set}
+
+Here is the sense, and the limit of the sense, in which the vertical likelihood walk is a hitting set. Recall that a hitting set for density $\tfrac12$ is a polynomial size set $H \subseteq \{0,1\}^m$ that intersects every polynomially recognisable set of density at least $\tfrac12$. Now consider the nested sampling walk with $n$ live points and the geometric grid $s_k = e^{-k/n}$. After $k$ steps the walk has visited $n + k$ points of the cube, each the output of a conditioned draw, and the prior mass above the current level is $e^{-k/n}$. In the quantile coordinate the walk has traversed the interval $[e^{-k/n}, 1]$. If $x \in L$ the acceptance set has mass $p(x) > \tfrac12$ and the step of $\Lambda_x$ sits at $s = p(x) > \tfrac12$; the walk reaches it after at most $k = n \log 2$ steps, that is, after visiting $O(n)$ points. These points are not, however, a hitting set in the sense just defined. A hitting set is fixed in advance and meets every dense recognisable set, whereas the points visited by the walk are random and depend on $A$ and $x$; with $n$ a small constant they meet the acceptance set only with constant probability, which a single uniform draw from the cube already achieves. Moreover each conditioned draw is a sample from a level set, which presupposes the ability to produce points of the acceptance set, so that using the walk to find such a point is circular.
+
+The vertical walk is at most a randomized hitting set generator whose randomness is entirely in the level set sampler\index{level set sampler}. It is not a derandomization; it is a change of where the randomness lives. Before the reordering the randomness was in $m$ uniform bits used once. After the reordering the randomness is in the conditioned draws, of which only $O(n)$ are needed, and the question has become whether those draws can be made deterministically.
+
+\section{Where the difficulty sits}
+
+Two things are now clear and should be stated plainly.
+
+First, the quantile reordering does not by itself show $\Pc = \RP$. It converts the problem of counting accepting strings to the problem of locating a step on the unit interval, and it converts the problem of locating that step to the problem of producing a point in the acceptance set by a deterministic procedure. The last problem is derandomization itself. There is no free lunch.
+
+Second, the reordering tells us exactly what a proof must do, and it tells us that the thing it must do is the same thing that stands between the queens and polynomial time counting. For a problem with an energy $S$ taking polynomially many values, the quantile function of the Boltzmann likelihood $e^{-S}$ is a step function with polynomially many steps, one per energy level, and the height of the $t$th step is $e^{-s_t}$ while its width is $N(s_t) / |\cX|$. The exponential sum $Z = \sum_s N(s) e^{-s}$ has become a polynomial sum. All of the $\sharpP$ hardness is in the widths, the density of states, and the one dimensional walk down the quantile function visits each width in turn and must estimate it. In the $\RP$ setting there is one step and we must find its location to within a factor of two; in the $\sharpP$ setting there are polynomially many steps and we must find each width to within a factor $(1 \pm \epsilon)$. The second problem contains the first. In the other direction, Stockmeyer~\cite{Stockmeyer} showed that approximate counting is in $\BPP^{\NP}$, so that $\NP \subseteq \RP$ gives randomized approximate counting, and for self reducible problems the Jerrum Valiant Vazirani theorem turns this into almost uniform sampling; that concerns deciding $\NP$, not locating the step of an $\RP$ algorithm, which an $\RP$ algorithm does already.
+
+This is the thesis. It does not resolve $\Pc$ versus $\RP$. It places the two problems, the derandomization of $\RP$ and the approximate counting of $\sharpP$, on the same one dimensional axis and identifies the quantity, the density of states expressed as the widths of a monotone step function, that governs both.
+
+\chapter{Vertical Likelihood and P = RP}
+\label{ch:prp}
+
+This chapter states precisely what vertical likelihood sampling proves about $\Pc$ and $\RP$, what it would prove under natural conjectures, and what the conjectures are.
+
+\section{A conditional theorem}
+
+Let us say that an energy $S: \cX \to \{0, 1, \dots, K\}$ on a finite set $\cX$ with $|\cX|$ known and $K$ polynomial in the input size admits a polynomial level set sampler if there is a randomized polynomial time procedure which, given a level $m$ and an accuracy $\delta$, produces a sample from the uniform distribution on $\{ x : S(x) \le m \}$ to within total variation $\delta$ in time polynomial in the input size and $\log(1/\delta)$.
+
+\begin{theorem}
+\label{thm:vertical_condfpras}
+If $S$ admits a polynomial level set sampler, and every ratio $Z_{t-1} / Z_t$ of consecutive level sets is at least $1/q$ for a polynomial $q$, then there is an FPRAS for $N(0) = \#\{ x : S(x) = 0 \}$, and hence for every cumulative count $\#\{ x : S(x) \le s \}$. The FPRAS runs the vertical likelihood walk with the ladder $m_t = t$ for $t = K, K-1, \dots, 0$, estimating each ratio $Z_{t-1} / Z_t$ by $O(K q / \epsilon^2)$ conditioned samples at level $t$, for a total of $O(K^2 q \, \epsilon^{-2})$ samples.
+\end{theorem}
+
+\begin{proof}
+This is the product estimator of Chapter~\ref{ch:product} with the integer ladder. Each ratio $\theta_t = Z_{t-1} / Z_t$ is a conditional probability, at least $1/q$ by hypothesis. The hypothesis is needed: if a single point of $\{0,1\}^n$ has energy zero and all others energy one then $K = 1$ but one ratio is $2^{-n}$, and no integer ladder estimates it from $O(K / \epsilon^2)$ samples. If the sampler also accepts a randomly tie broken (continuous) level, the ladder can be refined in the quantile coordinate as in split sampling, at the price of $O(K + \log(1/\rho))$ rungs, where $\rho = N(0)/|\cX|$. The variance bound of Chapter~\ref{ch:product} then gives relative error $\epsilon$ with probability $\tfrac34$ from $O(K^2 q / \epsilon^2)$ samples. The bias from the sampler's total variation error $\delta$ is $O(T \delta)$ and is absorbed by taking $\delta = \epsilon / T$.
+\end{proof}
+
+\begin{corollary}
+\label{cor:queens_nprp}
+If the queens energy, the number of attacking pairs on a partially filled board, admits a polynomial level set sampler, and the ratios of consecutive level sets are at least inverse polynomial, then there is an FPRAS for the queens completion count, and therefore $\NP = \RP$.
+\end{corollary}
+
+\begin{proof}
+The FPRAS decides whether the count is positive with bounded two sided error, which places the completion problem, which is $\NP$ complete by Gent, Jefferson and Nightingale~\cite{GJN}, in $\BPP$; hence $\NP \subseteq \BPP$, and $\NP = \RP$ by Ko~\cite{Ko} (or by using self reducibility to construct a completion and verify it).
+\end{proof}
+
+The corollary is one form of the claim in our 2024 paper that a polynomial time counting algorithm for the queens provides an avenue to random polynomial time algorithms for every problem in $\NP$. It is a conditional statement whose hypotheses are a polynomial level set sampler for the queens and inverse polynomial rung ratios, for instance a rapidly mixing Markov chain on partial queens placements, and nobody has proved such a bound. We regard it as unlikely to be true, for the reasons rehearsed in Chapter~\ref{ch:jvv}: a polynomial level set sampler for an $\NP$ complete energy would imply $\NP = \RP$, and in the expected world $\NP \neq \Pc = \RP$.
+
+\section{What vertical likelihood proves unconditionally}
+
+Strip away the conjectures and what remains is this.
+
+\begin{theorem}
+Let $A$ be a randomized polynomial time algorithm and let $x$ be an input. Then the acceptance probability $p(x)$ is the integral over $[0,1]$ of a monotone step function $\Lambda_x$ with a single step, and the nested sampling walk with $n$ live points locates the step to within a multiplicative factor $e^{\pm c \sqrt{\log(1/p(x)) / n}}$, for an absolute constant $c$, by the shrinkage estimate of nested sampling~\cite{Skilling, ChopinRobert}, after visiting $O(n \log(1/p(x)))$ points of the cube, each the output of a conditioned draw (ties among live points on the plateau of the indicator being broken at random). In particular, for $L \in \RP$, where $p(x)$ is bounded below, the factor is $e^{\pm c / \sqrt{n}}$ and the walk decides $x \in L$ after $O(n)$ conditioned draws.
+\end{theorem}
+
+\begin{theorem}
+Let $S$ be an energy with $K + 1$ levels on a finite set. Then the Boltzmann partition function at any temperature, divided by $|\cX|$, is the integral over $[0, 1]$ of a monotone step function with at most $K + 1$ steps whose $t$th height is $e^{-s_t / \gamma}$ and whose $t$th width is $N(s_t) / |\cX|$, so that the ground state count $N(0)$ is $|\cX|$ times the width of the first step. A trapezoidal rule on $n$ ordered uniform draws in the quantile coordinate integrates such a function with absolute mean squared error at most $V^2 / (2(n+1)(n+2))$, where $V \le 1$ is the total variation of the step function (Chapter~\ref{ch:staircase}), against $O(n^{-1})$ for naive Monte Carlo in the original coordinate. This is an absolute error, while $N(0)/|\cX|$ is exponentially small, and the trapezoid needs $\Lambda$ at the draws, which is the counting problem itself.
+\end{theorem}
+
+These are the two senses in which vertical likelihood sampling is a dimension reduction viewpoint for complexity. The first says that a randomized decision is a one dimensional problem with a single unknown, the step location. The second says that an exponential counting problem is a one dimensional problem with polynomially many unknowns, the step widths. Neither theorem is hard, and we state both as the standard shrinkage and quadrature estimates rather than prove them in full.
+
+\section{The conjectures in vertical form}
+
+In the vertical coordinates the standard conjectures read as follows.
+
+\begin{conjecture}[Vertical form of $\Pc = \RP$]
+For every polynomial time computable Boolean function $f(x, r)$ satisfying the $\RP$ promise, there is a deterministic polynomial time procedure that, given $x$, outputs a point $r^*$ with $f(x, r^*) = 1$ whenever $f(x, \cdot) \not\equiv 0$.
+\end{conjecture}
+
+This is the statement that the single conditioned draw needed by the vertical walk, from the level set $\{ r : L_x(r) = 1 \}$, can be made deterministically whenever the level set has density at least a half. It is equivalent to $\mathrm{prRP} = \mathrm{prP}$ by the search to decision reduction of Chapter~\ref{ch:theorems} (modulo the promise version of the Buhrman and Fortnow theorem, which we assume), it implies $\Pc = \RP$, and it is implied by the existence of hitting set generators, which is implied by the Impagliazzo Wigderson hypothesis.
+
+\begin{conjecture}[Vertical form of $\mathrm{prBPP} = \mathrm{prP}$]
+For every polynomial time computable Boolean function $f(x, r)$, the median $\operatorname{med}_r f(x, r)$ is computable in deterministic polynomial time whenever $|\PP_r(f(x,r) = 1) - \tfrac12| \ge \tfrac16$.
+\end{conjecture}
+
+Here the promise is two sided and the step of $\Lambda_x$ lies either left of $\tfrac13$ or right of $\tfrac23$; one must determine which without the help of the one sided structure. This is not known to be equivalent to $\Pc = \BPP$, and it is harder in the sense that the one sided structure is lost, which is why $\RP$ is the natural class for the vertical approach: the one sided promise means that a single conditioned draw, rather than an estimate of a density, settles the question.
+
+\begin{conjecture}[Vertical form of the queens conjecture]
+\label{conj:queens_vertical}
+The queens energy on partial boards does not admit a polynomial level set sampler. In particular, every Markov chain on partial queens placements whose transitions are computable in polynomial time and which is ergodic on each level set $\{ S \le m \}$ has mixing time superpolynomial in $N$ for some $m$ and some partial board.
+\end{conjecture}
+
+This is the vertical form of $\NP \neq \RP$ specialised to the queens, by the main equivalence of Chapter~\ref{ch:theorems}. We state it as a conjecture because we believe it, not because we hope it is false; and we note that a disproof would be among the most important results in complexity theory.
+
+\section{What the thesis is and is not}
+
+The reader will by now have formed a view, and we wish to be exact about what we claim.
+
+We do not claim to have proved $\Pc = \RP$. We claim that vertical likelihood Monte Carlo, in particular the Lorenz identity $Z = \int_0^1 \Lambda(s) \, ds$ and the nested walk that traverses it, is a coordinate system in which the problem has the simplest possible form: the location of a single step on the unit interval, to be found by a single draw from a level set of density at least a half. In that form the problem is implied by the existence of a deterministic procedure for producing an element of a dense, efficiently recognisable set, which is the hitting set formulation of Andreev, Clementi and Rolim. The contribution of the vertical view, as we argue it, is a viewpoint and not a theorem: in our view this formulation is not one option among many but a natural one, since every randomized algorithm, whatever its structure, is after reordering a walk down a one dimensional staircase, and the randomness that the reordering does not remove is in the single draw that finds the first stair.
+
+We further claim that the same coordinate system places approximate counting for structured $\sharpP$ problems, of which the queens are the running example, as a walk down a staircase with polynomially many stairs whose widths are the density of states. The hardness of counting, in this view, is the hardness of estimating widths; the hardness of derandomization is the hardness of finding a single stair deterministically; and, by Stockmeyer and by Jerrum, Valiant and Vazirani, randomized approximate counting of a self reducible problem is available as soon as $\NP \subseteq \RP$.
+
+That is the whole of it. It is a reorganisation of known material around a single identity, and if the reorganisation is right then the open problems of Chapter~\ref{ch:open} are the right questions to ask next.
+
+\input{ch_approxcount}
+
+\chapter{Phase Transitions and the Density of States}
+\label{ch:phase}
+
+The thesis says that the hardness of counting lives in the widths of a staircase. This chapter examines the staircase for the queens in detail and asks where, along the quantile axis, the difficulty concentrates.
+
+\section{The queens staircase}
+
+For permutations of size $N$ the quantile function of the Boltzmann likelihood $L(x) = e^{-S(x)}$ is the step function with heights $e^{-s}$ and widths $N(s) / N!$, arranged in increasing order of $s$ from the left. The right panel of Figure~\ref{fig:dos8} draws it for $N = 8$. The leftmost step, of width $92 / 40320$, is the one we want. The bulk of the width is in the steps $s = 3, 4, 5, 6$, which together account for $69\%$ of permutations. The rightmost steps, at $s = 22$ and $s = 28$, have widths of $4$ and $2$ permutations respectively and are the configurations close to the main diagonals.
+
+The nested walk begins at $s = 1$ on the quantile axis, which is the right end of the staircase, in the high energy region of width $2 / 40320$, and walks left. Each step of the walk discards the highest energy live point and replaces it by a conditioned draw from the current level set. The walk moves fast through the high energy tail, where the widths are tiny, slows through the bulk, where the widths are large and a conditioned draw from $\{ S \le 5 \}$ is nearly a uniform draw, and then must traverse the final steps at $s = 2, 1, 0$, whose widths are $0.071$, $0.022$ and $0.0023$. The ratio $Z_0 / Z_1 = 0.094$ is the single hardest ratio, and it is hard because a uniform draw from $\{ S \le 1 \}$ lands on a solution only one time in eleven.
+
+\section{The transition in $N$}
+
+How do the widths scale with $N$? The width of the ground step is $Q(N) / N! \approx e^{-0.942 N}$ by Simkin. The width of the step at energy $s$, for small $s$, can be estimated by a heuristic that treats the $\binom{N}{2}$ pairs as nearly independent. Under a uniform permutation the pair of rows at distance $d$ lies on a common diagonal with probability $2(N - d) / (N(N-1))$, and there are $N - d$ such pairs, so the expected number of attacking pairs is
+\[
+\EE[S] = \sum_{d=1}^{N-1} (N - d) \cdot \frac{2 (N - d)}{N (N - 1)} = \frac{2}{N(N-1)} \sum_{d=1}^{N-1} (N-d)^2 \approx \frac{2N}{3} ,
+\]
+which matches the mode near $N/2$ to $2N/3$ in Table~\ref{tab:dos}. If $S$ were Poisson with this mean, the ground step would have width $e^{-2N/3}$, which is larger than Simkin's $e^{-0.942 N}$: the pairs are negatively associated near the ground state, and the true count is smaller than the Poisson heuristic by a factor $e^{-0.275 N}$. This deficit is the queenon correction, and in our reading it is the quantitative content of Simkin's theorem.
+
+For the walk the consequence is that the number of ladder rungs below the bulk is, we expect, $O(N)$. In the low energy region the staircase has decreasing widths, but for $N = 8, 9, 10, 11$ the ratio $N(1)/N(0)$ is $9.7$, $9.6$, $19.9$, $25.2$ and $N(2)/N(1)$ is $3.2$, $4.9$, $6.3$, $7.6$ (exact enumeration, \texttt{code/dos.json}), so both grow with $N$ overall, and $N(s-1)/N(s)$ appears to tend to zero rather than to a positive constant. How fast it does, and whether the rate can be computed from the queenon, is a question we leave open.
+
+\section{Where mixing fails}
+
+A level set sampler for $\{ S \le m \}$ must produce near uniform permutations with at most $m$ attacking pairs. For $m$ in the bulk this is easy: uniform permutations already satisfy it with constant probability, and rejection sampling works. For $m = O(1)$ the level set is an exponentially small fraction of permutations and one must move within it by local moves, swapping two queens and accepting if the energy stays at most $m$. The question is whether this chain, started from a state of energy $m$, reaches every state of energy at most $m$ in polynomial time.
+
+On partially filled boards the level set $\{ S \le m \}$ for small $m$ is, we expect, disconnected under swap moves (on unconditioned boards the data show a giant component holding all but a vanishing number of the solutions, Chapter~\ref{ch:open}): there are solutions from which no single swap leads to another solution, nor to a placement with one attacking pair that leads by a further swap to another solution. If the components of the level set under local moves are exponentially many and exponentially small, no local chain mixes, and this is the mechanism by which $\NP$ hardness manifests itself in Monte Carlo. The Swendsen Wang moves of Chapter~\ref{ch:jvv} can jump between components, but whether they do so in polynomial time for the queens is unknown.
+
+In the quantile coordinate the failure of mixing shows up as a failure to estimate a width. The walk knows how far left it has gone, since $s_k = e^{-k/n}$ is deterministic, but it does not know whether the conditioned draws it has made are representative of the level set, and if the chain is trapped in a component the draws undercount the width of the next step down. The staircase is traversed, but with the wrong widths. There is no simple diagnostic for this within the walk itself; it is the one place where the vertical view, like every other, must defer to a mixing time analysis.
+
+\input{ch_experiments}
+
+\input{ch_swendsen}
+
+\input{ch_experiments2}
+
+\input{ch_genealogy}
+
+\input{ch_laboratories}
+
+\input{ch_ogp}
+
+\input{ch_otherhyp}
+
+\input{ch_worked}
+
+\input{ch_mixingproof}
+
+\chapter{The Completion Problem}
+\label{ch:completion}
+
+\section{Conditional counting}
+
+The queens completion problem is the queens problem with some queens already placed. Let $X_0$ be a partial placement, a set of rows with their columns fixed, and let $\cX(X_0)$ be the set of full permutations extending it. The completion count is
+\[
+Q(N; X_0) = \#\{ x \in \cX(X_0) : S(x) = 0 \} = |\cX(X_0)| \cdot \PP_{p(\cdot \mid X_0)}\big( S(x) = 0 \big) ,
+\]
+where $p(\cdot \mid X_0)$ is uniform on $\cX(X_0)$ and $|\cX(X_0)| = (N - |X_0|)!$ is known. Everything in the book goes through with the conditional distribution in place of the unconditional one: the Lorenz identity gives
+\[
+\PP_{p(\cdot \mid X_0)}\big( S = 0 \big) = \int_0^1 \Lambda_{X_0}(s) \, ds ,
+\]
+with $\Lambda_{X_0}$ the quantile function of $\Ind_{\{S = 0\}}$ under the conditional distribution, and the vertical walk proceeds as before with conditioned draws from $\cX(X_0) \cap \{ S \le m \}$.
+
+What changes is the hardness. The unconditioned count is a function of $N$ alone; the conditioned count is a function of an input of size $\Theta(N \log N)$ bits and is $\sharpP$ complete, and the decision version, whether $Q(N; X_0) > 0$, is $\NP$ complete~\cite{GJN}.
+
+\section{The Gent Jefferson Nightingale reduction}
+
+The proof of~\cite{GJN} that completion is $\NP$ complete reduces from a variant of satisfiability through an intermediate problem in which pieces are placed on a grid subject to line constraints. The partial placement $X_0$ encodes the clauses of a formula through the pattern of blocked squares, and the free rows encode the variables, so that an extension to a solution exists if and only if the formula is satisfiable. The construction uses boards of size polynomial in the formula, with most of the board occupied by fixed queens that serve only to block squares. We do not rely on the details of the reduction, only on the fact that hardness holds when the partial placement is part of the input, even though the unconditioned count is a single sequence.
+
+\section{Self reducibility and the search problem}
+
+Completion is the self reducibility structure of the queens made explicit. Fixing the first free row at column $j$ gives a smaller completion problem, and
+\[
+Q(N; X_0) = \sum_{j} Q(N; X_0 \cup \{(i, j)\}) .
+\]
+This is what makes the Jerrum Valiant Vazirani theorem apply, and it is what makes the search problem, finding a completion, polynomially equivalent to the decision problem: fix a column, ask whether a completion still exists, and proceed. An $\RP$ algorithm for completion decision would therefore give a randomized polynomial time algorithm for completion search, and a polynomial level set sampler would give both.
+
+\section{The vertical walk on a partial board}
+
+Nothing in the vertical algorithm distinguishes the conditioned from the unconditioned problem except the sampler. The grid $s_k = e^{-k/n}$ is the same, the trapezoidal rule is the same, the ladder refinement is the same. Only the conditioned draws differ: they are now draws from permutations of the free rows subject to the diagonal constraints imposed by the fixed queens. If $\NP \neq \RP$ then no polynomial time sampler has the right distribution on every $X_0$ (the statement is a worst case one, and any fixed instance is handled by a lookup), and on the instances where a given sampler fails the vertical walk fails in the only way it can, by estimating the widths of the staircase wrongly. For an $X_0$ that encodes an easy formula the draws may well be feasible, and the walk is then a practical algorithm. The vertical view does not sort instances into easy and hard; it does say what easy and hard mean for the walk, namely that the level sets of the conditioned energy are or are not traversable by a rapidly mixing chain.
+
+\input{ch_theorems}
+
+\input{ch_lean}
+
+\input{ch_openproblems}
+
+\chapter*{Epilogue}
+\addcontentsline{toc}{chapter}{Epilogue}
+\markboth{Epilogue}{}
+
+A reader who has come this far deserves a plain statement of what has been established, what has been conjectured, and what we think should happen next.
+
+Established: that every randomized algorithm and every counting problem has a Lorenz curve, that the Lorenz curve of a randomized decision is a single step whose location decides the question, that the Lorenz curve of a structured counting problem has polynomially many steps whose widths are the density of states, that the walk down the curve is polynomial in its number of rungs and in its quadrature error, and that the only part of the walk whose cost is not controlled analytically is the production of a draw from a level set. Established also, by proof, that the walk is an FPRAS whenever the level set chains mix, with explicit constants; that it may skip any rung whose level set is disconnected, at a price equal to the ratio of the ground state to the first connected level; that the mixing of the bottom chain on unconditioned boards is reducible to an expansion property of a family of finite graphs; and that no importance sampling proposal of product form, which is what the cross entropy method uses, can beat crude Monte Carlo on the queens by more than the factor $e^{d}$ of Theorem~\ref{thm:product}, which is at most $2$ for $8 \le N \le 12$.
+
+Computed: that the solutions of the unconditioned problem lie, with a vanishing number of exceptions, in one swap component of the level set with at most one attack, for $N \le 13$; that this component is held together not by direct repairs but by paths through near solutions, some of which lie eight swaps from the nearest solution; that the bottom chain on it has autocorrelation time growing like $N^{1.8}$ to $N = 32$; that the level set with at most two attacks is connected for $N \le 11$; that random conditioning by two to four queens gives more than one solution component on about half of the boards at $N = 12$ (the giant component holds down to 11 to 20 percent of the solutions on the worst) while conditioning by queens of a solution keeps at least 96 percent in the giant component; and that on every shattered board examined the completions reconnect two attacks up and the level set itself three or four attacks up, with one exception at $N = 12$ where two suffice, so that the shattering depth, the quantity on which the program now turns, is between two and four wherever it has been measured; that the spectral gap of the bottom chain is known exactly for $N = 8$ to $12$, with relaxation time growing roughly like $N^3$ (against the autocorrelation time $N^{1.8}$ of the sampled chain); and that the divergence of the solution law from the best Markov sequential family has been computed (Chapter~\ref{ch:open}).
+
+Conjectured: that the swap graph on the giant component has inverse polynomial conductance, which is the vertical form of a polynomial algorithm for $Q(N)$ and is the realistic prize; that on boards encoding hard formulas the shattering depth grows linearly with $N$, so that the first connected level set has exponentially more placements than completions and the walk fails on them, which is the vertical form of $\NP \neq \RP$; that the single level set of an $\RP$ algorithm, which has density at least a half, can nonetheless be hit by a deterministic polynomial size set, which is the vertical form of $\Pc = \RP$; and that the three conjectures are compatible because a dense level set and a sparse one are different objects, the first hit by a fixed set of points and the second reachable only by a chain.
+
+Next: the shattering depth of a reduction board, which the enumeration of Chapter~\ref{ch:open} can measure in seconds at $N = 12$ and which no one has measured; and the search for a class of $\RP$ problems whose level sets can be hit explicitly. We have given the problems their numbers. We hope to see them solved, by ourselves or by others, and we expect that the solutions, when they come, will be stated on the unit interval.
+
+\appendix
+
+\chapter{Algorithms}
+\label{app:alg}
+
+\section{Nested sampling}
+
+Input: a prior sampler for $P$, a likelihood $L$, a number $n$ of live points, a tolerance $\epsilon$.
+
+\begin{enumerate}
+\item Draw $x_1, \dots, x_n$ from $P$. Set $Z = 0$, $X = 1$, $k = 0$.
+\item Repeat:
+\begin{enumerate}
+\item Let $y = \min_i L(x_i)$ and let $i^*$ attain it. Set $k = k + 1$, $X_{\mathrm{new}} = e^{-k/n}$, $Z = Z + y \, (X - X_{\mathrm{new}})$, $X = X_{\mathrm{new}}$.
+\item Replace $x_{i^*}$ by a draw from $P$ restricted to $\{ L > y \}$.
+\item If $X \max_i L(x_i) < \epsilon Z$, add $(X / n) \sum_i L(x_i)$ to $Z$ and stop.
+\end{enumerate}
+\end{enumerate}
+
+The conditioned draw in step (b) is the only step whose cost depends on the problem. For the queens it is a Markov chain on permutations with fewer than $-\log y$ attacking pairs.
+
+\section{Split sampling with a discrete ladder}
+
+Input: a sampler, an energy $S$, a quantile fraction $\rho \in (0, 1)$, a sample size $M$ per level.
+
+\begin{enumerate}
+\item Set $t = 0$, $m_0 = \infty$, $\hat Z = 1$.
+\item Repeat:
+\begin{enumerate}
+\item Draw $x^{(1)}, \dots, x^{(M)}$ from $P$ restricted to $\{ S \le m_t \}$.
+\item Set $m_{t+1}$ to the $\rho$ quantile of $\{ S(x^{(i)}) \}$, so that a fraction at least $\rho$ of the sample has $S \le m_{t+1}$. If $m_{t+1} = m_t$, set $m_{t+1} = m_t - 1$.
+\item If $m_{t+1} = 0$, set $\hat Z = \hat Z \cdot \#\{ i : S(x^{(i)}) = 0 \} / M$ and stop.
+\item Otherwise set $\hat Z = \hat Z \cdot \#\{ i : S(x^{(i)}) \le m_{t+1} \} / M$, $t = t + 1$.
+\end{enumerate}
+\item Output $\hat Z \cdot |\cX|$ as the estimate of $N(0)$.
+\end{enumerate}
+
+With the flat histogram refinement of Chapter~\ref{ch:vertical} the fraction $\rho$ is replaced by a weight $\omega(m)$ on all levels that is updated until each level is visited equally often.
+
+\section{Wang Landau}
+
+Input: an energy $S$ with levels $0, \dots, K$, a flatness tolerance $c$ (we use $c = 0.2$), an initial modification factor $f_0 = e$.
+
+\begin{enumerate}
+\item Set $\log g(s) = 0$ and $H(s) = 0$ for all $s$. Set $f = f_0$.
+\item Repeat until $f < 1 + 10^{-8}$:
+\begin{enumerate}
+\item Propose a move $x \to x'$ and accept it with probability
+\[ \min\{1, \, g(S(x)) / g(S(x'))\}. \]
+\item Set $\log g(S(x)) \leftarrow \log g(S(x)) + \log f$ and $H(S(x)) \leftarrow H(S(x)) + 1$ for the current state.
+\item When $\min_s H(s) > (1 - c) \cdot \mathrm{mean}_s H(s)$, set $H \equiv 0$ and $f \leftarrow \sqrt f$.
+\end{enumerate}
+\item Output $g(s) / \sum_s g(s) \cdot |\cX|$ as the estimate of $N(s)$.
+\end{enumerate}
+
+The flat histogram condition in step (c) is the condition that the weight $1/g$ has equalised the visitation of the energy levels, which in the vertical coordinate is the condition that the sampler spends equal time on each stair.
+
+\chapter{Exact Counts}
+\label{app:counts}
+
+Table~\ref{tab:counts} records the known values of $Q(N)$ for $4 \le N \le 27$ together with the ratio to $N!$. The values are those tabulated in the On-Line Encyclopedia of Integer Sequences, entry A000170, and come from exhaustive computation by others: $Q(25)$ by Kise and coauthors (2005), $Q(26)$ by the Queens@TUD project of Preusser, Engelhardt and coauthors (2009), and $Q(27)$ by Preusser and Engelhardt~\cite{PreusserEngelhardt}. The book's own scripts enumerate permutations exhaustively only for small $N$ (density of states for $N \le 11$, low energy level sets up to $N = 13$ on unconditioned boards and to $N = 17$ on conditioned boards).
+
+\begin{table}[h]
+\centering
+\small
+\caption{Number of solutions $Q(N)$ of the $N$ queens problem.}
+\label{tab:counts}
+\begin{tabular}{rrl}
+\toprule
+$N$ & $Q(N)$ & $\log_{10}(Q(N) / N!)$ \\
+\midrule
+4 & 2 & $-1.08$ \\
+5 & 10 & $-1.08$ \\
+6 & 4 & $-2.26$ \\
+7 & 40 & $-2.10$ \\
+8 & 92 & $-2.64$ \\
+9 & 352 & $-3.01$ \\
+10 & 724 & $-3.70$ \\
+11 & 2680 & $-4.17$ \\
+12 & 14200 & $-4.53$ \\
+13 & 73712 & $-4.93$ \\
+14 & 365596 & $-5.38$ \\
+15 & 2279184 & $-5.76$ \\
+16 & 14772512 & $-6.15$ \\
+17 & 95815104 & $-6.57$ \\
+18 & 666090624 & $-6.98$ \\
+19 & 4968057848 & $-7.39$ \\
+20 & 39029188884 & $-7.79$ \\
+21 & 314666222712 & $-8.21$ \\
+22 & 2691008701644 & $-8.62$ \\
+23 & 24233937684440 & $-9.03$ \\
+24 & 227514171973736 & $-9.44$ \\
+25 & 2207893435808352 & $-9.85$ \\
+26 & 22317699616364044 & $-10.26$ \\
+27 & 234907967154122528 & $-10.67$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The last column decreases by approximately $0.41 = 0.942 / \ln 10$ per unit of $N$ once $N$ exceeds about 15, in agreement with Simkin's constant.
+
+\input{app_extra}
+
+\input{app_exercises}
+
+\input{app_theorems}
+
+\input{app_chronology}
+
+\backmatter
+
+\chapter*{About the Authors}
+\addcontentsline{toc}{chapter}{About the Authors}
+\markboth{About the Authors}{}
+
+Nick Polson is the Robert Law Jr. Professor of Econometrics and Statistics at the Booth School of Business, University of Chicago. He works on Bayesian computation, machine learning, and the probabilistic structure of problems in number theory and complexity. With Carvalho and Scott he introduced the horseshoe prior, and with Scott and Windle the P\'olya Gamma augmentation. His early work with Applegate and Kannan and with Frieze and Kannan on random polynomial time sampling, and his work with Scott on vertical likelihood Monte Carlo and with Birge and Chang on split sampling, are the roots of this book.
+
+Vadim Sokolov is Associate Professor of Operations Research at George Mason University. He works on Bayesian computation, generative models, deep learning and their applications to engineering and science, and is a coauthor with Polson of books on Bayesian methods, Hilbert's problems, and the mathematics of trading. The experiments and code in this book are joint.
+
+\clearpage
+
+\begin{thebibliography}{99}
+\addcontentsline{toc}{chapter}{Bibliography}
+
+\bibitem{AKS} Agrawal, M., Kayal, N. and Saxena, N. (2004). PRIMES is in P. \emph{Annals of Mathematics}, 160, 781 to 793.
+
+\bibitem{Adleman} Adleman, L. (1978). Two theorems on random polynomial time. \emph{Proceedings of the 19th IEEE Symposium on Foundations of Computer Science}, 75 to 83.
+
+\bibitem{ACR} Andreev, A. E., Clementi, A. E. F. and Rolim, J. D. P. (1998). A new general derandomization method. \emph{Journal of the ACM}, 45, 179 to 213.
+
+\bibitem{AKP} Applegate, D., Kannan, R. and Polson, N. G. (1990). Random polynomial time algorithms for sampling from joint distributions. Technical report, Carnegie Mellon University.
+
+\bibitem{BergNeuhaus} Berg, B. A. and Neuhaus, T. (1991). Multicanonical algorithms for first order phase transitions. \emph{Physics Letters B}, 267, 249 to 253.
+
+\bibitem{BCP} Birge, J. R., Chang, C. and Polson, N. G. (2013). Split sampling: expectations, normalisation and rare events. arXiv:1212.0534.
+
+\bibitem{Bornn} Bornn, L., Jacob, P. E., Del Moral, P. and Doucet, A. (2013). An adaptive interacting Wang Landau algorithm for automatic density exploration. \emph{Journal of Computational and Graphical Statistics}, 22, 749 to 773.
+
+\bibitem{Cook} Cook, S. A. (1971). The complexity of theorem proving procedures. \emph{Proceedings of the 3rd ACM Symposium on Theory of Computing}, 151 to 158.
+
+\bibitem{DWW} Damien, P., Wakefield, J. and Walker, S. (1999). Gibbs sampling for Bayesian non conjugate and hierarchical models by using auxiliary variables. \emph{Journal of the Royal Statistical Society B}, 61, 331 to 344.
+
+\bibitem{DiaconisHolmes} Diaconis, P. and Holmes, S. (1995). Three examples of Monte Carlo Markov chains: at the interface between statistical computing, computer science, and statistical mechanics. In \emph{Discrete Probability and Algorithms}, IMA Volumes in Mathematics and its Applications 72, Springer, 43 to 56.
+
+\bibitem{DFK} Dyer, M., Frieze, A. and Kannan, R. (1991). A random polynomial time algorithm for approximating the volume of convex bodies. \emph{Journal of the ACM}, 38, 1 to 17.
+
+\bibitem{EdwardsSokal} Edwards, R. G. and Sokal, A. D. (1988). Generalization of the Fortuin Kasteleyn Swendsen Wang representation and Monte Carlo algorithm. \emph{Physical Review D}, 38, 2009 to 2012.
+
+\bibitem{FK} Fortuin, C. M. and Kasteleyn, P. W. (1972). On the random cluster model: I. Introduction and relation to other models. \emph{Physica}, 57, 536 to 564.
+
+\bibitem{GJN} Gent, I. P., Jefferson, C. and Nightingale, P. (2017). Complexity of $n$ queens completion. \emph{Journal of Artificial Intelligence Research}, 59, 815 to 848.
+
+\bibitem{GVW} Goldreich, O., Vadhan, S. and Wigderson, A. (2011). Simplified derandomization of BPP using a hitting set generator. In \emph{Studies in Complexity and Cryptography}, Springer, 59 to 67.
+
+\bibitem{GoreJerrum} Gore, V. K. and Jerrum, M. R. (1999). The Swendsen Wang process does not always mix rapidly. \emph{Journal of Statistical Physics}, 97, 67 to 86.
+
+\bibitem{HS} Hesselbo, B. and Stinchcombe, R. B. (1995). Monte Carlo simulation and global optimization without parameters. \emph{Physical Review Letters}, 74, 2151 to 2155.
+
+\bibitem{Higdon} Higdon, D. M. (1998). Auxiliary variable methods for Markov chain Monte Carlo with applications. \emph{Journal of the American Statistical Association}, 93, 585 to 595.
+
+\bibitem{Huber} Huber, M. (2015). Approximation algorithms for the normalizing constant of Gibbs distributions. \emph{Annals of Applied Probability}, 25, 974 to 985.
+
+\bibitem{Impagliazzo} Impagliazzo, R. (1995). A personal view of average case complexity. \emph{Proceedings of the 10th IEEE Structure in Complexity Theory Conference}, 134 to 147.
+
+\bibitem{IW} Impagliazzo, R. and Wigderson, A. (1997). P = BPP if E requires exponential circuits: derandomizing the XOR lemma. \emph{Proceedings of the 29th ACM Symposium on Theory of Computing}, 220 to 229.
+
+\bibitem{JS} Jerrum, M. and Sinclair, A. (1989). Approximating the permanent. \emph{SIAM Journal on Computing}, 18, 1149 to 1178.
+
+\bibitem{JSV} Jerrum, M., Sinclair, A. and Vigoda, E. (2004). A polynomial time approximation algorithm for the permanent of a matrix with nonnegative entries. \emph{Journal of the ACM}, 51, 671 to 697.
+
+\bibitem{JVV} Jerrum, M. R., Valiant, L. G. and Vazirani, V. V. (1986). Random generation of combinatorial structures from a uniform distribution. \emph{Theoretical Computer Science}, 43, 169 to 188.
+
+\bibitem{KI} Kabanets, V. and Impagliazzo, R. (2004). Derandomizing polynomial identity tests means proving circuit lower bounds. \emph{Computational Complexity}, 13, 1 to 46.
+
+\bibitem{Karp} Karp, R. M. (1972). Reducibility among combinatorial problems. In \emph{Complexity of Computer Computations}, Plenum, 85 to 103.
+
+\bibitem{KL} Karp, R. M. and Luby, M. (1983). Monte Carlo algorithms for enumeration and reliability problems. \emph{Proceedings of the 24th IEEE Symposium on Foundations of Computer Science}, 56 to 64.
+
+\bibitem{KGV} Kirkpatrick, S., Gelatt, C. D. and Vecchi, M. P. (1983). Optimization by simulated annealing. \emph{Science}, 220, 671 to 680.
+
+\bibitem{Lautemann} Lautemann, C. (1983). BPP and the polynomial hierarchy. \emph{Information Processing Letters}, 17, 215 to 217.
+
+\bibitem{MasryCambanis} Masry, E. and Cambanis, S. (1990). Trapezoidal Monte Carlo integration. \emph{SIAM Journal on Numerical Analysis}, 27, 225 to 246.
+
+\bibitem{NW} Nisan, N. and Wigderson, A. (1994). Hardness vs randomness. \emph{Journal of Computer and System Sciences}, 49, 149 to 167.
+
+\bibitem{Polson96} Polson, N. G. (1996). Convergence of Markov chain Monte Carlo algorithms (with discussion). In \emph{Bayesian Statistics 5}, Oxford University Press, 297 to 321.
+
+\bibitem{PolsonScott} Polson, N. G. and Scott, J. G. (2015). Vertical likelihood Monte Carlo. arXiv:1409.3601.
+
+\bibitem{PolsonSokolov} Polson, N. G. and Sokolov, V. (2024). Counting $N$ queens. arXiv:2407.08830.
+
+\bibitem{RVZ} Rivin, I., Vardi, I. and Zimmermann, P. (1994). The $n$ queens problem. \emph{American Mathematical Monthly}, 101, 629 to 639.
+
+\bibitem{RubinsteinKroese} Rubinstein, R. Y. and Kroese, D. P. (2016). \emph{Simulation and the Monte Carlo Method}, third edition. Wiley.
+
+\bibitem{RRV} Rubinstein, R. Y., Ridder, A. and Vaisman, R. (2013). \emph{Fast Sequential Monte Carlo Methods for Counting and Optimization}. Wiley.
+
+\bibitem{SchwartzZippel} Schwartz, J. T. (1980). Fast probabilistic algorithms for verification of polynomial identities. \emph{Journal of the ACM}, 27, 701 to 717.
+
+\bibitem{Simkin} Simkin, M. (2023). The number of $n$ queens configurations. \emph{Advances in Mathematics}, 427, 109127. arXiv:2107.13460.
+
+\bibitem{Sipser} Sipser, M. (1983). A complexity theoretic approach to randomness. \emph{Proceedings of the 15th ACM Symposium on Theory of Computing}, 330 to 335.
+
+\bibitem{Skilling} Skilling, J. (2006). Nested sampling for general Bayesian computation. \emph{Bayesian Analysis}, 1, 833 to 859.
+
+\bibitem{SVV} \v{S}tefankovi\v{c}, D., Vempala, S. and Vigoda, E. (2009). Adaptive simulated annealing: a near optimal connection between sampling and counting. \emph{Journal of the ACM}, 56, Article 18.
+
+\bibitem{SW} Swendsen, R. H. and Wang, J. S. (1987). Nonuniversal critical dynamics in Monte Carlo simulations. \emph{Physical Review Letters}, 58, 86 to 88.
+
+\bibitem{Toda} Toda, S. (1991). PP is as hard as the polynomial time hierarchy. \emph{SIAM Journal on Computing}, 20, 865 to 877.
+
+\bibitem{Valiant} Valiant, L. G. (1979). The complexity of computing the permanent. \emph{Theoretical Computer Science}, 8, 189 to 201.
+
+\bibitem{ValiantVazirani} Valiant, L. G. and Vazirani, V. V. (1986). NP is as easy as detecting unique solutions. \emph{Theoretical Computer Science}, 47, 85 to 93.
+
+\bibitem{WangLandau} Wang, F. and Landau, D. P. (2001). Efficient, multiple range random walk algorithm to calculate the density of states. \emph{Physical Review Letters}, 86, 2050 to 2053.
+
+\bibitem{YKS} Yakowitz, S., Krimmel, J. E. and Szidarovszky, F. (1978). Weighted Monte Carlo integration. \emph{SIAM Journal on Numerical Analysis}, 15, 1289 to 1300.
+
+
+\bibitem{AaronsonWigderson} Aaronson, S. and Wigderson, A. (2009). Algebrization: a new barrier in complexity theory. \emph{ACM Transactions on Computation Theory}, 1, Article 2.
+
+\bibitem{AchlioptasCojaOghlan} Achlioptas, D. and Coja Oghlan, A. (2008). Algorithmic barriers from phase transitions. \emph{Proceedings of the 49th IEEE Symposium on Foundations of Computer Science}, 793 to 802.
+
+\bibitem{BGS} Baker, T., Gill, J. and Solovay, R. (1975). Relativizations of the P =? NP question. \emph{SIAM Journal on Computing}, 4, 431 to 442.
+
+\bibitem{BaranyFuredi} B\'ar\'any, I. and F\"uredi, Z. (1987). Computing the volume is difficult. \emph{Discrete and Computational Geometry}, 2, 319 to 326.
+
+\bibitem{BSVV} Bez\'akov\'a, I., \v{S}tefankovi\v{c}, D., Vazirani, V. V. and Vigoda, E. (2008). Accelerating simulated annealing for the permanent and combinatorial counting problems. \emph{SIAM Journal on Computing}, 37, 1429 to 1454.
+
+\bibitem{BlumMicali} Blum, M. and Micali, S. (1984). How to generate cryptographically strong sequences of pseudorandom bits. \emph{SIAM Journal on Computing}, 13, 850 to 864.
+
+\bibitem{BrightwellWinkler} Brightwell, G. and Winkler, P. (1991). Counting linear extensions. \emph{Order}, 8, 225 to 242.
+
+\bibitem{BubleyDyer} Bubley, R. and Dyer, M. (1997). Path coupling: a technique for proving rapid mixing in Markov chains. \emph{Proceedings of the 38th IEEE Symposium on Foundations of Computer Science}, 223 to 231.
+
+\bibitem{Bucklew} Bucklew, J. A. (2004). \emph{Introduction to Rare Event Simulation}. Springer.
+
+\bibitem{CerouGuyader} C\'erou, F. and Guyader, A. (2007). Adaptive multilevel splitting for rare event analysis. \emph{Stochastic Analysis and Applications}, 25, 417 to 443.
+
+\bibitem{ChopinRobert} Chopin, N. and Robert, C. P. (2010). Properties of nested sampling. \emph{Biometrika}, 97, 741 to 755.
+
+\bibitem{CifarelliRegazzini} Cifarelli, D. M. and Regazzini, E. (1987). On a general definition of concentration function. \emph{Sankhy\=a B}, 49, 307 to 319.
+
+\bibitem{Cobham} Cobham, A. (1965). The intrinsic computational difficulty of functions. In \emph{Logic, Methodology and Philosophy of Science}, North Holland, 24 to 30.
+
+\bibitem{Edmonds} Edmonds, J. (1965). Paths, trees, and flowers. \emph{Canadian Journal of Mathematics}, 17, 449 to 467.
+
+\bibitem{GareyJohnson} Garey, M. R. and Johnson, D. S. (1979). \emph{Computers and Intractability: A Guide to the Theory of NP Completeness}. Freeman.
+
+\bibitem{Gill} Gill, J. (1977). Computational complexity of probabilistic Turing machines. \emph{SIAM Journal on Computing}, 6, 675 to 695.
+
+\bibitem{GlassermanEtAl} Glasserman, P., Heidelberger, P., Shahabuddin, P. and Zajic, T. (1999). Multilevel splitting for estimating rare event probabilities. \emph{Operations Research}, 47, 585 to 600.
+
+\bibitem{Godel} G\"odel, K. (1956). Letter to John von Neumann, March 20, 1956. Reprinted in Sipser, M. (1992), The history and status of the P versus NP question, \emph{Proceedings of the 24th ACM Symposium on Theory of Computing}, 603 to 618.
+
+\bibitem{HLP} Hardy, G. H., Littlewood, J. E. and P\'olya, G. (1934). \emph{Inequalities}. Cambridge University Press.
+
+\bibitem{KahnHarris} Kahn, H. and Harris, T. E. (1951). Estimation of particle transmission by random sampling. \emph{National Bureau of Standards Applied Mathematics Series}, 12, 27 to 30.
+
+\bibitem{KLS} Kannan, R., Lov\'asz, L. and Simonovits, M. (1997). Random walks and an $O^*(n^5)$ volume algorithm for convex bodies. \emph{Random Structures and Algorithms}, 11, 1 to 50.
+
+\bibitem{KLM} Karp, R. M., Luby, M. and Madras, N. (1989). Monte Carlo approximation algorithms for enumeration problems. \emph{Journal of Algorithms}, 10, 429 to 448.
+
+\bibitem{Knuth} Knuth, D. E. (1975). Estimating the efficiency of backtrack programs. \emph{Mathematics of Computation}, 29, 121 to 136.
+
+\bibitem{LawlerSokal} Lawler, G. F. and Sokal, A. D. (1988). Bounds on the $L^2$ spectrum for Markov chains and Markov processes: a generalization of Cheeger's inequality. \emph{Transactions of the American Mathematical Society}, 309, 557 to 580.
+
+\bibitem{Levin} Levin, L. A. (1973). Universal sequential search problems. \emph{Problems of Information Transmission}, 9, 265 to 266.
+
+\bibitem{LevinPeresWilmer} Levin, D. A., Peres, Y. and Wilmer, E. L. (2009). \emph{Markov Chains and Mixing Times}. American Mathematical Society.
+
+\bibitem{Lorenz} Lorenz, M. O. (1905). Methods of measuring the concentration of wealth. \emph{Publications of the American Statistical Association}, 9, 209 to 219.
+
+\bibitem{LovaszVempala} Lov\'asz, L. and Vempala, S. (2006). Simulated annealing in convex bodies and an $O^*(n^4)$ volume algorithm. \emph{Journal of Computer and System Sciences}, 72, 392 to 417.
+
+\bibitem{Metropolis} Metropolis, N., Rosenbluth, A. W., Rosenbluth, M. N., Teller, A. H. and Teller, E. (1953). Equation of state calculations by fast computing machines. \emph{Journal of Chemical Physics}, 21, 1087 to 1092.
+
+\bibitem{Miller} Miller, G. L. (1976). Riemann's hypothesis and tests for primality. \emph{Journal of Computer and System Sciences}, 13, 300 to 317.
+
+\bibitem{Rabin} Rabin, M. O. (1980). Probabilistic algorithm for testing primality. \emph{Journal of Number Theory}, 12, 128 to 138.
+
+\bibitem{RazborovRudich} Razborov, A. A. and Rudich, S. (1997). Natural proofs. \emph{Journal of Computer and System Sciences}, 55, 24 to 35.
+
+\bibitem{Siegmund} Siegmund, D. (1976). Importance sampling in the Monte Carlo study of sequential tests. \emph{Annals of Statistics}, 4, 673 to 684.
+
+\bibitem{SipserHistory} Sipser, M. (1992). The history and status of the P versus NP question. \emph{Proceedings of the 24th ACM Symposium on Theory of Computing}, 603 to 618.
+
+\bibitem{Sly} Sly, A. (2010). Computational transition at the uniqueness threshold. \emph{Proceedings of the 51st IEEE Symposium on Foundations of Computer Science}, 287 to 296.
+
+\bibitem{SolovayStrassen} Solovay, R. and Strassen, V. (1977). A fast Monte Carlo test for primality. \emph{SIAM Journal on Computing}, 6, 84 to 85.
+
+\bibitem{Stockmeyer} Stockmeyer, L. (1985). On approximation algorithms for $\sharpP$. \emph{SIAM Journal on Computing}, 14, 849 to 861.
+
+\bibitem{Yao} Yao, A. C. (1982). Theory and applications of trapdoor functions. \emph{Proceedings of the 23rd IEEE Symposium on Foundations of Computer Science}, 80 to 91.
+
+\bibitem{Zippel} Zippel, R. (1979). Probabilistic algorithms for sparse polynomials. In \emph{Symbolic and Algebraic Computation}, Lecture Notes in Computer Science 72, Springer, 216 to 226.
+
+\bibitem{FKP} Frieze, A., Kannan, R. and Polson, N. (1994). Sampling from log concave distributions. \emph{Annals of Applied Probability}, 4, 812 to 837.
+
+\bibitem{BGP} Bellare, M., Goldreich, O. and Petrank, E. (2000). Uniform generation of NP witnesses using an NP oracle. \emph{Information and Computation}, 163, 510 to 526.
+
+\bibitem{Haber} Haber, S. (1966). A modified Monte Carlo quadrature. \emph{Mathematics of Computation}, 20, 361 to 368.
+
+\bibitem{DelMoral} Del Moral, P. (2004). \emph{Feynman Kac Formulae: Genealogical and Interacting Particle Systems with Applications}. Springer.
+
+\bibitem{CDFG} C\'erou, F., Del Moral, P., Furon, T. and Guyader, A. (2012). Sequential Monte Carlo for rare event estimation. \emph{Statistics and Computing}, 22, 795 to 808.
+
+\bibitem{Feroz} Feroz, F., Hobson, M. P., Cameron, E. and Pettitt, A. N. (2019). Importance nested sampling and the MultiNest algorithm. \emph{Open Journal of Astrophysics}, 2, 10.
+
+\bibitem{Higson} Higson, E., Handley, W., Hobson, M. and Lasenby, A. (2019). Dynamic nested sampling: an improved algorithm for parameter estimation and evidence calculation. \emph{Statistics and Computing}, 29, 891 to 913.
+
+\bibitem{Brewer} Brewer, B. J., P\'artay, L. B. and Cs\'anyi, G. (2011). Diffusive nested sampling. \emph{Statistics and Computing}, 21, 649 to 656.
+
+\bibitem{Salomone} Salomone, R., South, L. F., Drovandi, C. C. and Kroese, D. P. (2025). Unbiased and consistent nested sampling via sequential Monte Carlo. \emph{Journal of the Royal Statistical Society, Series B}, 87, 1221 to 1238.
+
+\bibitem{HartmanisStearns} Hartmanis, J. and Stearns, R. E. (1965). On the computational complexity of algorithms. \emph{Transactions of the American Mathematical Society}, 117, 285 to 306.
+
+\bibitem{Ladner} Ladner, R. E. (1975). On the structure of polynomial time reducibility. \emph{Journal of the ACM}, 22, 155 to 171.
+
+\bibitem{Fagin} Fagin, R. (1974). Generalized first order spectra and polynomial time recognizable sets. In \emph{Complexity of Computation}, SIAM AMS Proceedings 7, 43 to 73.
+
+\bibitem{Pratt} Pratt, V. (1975). Every prime has a succinct certificate. \emph{SIAM Journal on Computing}, 4, 214 to 220.
+
+\bibitem{Babai} Babai, L. (2016). Graph isomorphism in quasipolynomial time. \emph{Proceedings of the 48th ACM Symposium on Theory of Computing}, 684 to 697.
+
+\bibitem{KarpLipton} Karp, R. M. and Lipton, R. J. (1980). Some connections between nonuniform and uniform complexity classes. \emph{Proceedings of the 12th ACM Symposium on Theory of Computing}, 302 to 309.
+
+\bibitem{Williams} Williams, R. (2014). Nonuniform ACC circuit lower bounds. \emph{Journal of the ACM}, 61, Article 2.
+
+\bibitem{Razborov85} Razborov, A. A. (1985). Lower bounds on the monotone complexity of some Boolean functions. \emph{Soviet Mathematics Doklady}, 31, 354 to 357.
+
+\bibitem{Hastad} H{\aa}stad, J. (1986). Almost optimal lower bounds for small depth circuits. \emph{Proceedings of the 18th ACM Symposium on Theory of Computing}, 6 to 20.
+
+\bibitem{FSS} Furst, M., Saxe, J. B. and Sipser, M. (1984). Parity, circuits, and the polynomial time hierarchy. \emph{Mathematical Systems Theory}, 17, 13 to 27.
+
+\bibitem{Shor} Shor, P. W. (1997). Polynomial time algorithms for prime factorization and discrete logarithms on a quantum computer. \emph{SIAM Journal on Computing}, 26, 1484 to 1509.
+
+\bibitem{Grover} Grover, L. K. (1996). A fast quantum mechanical algorithm for database search. \emph{Proceedings of the 28th ACM Symposium on Theory of Computing}, 212 to 219.
+
+\bibitem{BHMT} Brassard, G., H{\o}yer, P., Mosca, M. and Tapp, A. (2002). Quantum amplitude amplification and estimation. \emph{Contemporary Mathematics}, 305, 53 to 74.
+
+\bibitem{Montanaro} Montanaro, A. (2015). Quantum speedup of Monte Carlo methods. \emph{Proceedings of the Royal Society A}, 471, 20150301.
+
+\bibitem{Szegedy} Szegedy, M. (2004). Quantum speed up of Markov chain based algorithms. \emph{Proceedings of the 45th IEEE Symposium on Foundations of Computer Science}, 32 to 41.
+
+\bibitem{RazTal} Raz, R. and Tal, A. (2019). Oracle separation of BQP and PH. \emph{Proceedings of the 51st ACM Symposium on Theory of Computing}, 13 to 23.
+
+\bibitem{Matiyasevich} Matiyasevich, Y. (1970). Enumerable sets are Diophantine. \emph{Soviet Mathematics Doklady}, 11, 354 to 358.
+
+\bibitem{Church} Church, A. (1936). An unsolvable problem of elementary number theory. \emph{American Journal of Mathematics}, 58, 345 to 363.
+
+\bibitem{Turing} Turing, A. M. (1936). On computable numbers, with an application to the Entscheidungsproblem. \emph{Proceedings of the London Mathematical Society}, 42, 230 to 265.
+
+\bibitem{HilbertAckermann} Hilbert, D. and Ackermann, W. (1928). \emph{Grundz\"uge der theoretischen Logik}. Springer.
+
+\bibitem{Godel31} G\"odel, K. (1931). \"Uber formal unentscheidbare S\"atze der Principia Mathematica und verwandter Systeme I. \emph{Monatshefte f\"ur Mathematik und Physik}, 38, 173 to 198.
+
+\bibitem{Shannon48} Shannon, C. E. (1948). A mathematical theory of communication. \emph{Bell System Technical Journal}, 27, 379 to 423 and 623 to 656.
+
+\bibitem{Shannon49} Shannon, C. E. (1949). The synthesis of two terminal switching circuits. \emph{Bell System Technical Journal}, 28, 59 to 98.
+
+\bibitem{Shannon49b} Shannon, C. E. (1949). Communication theory of secrecy systems. \emph{Bell System Technical Journal}, 28, 656 to 715.
+
+\bibitem{Shannon50} Shannon, C. E. (1950). Programming a computer for playing chess. \emph{Philosophical Magazine}, 41, 256 to 275.
+
+\bibitem{vonNeumann51} von Neumann, J. (1951). Various techniques used in connection with random digits. \emph{National Bureau of Standards Applied Mathematics Series}, 12, 36 to 38.
+
+\bibitem{vonNeumann56} von Neumann, J. (1956). Probabilistic logics and the synthesis of reliable organisms from unreliable components. In \emph{Automata Studies}, Princeton University Press, 43 to 98.
+
+\bibitem{MetropolisUlam} Metropolis, N. and Ulam, S. (1949). The Monte Carlo method. \emph{Journal of the American Statistical Association}, 44, 335 to 341.
+
+\bibitem{Pauls} Pauls, E. (1874). Das Maximalproblem der Damen auf dem Schachbrete. \emph{Deutsche Schachzeitung}, 29, 129 to 134.
+
+\bibitem{PolsonSokolovGBC} Polson, N. G. and Sokolov, V. (2025). Generative AI for Bayesian computation. \emph{Entropy}, 27, 683. arXiv:2305.14972.
+
+\bibitem{PolsonRobert} Polson, N. G. and Robert, C. P. (1993). Discussion of Vardi and Lee, From image deblurring to optimal investments: maximum likelihood solutions for positive linear inverse problems. \emph{Journal of the Royal Statistical Society B}, 55, 569 to 612.
+
+\bibitem{DKW} Dvoretzky, A., Kiefer, J. and Wolfowitz, J. (1956). Asymptotic minimax character of the sample distribution function and of the classical multinomial estimator. \emph{Annals of Mathematical Statistics}, 27, 642 to 669.
+
+\bibitem{LovaszSimonovits} Lov\'asz, L. and Simonovits, M. (1993). Random walks in a convex body and an improved volume algorithm. \emph{Random Structures and Algorithms}, 4, 359 to 412.
+
+\bibitem{Aaronson} Aaronson, S. (2016). P =? NP. In \emph{Open Problems in Mathematics}, Springer, 1 to 122.
+
+
+\bibitem{Haken} Haken, A. (1985). The intractability of resolution. \emph{Theoretical Computer Science}, 39, 297 to 308.
+
+\bibitem{BenSassonWigderson} Ben Sasson, E. and Wigderson, A. (2001). Short proofs are narrow: resolution made simple. \emph{Journal of the ACM}, 48, 149 to 169.
+
+\bibitem{CookReckhow} Cook, S. A. and Reckhow, R. A. (1979). The relative efficiency of propositional proof systems. \emph{Journal of Symbolic Logic}, 44, 36 to 50.
+
+\bibitem{MPZ} M\'ezard, M., Parisi, G. and Zecchina, R. (2002). Analytic and algorithmic solution of random satisfiability problems. \emph{Science}, 297, 812 to 815.
+
+\bibitem{PipatsrisawatDarwiche} Pipatsrisawat, K. and Darwiche, A. (2011). On the power of clause learning SAT solvers as resolution engines. \emph{Artificial Intelligence}, 175, 512 to 525.
+
+\bibitem{DiaconisSaloffCoste} Diaconis, P. and Saloff Coste, L. (1996). Logarithmic Sobolev inequalities for finite Markov chains. \emph{Annals of Applied Probability}, 6, 695 to 750.
+
+\bibitem{CsiszarKorner} Csisz\'ar, I. and K\"orner, J. (2011). \emph{Information Theory: Coding Theorems for Discrete Memoryless Systems}, second edition. Cambridge University Press.
+
+\bibitem{DemboZeitouni} Dembo, A. and Zeitouni, O. (1998). \emph{Large Deviations Techniques and Applications}, second edition. Springer.
+
+
+\bibitem{PolsonSokolovXu} Polson, N. G., Sokolov, V. and Xu, J. (2023). Quantum Bayesian computation. \emph{Applied Stochastic Models in Business and Industry}, 39, 869 to 883. arXiv:2208.08068.
+
+
+\bibitem{Peskun} Peskun, P. H. (1973). Optimum Monte Carlo sampling using Markov chains. \emph{Biometrika}, 60, 607 to 612.
+
+\bibitem{Tierney} Tierney, L. (1994). Markov chains for exploring posterior distributions (with discussion). \emph{Annals of Statistics}, 22, 1701 to 1762.
+
+\bibitem{Geyer} Geyer, C. J. (1992). Practical Markov chain Monte Carlo (with discussion). \emph{Statistical Science}, 7, 473 to 511.
+
+\bibitem{Polson92} Polson, N. G. (1992). Discussion of Geyer, Practical Markov chain Monte Carlo. \emph{Statistical Science}, 7, 490 to 491.
+
+\bibitem{GelmanRubin} Gelman, A. and Rubin, D. B. (1992). Inference from iterative simulation using multiple sequences. \emph{Statistical Science}, 7, 457 to 472.
+
+\bibitem{GelfandSmith} Gelfand, A. E. and Smith, A. F. M. (1990). Sampling based approaches to calculating marginal densities. \emph{Journal of the American Statistical Association}, 85, 398 to 409.
+
+\bibitem{DiaconisShahshahani} Diaconis, P. and Shahshahani, M. (1981). Generating a random permutation with random transpositions. \emph{Zeitschrift f\"ur Wahrscheinlichkeitstheorie}, 57, 159 to 179.
+
+\bibitem{DiaconisSaloffCoste93} Diaconis, P. and Saloff Coste, L. (1993). Comparison theorems for reversible Markov chains. \emph{Annals of Applied Probability}, 3, 696 to 730.
+
+\bibitem{DiaconisBook} Diaconis, P. (1988). \emph{Group Representations in Probability and Statistics}. Institute of Mathematical Statistics.
+
+\bibitem{Elekes} Elekes, G. (1986). A geometric inequality and the complexity of computing volume. \emph{Discrete and Computational Geometry}, 1, 289 to 292.
+
+\bibitem{ApplegateKannan} Applegate, D. and Kannan, R. (1991). Sampling and integration of near log concave functions. \emph{Proceedings of the 23rd ACM Symposium on Theory of Computing}, 156 to 163.
+
+\bibitem{Chen} Chen, Y. (2021). An almost constant lower bound of the isoperimetric coefficient in the KLS conjecture. \emph{Geometric and Functional Analysis}, 31, 34 to 61.
+
+\bibitem{KlartagLehec} Klartag, B. and Lehec, J. (2022). Bourgain's slicing problem and KLS isoperimetry up to polylog. \emph{Geometric and Functional Analysis}, 32, 1134 to 1159.
+
+\bibitem{GamarnikSudan} Gamarnik, D. and Sudan, M. (2014). Limits of local algorithms over sparse random graphs. \emph{Proceedings of the 5th Innovations in Theoretical Computer Science Conference}, 369 to 376.
+
+\bibitem{Gamarnik} Gamarnik, D. (2021). The overlap gap property: a topological barrier to optimizing over random structures. \emph{Proceedings of the National Academy of Sciences}, 118, e2108492118.
+
+\bibitem{LevinAvg} Levin, L. A. (1986). Average case complete problems. \emph{SIAM Journal on Computing}, 15, 285 to 286.
+
+\bibitem{DingSlySun} Ding, J., Sly, A. and Sun, N. (2015). Proof of the satisfiability conjecture for large $k$. \emph{Proceedings of the 47th ACM Symposium on Theory of Computing}, 59 to 68.
+
+\bibitem{vanLintWilson} van Lint, J. H. and Wilson, R. M. (2001). \emph{A Course in Combinatorics}, second edition. Cambridge University Press.
+
+\bibitem{Keevash} Keevash, P. (2018). Counting designs. \emph{Journal of the European Mathematical Society}, 20, 903 to 927.
+
+\bibitem{KSSS} Kwan, M., Sah, A., Sawhney, M. and Simkin, M. (2023). Substructures in Latin squares. \emph{Israel Journal of Mathematics}, 256, 363 to 416.
+
+\bibitem{Bregman} Br\`egman, L. M. (1973). Some properties of nonnegative matrices and their permanents. \emph{Soviet Mathematics Doklady}, 14, 945 to 949.
+
+\bibitem{Polya1918} P\'olya, G. (1918). \"Uber die doppelt periodischen L\"osungen des $n$ Damen Problems. In \emph{Mathematische Unterhaltungen und Spiele}, Teubner.
+
+\bibitem{Shamir} Shamir, A. (1992). IP = PSPACE. \emph{Journal of the ACM}, 39, 869 to 877.
+
+\bibitem{ALMSS} Arora, S., Lund, C., Motwani, R., Sudan, M. and Szegedy, M. (1998). Proof verification and the hardness of approximation problems. \emph{Journal of the ACM}, 45, 501 to 555.
+
+\bibitem{Dinur} Dinur, I. (2007). The PCP theorem by gap amplification. \emph{Journal of the ACM}, 54, Article 12.
+
+\bibitem{GMR} Goldwasser, S., Micali, S. and Rackoff, C. (1989). The knowledge complexity of interactive proof systems. \emph{SIAM Journal on Computing}, 18, 186 to 208.
+
+\bibitem{STV} Sudan, M., Trevisan, L. and Vadhan, S. (2001). Pseudorandom generators without the XOR lemma. \emph{Journal of Computer and System Sciences}, 62, 236 to 266.
+
+\bibitem{FrielPettitt} Friel, N. and Pettitt, A. N. (2008). Marginal likelihood estimation via power posteriors. \emph{Journal of the Royal Statistical Society B}, 70, 589 to 607.
+
+\bibitem{RobertsRosenthal} Roberts, G. O. and Rosenthal, J. S. (2004). General state space Markov chains and MCMC algorithms. \emph{Probability Surveys}, 1, 20 to 71.
+
+\bibitem{Mathlib} The Mathlib Community (2020). The Lean mathematical library. \emph{Proceedings of the 9th ACM SIGPLAN International Conference on Certified Programs and Proofs}, 367 to 381.
+
+
+\bibitem{IwamaMorizumi} Iwama, K. and Morizumi, H. (2002). An explicit lower bound of $5n - o(n)$ for Boolean circuits. \emph{Proceedings of the 27th International Symposium on Mathematical Foundations of Computer Science}, 353 to 364.
+
+\bibitem{FGHK} Find, M. G., Golovnev, A., Hirsch, E. A. and Kulikov, A. S. (2016). A better than $3n$ lower bound for the circuit complexity of an explicit function. \emph{Proceedings of the 57th IEEE Symposium on Foundations of Computer Science}, 89 to 98.
+
+\bibitem{IP2001} Impagliazzo, R. and Paturi, R. (2001). On the complexity of $k$ SAT. \emph{Journal of Computer and System Sciences}, 62, 367 to 375.
+
+\bibitem{IPZ2001} Impagliazzo, R., Paturi, R. and Zane, F. (2001). Which problems have strongly exponential complexity? \emph{Journal of Computer and System Sciences}, 63, 512 to 530.
+
+\bibitem{DHMTW} Dell, H., Husfeldt, T., Marx, D., Taslaman, N. and Wahl\'en, M. (2014). Exponential time complexity of the permanent and the Tutte polynomial. \emph{ACM Transactions on Algorithms}, 10, article 21.
+
+\bibitem{LMS} Lokshtanov, D., Marx, D. and Saurabh, S. (2011). Lower bounds based on the exponential time hypothesis. \emph{Bulletin of the EATCS}, 105, 41 to 72.
+
+\bibitem{Cygan} Cygan, M., Fomin, F. V., Kowalik, L., Lokshtanov, D., Marx, D., Pilipczuk, M., Pilipczuk, M. and Saurabh, S. (2015). \emph{Parameterized Algorithms}. Springer.
+
+\bibitem{Williams2005} Williams, R. (2005). A new algorithm for optimal 2 constraint satisfaction and its implications. \emph{Theoretical Computer Science}, 348, 357 to 365.
+
+\bibitem{Schoning} Sch\"oning, U. (1999). A probabilistic algorithm for $k$ SAT and constraint satisfaction problems. \emph{Proceedings of the 40th IEEE Symposium on Foundations of Computer Science}, 410 to 414.
+
+\bibitem{PPSZ} Paturi, R., Pudl\'ak, P., Saks, M. E. and Zane, F. (2005). An improved exponential time algorithm for $k$ SAT. \emph{Journal of the ACM}, 52, 337 to 364.
+
+\bibitem{Hertli} Hertli, T. (2014). 3 SAT faster and simpler: unique SAT bounds for PPSZ hold in general. \emph{SIAM Journal on Computing}, 43, 718 to 729.
+
+\bibitem{JiangWong2017} Jiang, B., Wu, T. Y., Zheng, C. and Wong, W. H. (2017). Learning summary statistic for approximate Bayesian computation via deep neural network. \emph{Statistica Sinica}, 27, 1595 to 1618.
+
+\bibitem{JiangWong2018} Jiang, B., Wu, T. Y. and Wong, W. H. (2018). Approximate Bayesian computation with Kullback Leibler divergence as data discrepancy. \emph{Proceedings of the 21st International Conference on Artificial Intelligence and Statistics}, 1711 to 1721.
+
+\bibitem{FearnheadPrangle} Fearnhead, P. and Prangle, D. (2012). Constructing summary statistics for approximate Bayesian computation: semi automatic approximate Bayesian computation. \emph{Journal of the Royal Statistical Society, Series B}, 74, 419 to 474.
+
+\bibitem{LehmannScheffe} Lehmann, E. L. and Scheff\'e, H. (1950). Completeness, similar regions, and unbiased estimation, part I. \emph{Sankhy\=a}, 10, 305 to 340.
+
+\bibitem{Kolmogorov1965} Kolmogorov, A. N. (1965). Three approaches to the quantitative definition of information. \emph{Problems of Information Transmission}, 1, 1 to 7.
+
+\bibitem{Kolmogorov1983} Kolmogorov, A. N. (1983). Combinatorial foundations of information theory and the calculus of probabilities. \emph{Russian Mathematical Surveys}, 38, 29 to 40.
+
+\bibitem{Solomonoff} Solomonoff, R. J. (1964). A formal theory of inductive inference, parts I and II. \emph{Information and Control}, 7, 1 to 22 and 224 to 254.
+
+\bibitem{Chaitin} Chaitin, G. J. (1966). On the length of programs for computing finite binary sequences. \emph{Journal of the ACM}, 13, 547 to 569.
+
+\bibitem{MartinLof} Martin L\"of, P. (1966). The definition of random sequences. \emph{Information and Control}, 9, 602 to 619.
+
+\bibitem{Levin1974} Levin, L. A. (1974). Laws of information conservation (nongrowth) and aspects of the foundation of probability theory. \emph{Problems of Information Transmission}, 10, 206 to 210.
+
+\bibitem{KaratsubaOfman} Karatsuba, A. and Ofman, Yu. (1962). Multiplication of multidigit numbers on automata. \emph{Doklady Akademii Nauk SSSR}, 145, 293 to 294.
+
+\bibitem{CoverGacsGray} Cover, T. M., G\'acs, P. and Gray, R. M. (1989). Kolmogorov's contributions to information theory and algorithmic complexity. \emph{Annals of Probability}, 17, 840 to 865.
+
+\bibitem{CoverThomas} Cover, T. M. and Thomas, J. A. (2006). \emph{Elements of Information Theory}, second edition. Wiley.
+
+\bibitem{Cover1973} Cover, T. M. (1973). Enumerative source encoding. \emph{IEEE Transactions on Information Theory}, 19, 73 to 77.
+
+\bibitem{Cover1974} Cover, T. M. (1974). Universal gambling schemes and the complexity measures of Kolmogorov and Chaitin. Technical Report 12, Department of Statistics, Stanford University.
+
+\bibitem{VereshchaginVitanyi} Vereshchagin, N. K. and Vit\'anyi, P. M. B. (2004). Kolmogorov's structure functions and model selection. \emph{IEEE Transactions on Information Theory}, 50, 3265 to 3290.
+
+\bibitem{LiVitanyi} Li, M. and Vit\'anyi, P. M. B. (2008). \emph{An Introduction to Kolmogorov Complexity and Its Applications}, third edition. Springer.
+
+\bibitem{LiuPass} Liu, Y. and Pass, R. (2020). On one way functions and Kolmogorov complexity. \emph{Proceedings of the 61st IEEE Symposium on Foundations of Computer Science}, 1243 to 1254.
+
+\bibitem{Rubinstein2006} Rubinstein, R. Y. (2006). How many needles are in a haystack, or how to solve $\sharpP$ complete counting problems fast. \emph{Methodology and Computing in Applied Probability}, 8, 5 to 51.
+
+\bibitem{RubinsteinKroeseCE} Rubinstein, R. Y. and Kroese, D. P. (2004). \emph{The Cross Entropy Method: A Unified Approach to Combinatorial Optimization, Monte Carlo Simulation and Machine Learning}. Springer.
+
+\bibitem{Rubinstein2009} Rubinstein, R. Y. (2009). The Gibbs cloner for combinatorial optimization, counting and sampling. \emph{Methodology and Computing in Applied Probability}, 11, 491 to 549.
+
+\bibitem{RubinsteinGlynn} Rubinstein, R. Y. and Glynn, P. W. (2009). How to deal with the curse of dimensionality of likelihood ratios in Monte Carlo simulation. \emph{Stochastic Models}, 25, 547 to 568.
+
+\bibitem{Rubinstein2013} Rubinstein, R. Y. (2013). Stochastic enumeration method for counting NP hard problems. \emph{Methodology and Computing in Applied Probability}, 15, 249 to 291.
+
+\bibitem{BotevKroese} Botev, Z. I. and Kroese, D. P. (2012). Efficient Monte Carlo simulation via the generalized splitting method. \emph{Statistics and Computing}, 22, 1 to 16.
+
+\bibitem{Knuth1975} Knuth, D. E. (1975). Estimating the efficiency of backtrack programs. \emph{Mathematics of Computation}, 29, 121 to 136.
+
+\bibitem{VaismanKroese} Vaisman, R. and Kroese, D. P. (2017). Stochastic enumeration method for counting trees. \emph{Methodology and Computing in Applied Probability}, 19, 31 to 73.
+
+\bibitem{PolsonSokolovMonads} Polson, N. G. and Sokolov, V. (2026). From the $\lambda$ calculus to fast Bayes and deep learning: monads, functors, and generative Bayesian computation. Working paper, University of Chicago and George Mason University.
+
+\bibitem{Moggi} Moggi, E. (1991). Notions of computation and monads. \emph{Information and Computation}, 93, 55 to 92.
+
+\bibitem{Giry} Giry, M. (1982). A categorical approach to probability theory. In \emph{Categorical Aspects of Topology and Analysis}, Lecture Notes in Mathematics 915, Springer, 68 to 85.
+
+\bibitem{Fritz} Fritz, T. (2020). A synthetic approach to Markov kernels, conditional independence and theorems on sufficient statistics. \emph{Advances in Mathematics}, 370, 107239.
+
+\bibitem{ScottConsensus} Scott, S. L., Blocker, A. W., Bonassi, F. V., Chipman, H. A., George, E. I. and McCulloch, R. E. (2016). Bayes and big data: the consensus Monte Carlo algorithm. \emph{International Journal of Management Science and Engineering Management}, 11, 78 to 88.
+
+\bibitem{BennettGill} Bennett, C. H. and Gill, J. (1981). Relative to a random oracle $A$, $\mathrm{P}^A \neq \mathrm{NP}^A \neq \mathrm{co\text{-}NP}^A$ with probability 1. \emph{SIAM Journal on Computing}, 10, 96 to 113.
+
+\bibitem{Campbell} Campbell, P. J. (1977). Gauss and the eight queens problem: a study in miniature of the propagation of historical error. \emph{Historia Mathematica}, 4, 397 to 404.
+
+\bibitem{CousinsVempala} Cousins, B. and Vempala, S. (2018). Gaussian cooling and $O^*(n^3)$ algorithms for volume and Gaussian volume. \emph{SIAM Journal on Computing}, 47, 1237 to 1273.
+
+\bibitem{Klartag2023} Klartag, B. (2023). Logarithmic bounds for isoperimetry and slices of convex sets. \emph{Ars Inveniendi Analytica}, Paper No. 4.
+
+\bibitem{BF} Buhrman, H. and Fortnow, L. (1999). One sided versus two sided error in probabilistic computation. In \emph{STACS 1999}, Lecture Notes in Computer Science 1563, 100 to 109.
+
+\bibitem{Ko} Ko, K.-I. (1982). Some observations on the probabilistic algorithms and NP-hard problems. \emph{Information Processing Letters}, 14, 39 to 43.
+
+\bibitem{Lagnoux} Lagnoux, A. (2006). Rare event simulation. \emph{Probability in the Engineering and Informational Sciences}, 20, 45 to 66.
+
+\bibitem{LiYang} Li, J. and Yang, T. (2022). $3.1n - o(n)$ circuit lower bounds for explicit functions. \emph{Proceedings of the 54th ACM Symposium on Theory of Computing}, 1180 to 1193.
+
+\bibitem{PreusserEngelhardt} Preusser, T. B. and Engelhardt, M. R. (2017). Putting queens in carry chains, No. 27. \emph{Journal of Signal Processing Systems}, 88, 185 to 201.
+\bibitem{SinclairJerrum} Sinclair, A. and Jerrum, M. (1989). Approximate counting, uniform generation and rapidly mixing Markov chains. \emph{Information and Computation}, 82, 93 to 133.
+
+
+\bibitem{Luria2017} Luria, Z. (2017). New bounds on the number of $n$-queens configurations. arXiv:1705.05225.
+\bibitem{BowtellKeevash} Bowtell, C. and Keevash, P. (2021). The $n$-queens problem. arXiv:2109.08083.
+\bibitem{LuriaSimkin} Luria, Z. and Simkin, M. (2022). A lower bound for the $n$-queens problem. \emph{Proceedings of the 2022 ACM-SIAM Symposium on Discrete Algorithms}, 2185 to 2197.
+\bibitem{BFL} Buhrman, H., Fortnow, L. and Laplante, S. (2002). Resource bounded Kolmogorov complexity revisited. \emph{SIAM Journal on Computing}, 31, 887 to 905.
+\end{thebibliography}
+
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Index}
+\printindex
+\cleardoublepage
+\thispagestyle{empty}
+\mbox{}
+
+\end{document}

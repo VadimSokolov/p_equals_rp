@@ -1,0 +1,12 @@
+4 {'N0': 2, 'N1': 8, 'ratio': 0.25, 'comps': 2, 'largest': 5, 'comps_with_solutions': 2, 'largest_sol': 1, 'isolated': 2, 'secs': 0.000396728515625}
+5 {'N0': 10, 'N1': 0, 'ratio': None, 'comps': 10, 'largest': 1, 'comps_with_solutions': 10, 'largest_sol': 1, 'isolated': 10, 'secs': 0.00036525726318359375}
+6 {'N0': 4, 'N1': 60, 'ratio': 0.06666666666666667, 'comps': 10, 'largest': 14, 'comps_with_solutions': 4, 'largest_sol': 1, 'isolated': 4, 'secs': 0.0019161701202392578}
+7 {'N0': 40, 'N1': 152, 'ratio': 0.2631578947368421, 'comps': 22, 'largest': 84, 'comps_with_solutions': 6, 'largest_sol': 16, 'isolated': 32, 'secs': 0.008571863174438477}
+8 {'N0': 92, 'N1': 888, 'ratio': 0.1036036036036036, 'comps': 1, 'largest': 980, 'comps_with_solutions': 1, 'largest_sol': 92, 'isolated': 76, 'secs': 0.048699140548706055}
+9 {'N0': 352, 'N1': 3376, 'ratio': 0.10426540284360189, 'comps': 69, 'largest': 3636, 'comps_with_solutions': 5, 'largest_sol': 348, 'isolated': 264, 'secs': 0.19843697547912598}
+10 {'N0': 724, 'N1': 14404, 'ratio': 0.0502638156067759, 'comps': 253, 'largest': 14824, 'comps_with_solutions': 1, 'largest_sol': 724, 'isolated': 532, 'secs': 0.8378052711486816}
+11 {'N0': 2680, 'N1': 67656, 'ratio': 0.039612155610736666, 'comps': 1121, 'largest': 69096, 'comps_with_solutions': 1, 'largest_sol': 2680, 'isolated': 1776, 'secs': 5.11740517616272}
+12 {'N0': 14200, 'N1': 346088, 'ratio': 0.041030027045144586, 'comps': 4021, 'largest': 355860, 'comps_with_solutions': 5, 'largest_sol': 14196, 'isolated': 8668, 'secs': 34.45972752571106}
+13 {'N0': 73712, 'N1': 1910080, 'ratio': 0.038591053777852234, 'comps': 13257, 'largest': 1969288, 'comps_with_solutions': 57, 'largest_sol': 73656, 'isolated': 37704, 'secs': 250.36223649978638}
+
+[exited with code 124]

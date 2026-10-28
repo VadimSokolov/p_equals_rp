@@ -1,0 +1,109 @@
+\chapter{Beyond Yakowitz: Higher Order and Stratified Vertical Rules}
+\label{ch:beyond}
+
+The Yakowitz\index{Yakowitz, Krimmel and Szidarovszky} bounds are not the end of the story. Three improvements are available, each provable with the same spacing calculus, and together they change the picture of what the quantile coordinate can do. The first replaces the trapezoid by a higher order interpolatory rule and gains a factor $n^{-2}$ in mean squared error for each extra derivative. The second replaces independent uniforms by stratified\index{stratified sampling} uniforms and has a bound smaller by a factor $K$ than the bracketing bound proved in Chapter~\ref{ch:yakowitz} for staircases (a comparison of upper bounds). The third replaces the plug in spacings of nested sampling\index{nested sampling} by their exact expectations under the latent position law, and gives an exact error bar for the spacing error rather than removing it. We state and prove all three, and then say precisely what they do and do not buy for the counting problem.
+
+\section{Higher order rules on random nodes}
+
+On the random grid $0 = U_{(0)} < U_{(1)} < \dots < U_{(n+1)} = 1$, a degree $k$ interpolatory rule approximates $\int_{U_{(i-1)}}^{U_{(i)}} \Lambda$ by the integral of the polynomial of degree $k$ that interpolates $\Lambda$ at $k + 1$ consecutive grid points including the endpoints of the cell. For $k = 1$ this is the trapezoid; for $k = 2$ it uses one extra neighbour; and so on.
+
+\begin{theorem}
+\label{thm:interp}
+Let $\Lambda \in C^{k+1}[0, 1]$ with $\|\Lambda^{(k+1)}\|_\infty \le C_{k+1}$, and let $\hat Z_k$ be the degree $k$ interpolatory rule on the random grid. Then
+\[
+\EE | \hat Z_k - Z | \le c_k \, C_{k+1} \, n^{-(k+1)} \quad \text{and} \quad \EE ( \hat Z_k - Z )^2 \le c_k' \, C_{k+1}^2 \, n^{-2(k+1)} ,
+\]
+for constants $c_k, c_k'$ depending only on $k$.
+\end{theorem}
+
+\begin{proof}
+The interpolation error on a cell of width $D_i$ using nodes within distance $h_i$ of the cell is at most $C_{k+1} (2 h_i)^{k+1} / (k+1)!$ pointwise, by the Lagrange remainder, and integrating over the cell gives a cell error of at most $C_{k+1} (2 h_i)^{k+1} D_i / (k+1)!$. The nodes used are at most $k$ cells away, so $h_i \le \sum_{j = i - k}^{i + k} D_j$ and by convexity $h_i^{k+1} \le (2k+1)^{k} \sum_j D_j^{k+1}$. Summing over cells, the total error is bounded by a constant times $C_{k+1} \sum_i D_i^{k+2}$ plus cross terms of the same order, and $\EE \sum_i D_i^{k+2} = (n+1) (k+2)! \, n! / (n+k+2)! = O(n^{-(k+1)})$. The second moment follows as in the trapezoidal case, with the cross terms $\EE D_i^{k+2} D_j^{k+2} = O(n^{-2k-4})$ summed over $n^2$ pairs giving $O(n^{-2k-2})$.
+\end{proof}
+
+For $k = 2$ the mean squared error is $O(n^{-6})$ and for $k = 3$ it is $O(n^{-8})$, against the $O(n^{-4})$ of Yakowitz. The gain is real for smooth integrands and is the random node analogue of Newton Cotes rules. It is also, as the proof makes plain, useless for staircases, which are not even continuous: the derivative bound $C_{k+1}$ is infinite and the theorem says nothing. For counting one needs the second improvement.
+
+\section{Stratified nodes}
+
+Replace the independent uniforms by stratified uniforms: $U_i = (i - 1 + V_i) / n$ for $i = 1, \dots, n$ with $V_i$ independent uniforms on $[0, 1]$. Each stratum $[(i-1)/n, i/n]$ contains exactly one point and the spacings are at most $2/n$. The randomised midpoint rule is
+\[
+\hat Z_S = \frac{1}{n} \sum_{i=1}^{n} \Lambda(U_i) .
+\]
+
+\begin{theorem}
+\label{thm:stratified}
+The stratified estimator $\hat Z_S$ is unbiased for every integrable $\Lambda$, and
+\[
+\Var (\hat Z_S) = \frac{1}{n^2} \sum_{i=1}^{n} \Var \big( \Lambda(U_i) \big) \le \frac{1}{n^2} \sum_{i=1}^{n} \frac{ \mathrm{osc}_i(\Lambda)^2 }{4} ,
+\]
+where $\mathrm{osc}_i$ is the oscillation of $\Lambda$ on the $i$th stratum. In particular, for a staircase with $K$ jumps and $\Lambda(0) = \lambda_1$,
+\[
+\EE (\hat Z_S - Z)^2 \le \frac{K \lambda_1^2}{4 n^2} ,
+\]
+and for Lipschitz $\Lambda$ with constant $C_1$, $\EE (\hat Z_S - Z)^2 \le C_1^2 / (4 n^3)$.
+\end{theorem}
+
+\begin{proof}
+$\EE \Lambda(U_i) = n \int_{(i-1)/n}^{i/n} \Lambda$, so $\EE \hat Z_S = Z$. The $U_i$ are independent, so the variance is the sum of the variances, and the variance of a random variable confined to an interval of length $\ell$ is at most $\ell^2 / 4$. For a staircase, $\Lambda$ is constant on every stratum that contains no jump, and at most $K$ strata contain a jump, each with oscillation at most $\lambda_1$. For Lipschitz $\Lambda$ the oscillation on a stratum is at most $C_1 / n$.
+\end{proof}
+
+This is Haber's \cite{Haber} stratified estimator of 1966, and in the vertical setting it is the right rule for staircases. The mean squared error is $O(K / n^2)$ against the $O(K^2 / n^2)$ of the bracketing sums on independent nodes, smaller by a factor $K$ as a comparison of the two upper bounds (the bracketing bound is loose, see Chapter~\ref{ch:staircase}), and the estimator is exactly unbiased, which the trapezoidal rule is not. For the queens, with $K$ the number of nonempty energy levels (at least $2N$ for $N = 8$ to $11$ in the exact density of states), the stratified bound gives absolute error $O(\sqrt K \lambda_1 / n)$, and relative error $\epsilon$ needs $n = O(\sqrt K \lambda_1 / (Z \epsilon))$ nodes, which is $O(\sqrt K / \epsilon)$ on a rung whose ratio $Z / \lambda_1$ is bounded below.
+
+The stratified rule can be combined with the higher order rule on smooth integrands: use stratified nodes and a degree $k$ interpolant, and the spacings are now at most $2/n$, so the error is that of a degree $k$ rule on a grid of mesh $2/n$, namely $O(n^{-(k+1)})$ pointwise and deterministic rather than in mean. This recovers the full Newton Cotes rate (the estimator is not unbiased, since the rule has node dependent weights).
+
+\section{Exact moments of the nested sampling estimate}
+
+The third improvement concerns the one thing the quadrature rules cannot see: in nested sampling the positions $s_k$ of the grid points on the quantile axis are not observed. What is observed is the sequence of likelihood values $y_1 > y_2 > \dots$ at which live points are discarded, and the positions are latent. Skilling\index{Skilling, John}'s \cite{Skilling} algorithm plugs in $s_k = e^{-k/n}$, the exponential of the mean of $\log s_k$; the analysis of Chopin and Robert\index{Chopin and Robert} \cite{ChopinRobert} shows that the resulting relative error is $O(\sqrt{\log(1/Z) / n})$.
+
+The latent positions have a known law. With $n$ live points, $s_k = \prod_{j=1}^{k} t_j$ where the $t_j$ are independent with the $\mathrm{Beta}(n, 1)$ law, the maximum of $n$ uniforms, and this holds exactly and independently of $\Lambda$ when the law of $L(X)$ has no atoms, because then $Z(L(X)) \sim U(0,1)$ for $X \sim P$; for a staircase, ties must first be broken by an independent uniform.
+
+\begin{theorem}
+\label{thm:nestedmoments}
+Hold the discarded likelihood sequence $(y_k)$ fixed and let the latent positions $s_k$ have the product Beta law above. Then the nested sampling estimate $\hat Z = \sum_k y_k (s_{k-1} - s_k)$ has exact mean and variance (under the law of the positions, not conditionally on $y$)
+\[
+\begin{gathered}
+\EE \hat Z = \sum_{k \ge 1} y_k \, \frac{1}{n+1} \Big( \frac{n}{n+1} \Big)^{k-1} , \\
+\Var \hat Z = \sum_{k, l} y_k y_l \, \mathrm{Cov}(s_{k-1} - s_k, \, s_{l-1} - s_l) ,
+\end{gathered}
+\]
+where $\EE s_k = (n/(n+1))^k$, $\EE s_k^2 = (n/(n+2))^k$, and for $k \le l$, $\EE s_k s_l = (n/(n+2))^k (n/(n+1))^{l-k}$.
+\end{theorem}
+
+\begin{proof}
+$\EE t_j = n/(n+1)$ and $\EE t_j^2 = n/(n+2)$, the $t_j$ are independent, and $s_k s_l = s_k^2 \prod_{j=k+1}^{l} t_j$ for $k \le l$. The rest is algebra.
+\end{proof}
+
+The estimator $\EE \hat Z$, the mean of the estimate under the law of the positions (we make no optimality claim for it\index{Rao Blackwellisation}), is Skilling's estimator with the weights $e^{-(k-1)/n} - e^{-k/n}$ replaced by $(n/(n+1))^{k-1} / (n+1)$, which differ by $O(1/n^2)$ per term. The gain over plugging in the means is therefore small in the estimate itself; the real gain is the variance formula, which gives an exact error bar from a single run without the resampling of the $s_k$ that Skilling and Chopin and Robert propose. The variance under the position law is $O(\log(1/Z)/n)$ relative, which recovers the Chopin Robert rate, and indicates that the rate is intrinsic to this scheme: with $n$ live points the positions are known to relative precision $\sqrt{k}/n$ after $k$ steps, since the $t_j$ are genuinely random and unobserved (we do not prove a lower bound over all estimators).
+
+\section{Can the spacing error be beaten?}
+
+The $O(n^{-1/2})$ rate in the number of live points is the Monte Carlo rate, and it is the one place in the vertical walk where the $n^{-2}$ or better rates of weighted integration are not available. Can it be improved? Two routes suggest themselves.
+
+The first is to observe the positions. In a counting problem the survival function $Z(y) = \PP_P(L > y)$ is, at each discarded level $y_k$, the probability that a uniform configuration has energy at most the current level, and this can be estimated independently by a product of conditional probabilities along the ladder; this is the product estimator\index{product estimator}, and its error is $O(T / \sqrt{M})$ with $M$ samples per rung, which is again a Monte Carlo rate. The positions can be estimated, but only at the Monte Carlo rate, because they are probabilities of events and probabilities are estimated by frequencies.
+
+The second is to make the positions deterministic. Stratified nested sampling, in which the live points at each stage are not independent draws from the level set but a stratified sample in the quantile coordinate, would give spacings known to within $2/n$ rather than to a random factor. Such a sample is a sample of the level set with prescribed likelihood quantiles, which requires knowing the quantile function\index{quantile function} of the likelihood on the level set, which is the thing being computed. The circularity is the same as in the rest of the subject: the positions on the quantile axis are known deterministically only if the staircase is known.
+
+So the answer is that the Yakowitz rates can be improved, to any order for smooth integrands and by a factor of about two in mean squared error for staircases (Chapter~\ref{ch:staircase}), and the improvements are the right numerical analysis for the quantile coordinate; but the error that remains after they are applied is the error of not knowing where on the axis one stands. The quadrature error can be driven to zero at polynomial cost. Given exact conditional draws the positional error is also polynomial, $O(\sqrt{\log(1/Z)/n})$ relative, as in Chapter~\ref{ch:rates}; the difficulty is the sampler, which is what the conditioned draws require.
+
+\section{A table of rates}
+
+For reference, the mean squared error of the estimators in this chapter and the last, in the number of nodes $n$ and the number of jumps $K$, with $\lambda_1 = \Lambda(0)$ and the integrand's derivative bounds as indicated.
+
+\begin{center}
+\small
+\begin{tabular}{p{1.35in}p{0.85in}p{1.8in}}
+\toprule
+rule & nodes & mean squared error \\
+\midrule
+naive Monte Carlo & independent & $\Var(\Lambda(U)) / n$ \\
+left or right Riemann & independent, sorted & $O(\lambda_1^2 \log^2 n / n^2)$ monotone \\
+trapezoid (Yakowitz) & independent, sorted & $O(C_2^2 / n^4)$ for $C^2$ \\
+degree $k$ interpolant & independent, sorted & $O(C_{k+1}^2 / n^{2k+2})$ for $C^{k+1}$ \\
+bracketing sums & independent, sorted & $O(K^2 \lambda_1^2 / n^2)$ staircase \\
+stratified midpoint & stratified & $K \lambda_1^2 / (4 n^2)$ staircase, unbiased \\
+stratified degree $k$ & stratified & $O(C_{k+1}^2 / n^{2k+2})$ \\
+trapezoid, Chapter~\ref{ch:staircase} & independent, sorted & $\le V^2 / (2(n+1)(n+2))$ any bounded variation; $\sum h_k^2 / (2n^2)$ asymptotically for separated steps \\
+stratified, Chapter~\ref{ch:staircase} & stratified & $\le V^2 / (4 n^2)$ any bounded variation; $\le \sum h_k^2 / (4 n^2)$ separated steps \\
+nested sampling & live points & $O(\log(1/Z) / n)$ relative, positional \\
+\bottomrule
+\end{tabular}
+\end{center}

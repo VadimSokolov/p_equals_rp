@@ -1,0 +1,58 @@
+\chapter{Sequential Monte Carlo and Feynman Kac Models}
+\label{ch:smc}
+
+The vertical walk with a population of particles, as run in Chapter~\ref{ch:experiments}, is a sequential Monte Carlo algorithm, and sequential Monte Carlo has a complete theory due to Del Moral and others in which the ladder of level sets is a Feynman Kac\index{Feynman Kac model} model and the estimate of the normalising constant is unbiased with an explicit variance. This chapter places the walk in that theory, states the unbiasedness and central limit theorems, and explains what they add to the Yakowitz\index{Yakowitz, Krimmel and Szidarovszky} and nested sampling analyses: a law of large numbers in the number of particles, with a variance that decomposes rung by rung and isolates the contribution of the sampler at each rung.
+
+\section{Feynman Kac models}
+
+A Feynman Kac model on a sequence of state spaces $E_0, E_1, \dots, E_T$ consists of an initial law $\eta_0$ on $E_0$, Markov kernels $M_t$ from $E_{t-1}$ to $E_t$, and nonnegative potential functions $G_t$ on $E_t$. The unnormalised measures are
+\[
+\gamma_t(f) = \EE\Big[ f(X_t) \prod_{s=0}^{t-1} G_s(X_s) \Big] ,
+\]
+where $X_0 \sim \eta_0$ and $X_s \sim M_s(X_{s-1}, \cdot)$, the normalised measures are $\eta_t = \gamma_t / \gamma_t(1)$, and the normalising constants satisfy $\gamma_t(1) = \prod_{s < t} \eta_s(G_s)$. The potential $G_s$ reweights and the kernel $M_s$ moves; the product $\gamma_T(1)$ is the quantity of interest.
+
+The level set ladder is the model with $E_t = \cX$ for all $t$, $\eta_0 = p$ the uniform distribution, $G_t = \Ind\{ S \le m_{t+1} \}$ the indicator of the next level, and $M_t$ a Markov kernel invariant for $p(\cdot \mid S \le m_t)$, the level set chain. Then $\eta_t = p(\cdot \mid S \le m_t)$ by invariance, $\eta_t(G_t) = \PP(S \le m_{t+1} \mid S \le m_t) = \theta_{t+1}$, and $\gamma_T(1) = \prod_t \theta_t = \rho$. The product estimator\index{product estimator} is the Feynman Kac normalising constant.
+
+The Boltzmann\index{Boltzmann distribution} ladder is the model with $G_t(x) = e^{-S(x)(\beta_{t+1} - \beta_t)}$ and $M_t$ invariant for $\pi_{1/\beta_t}$, where $\beta$ is the inverse temperature; this is annealed importance sampling, and $\gamma_T(1) = Z(1/\beta_T) / Z(1/\beta_0)$. Nested sampling is a Feynman Kac model with a random number of steps and a single particle replaced at a time, and its analysis in this framework is in Salomone, South, Drovandi and Kroese~\cite{Salomone}.
+
+\section{The particle approximation}
+
+The sequential Monte Carlo algorithm approximates $\eta_t$ by $M$ particles. At time $t$ one has particles $\xi_t^1, \dots, \xi_t^M$ with empirical measure $\eta_t^M = M^{-1} \sum_i \delta_{\xi_t^i}$. The selection step resamples $M$ particles from $\eta_t^M$ with weights proportional to $G_t(\xi_t^i)$, which for the indicator potential means discarding the particles above the next level and replacing them by copies of those below. The mutation step moves each selected particle by $M_{t+1}$, that is, runs the level set chain. The normalising constant estimate is
+\[
+\gamma_T^M(1) = \prod_{t=0}^{T-1} \eta_t^M(G_t) = \prod_{t=0}^{T-1} \frac{1}{M} \sum_{i=1}^{M} \Ind\{ S(\xi_t^i) \le m_{t+1} \} ,
+\]
+which is exactly the split sampling\index{split sampling} estimator of Chapter~\ref{ch:experiments}.
+
+\begin{theorem}[Del Moral \cite{DelMoral}, Chapters 7 and 9]
+For any Feynman Kac model with bounded potentials and any number of particles $M$, with multinomial resampling at every step, the estimate $\gamma_T^M(1)$ is unbiased: $\EE[\gamma_T^M(1)] = \gamma_T(1)$. Moreover, if $\eta_t(G_t) > 0$ for every $t$, $\sqrt M (\gamma_T^M(1) / \gamma_T(1) - 1) \Rightarrow N(0, \sigma_T^2)$ with
+\[
+\sigma_T^2 = \sum_{t=0}^{T} \frac{ \eta_t\big( (Q_{t, T}(1) - \eta_t Q_{t,T}(1))^2 \big) }{ (\eta_t Q_{t,T}(1))^2 } ,
+\]
+where $Q_{t, T}(1)(x)$ is the expected product of potentials from time $t$ to $T$ starting from $x$.
+\end{theorem}
+
+Unbiasedness is a surprise on first meeting, since each factor $\eta_t^M(G_t)$ is a biased estimate of $\eta_t(G_t)$ owing to the resampling; the product nonetheless has the right mean, by a martingale argument. The practical consequence is that one may run many independent short runs and average, which is what Chapter~\ref{ch:experiments} did, and the average is unbiased for $\rho$ even if each run is far off, provided the levels are fixed in advance and resampling is multinomial (the adaptive runs of Chapter~\ref{ch:experiments} satisfy neither; see below).
+
+\section{The variance decomposition}
+
+The asymptotic variance $\sigma_T^2$ is a sum over rungs, and the $t$th term is the variance, under the level $t$ distribution, of the conditional probability of reaching the bottom from a particle at level $t$, normalised by its mean squared. When the level set chain mixes perfectly between rungs, a particle at level $t$ reaches the bottom with conditional probability $\Ind\{ S \le m_{t+1} \} \prod_{s > t+1} \theta_s$, a constant times the indicator of the next level, and the $t$th term is the Bernoulli variance $(1 - \theta_{t+1}) / \theta_{t+1}$ of the next selection. Then
+\[
+\sigma_T^2 = \sum_{t=0}^{T-1} \frac{1 - \theta_{t+1}}{\theta_{t+1}} ,
+\]
+which for $T$ rungs of ratio $\theta$ is $T (1 - \theta) / \theta$, and the relative mean squared error with $M$ particles is asymptotically $T(1 - \theta) / (\theta M)$. This is the product estimator bound of Chapter~\ref{ch:product}, now derived as the perfect mixing case of a general formula.
+
+When the chain does not mix perfectly the $t$th term is larger: particles at level $t$ differ in their prospects of reaching the bottom, because some are in components of the level set from which the bottom is reachable and some are not, and the variance of their conditional probabilities is the excess. This excess is the quantitative signature of a shattered level set in the sequential Monte Carlo analysis. It is estimable from the genealogy of the particle system: the number of distinct ancestors at level $t$ of the particles that reach the bottom, which falls below its neutral value when the level set is shattered and only one component leads down. Monitoring the ancestral diversity of a particle run is the practical diagnostic for the mixing conjecture, and Chapter~\ref{ch:genealogy} computes it.
+
+\section{Adaptive levels}
+
+The quantile rule for choosing $m_{t+1}$ as the $f$ quantile of the current particle energies makes the levels random and data dependent, and the unbiasedness theorem does not apply directly. C\'erou, Del Moral, Furon and Guyader~\cite{CDFG} analysed adaptive multilevel splitting with quantile levels and showed that the estimate remains consistent and asymptotically normal, with a bias of order $1/M$ that vanishes faster than the standard deviation, and that the adaptive choice approaches an equal ratio schedule when the energy levels are continuous. For the queens this is what Chapter~\ref{ch:experiments} observed: the adaptive ladder settled on ratios between about $0.3$ and $0.6$ at the upper rungs and fell below $0.3$ over the last two to four rungs, where the integer levels force steps of one.
+
+\section{Genealogies and the bottom rung}
+
+The genealogical tree of a particle system records, for each particle at the final time, its ancestors at every earlier time. Resampling alone makes genealogies coalesce, even under perfect mixing, so the number of distinct ancestors at a level is informative only when compared with the neutral prediction of Chapter~\ref{ch:genealogy}; in a well mixed run it stays close to that prediction. In a run that passes through a shattered level set, the final particles descend from the few ancestors that happened to be in the right component, and the number of distinct ancestors falls below the neutral value. The coalescence is a measurable quantity.
+
+For the queens the bottom rung, from $S \le 1$ to $S = 0$, is the one where coalescence should appear if the solution set is disconnected under swaps through one attacking pair. Chapter~\ref{ch:genealogy} records them. A coalescence below the neutral prediction at the bottom rung, growing more pronounced with $N$, would be the experimental form of the mixing conjecture's failure, and it would tell us which components the chain is confined to.
+
+\section{The place of the theory}
+
+Feynman Kac theory does for the particle walk what the Yakowitz bounds do for the quadrature and the Chopin Robert theorem~\cite{ChopinRobert} does for nested sampling\index{nested sampling}: it gives an asymptotic variance with an explicit structure. The structure is the sum over rungs, and the rung terms separate into the Bernoulli part, which is the product estimator's variance and is polynomial, and the mixing part, which is the excess variance of the conditional prospects and is the sampler's contribution. The thesis of the book is that only the second part is hard, and the Feynman Kac decomposition is the formula in which that statement is a sum of two terms.

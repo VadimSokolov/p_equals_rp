@@ -1,0 +1,1044 @@
+{
+ "edition": "1",
+ "pdf": {
+  "bytes": 1640316,
+  "file": "pdf/p_equals_rp.pdf",
+  "pages": 337,
+  "parts": [
+   {
+    "first_page": "i",
+    "key": "",
+    "last_page": "xxii",
+    "pages": 22,
+    "title": "Front matter"
+   },
+   {
+    "first_page": "2",
+    "key": "1",
+    "last_page": "6",
+    "pages": 5,
+    "title": "Chapter 1. The Problem in One Chapter"
+   },
+   {
+    "first_page": "7",
+    "key": "2",
+    "last_page": "9",
+    "pages": 3,
+    "title": "Chapter 2. Hilbert, Gödel and the Decision Problem"
+   },
+   {
+    "first_page": "10",
+    "key": "3",
+    "last_page": "13",
+    "pages": 4,
+    "title": "Chapter 3. Turing Machines and the Measurement of Time"
+   },
+   {
+    "first_page": "14",
+    "key": "4",
+    "last_page": "17",
+    "pages": 4,
+    "title": "Chapter 4. Nondeterminism and the Classes P and NP"
+   },
+   {
+    "first_page": "18",
+    "key": "5",
+    "last_page": "20",
+    "pages": 3,
+    "title": "Chapter 5. NP Completeness"
+   },
+   {
+    "first_page": "21",
+    "key": "6",
+    "last_page": "23",
+    "pages": 3,
+    "title": "Chapter 6. Circuits and Lower Bounds"
+   },
+   {
+    "first_page": "24",
+    "key": "7",
+    "last_page": "26",
+    "pages": 3,
+    "title": "Chapter 7. The Three Barriers"
+   },
+   {
+    "first_page": "27",
+    "key": "8",
+    "last_page": "30",
+    "pages": 4,
+    "title": "Chapter 8. Quantum Computation and the Limits of Randomness"
+   },
+   {
+    "first_page": "31",
+    "key": "9",
+    "last_page": "33",
+    "pages": 3,
+    "title": "Chapter 9. What a Resolution Would Mean"
+   },
+   {
+    "first_page": "34",
+    "key": "10",
+    "last_page": "40",
+    "pages": 7,
+    "title": "Chapter 10. The Exponential Time Hypothesis"
+   },
+   {
+    "first_page": "41",
+    "key": "11",
+    "last_page": "44",
+    "pages": 4,
+    "title": "Chapter 11. Shannon and von Neumann"
+   },
+   {
+    "first_page": "45",
+    "key": "12",
+    "last_page": "51",
+    "pages": 7,
+    "title": "Chapter 12. Kolmogorov, Cover and the Information in a Solution"
+   },
+   {
+    "first_page": "52",
+    "key": "13",
+    "last_page": "54",
+    "pages": 3,
+    "title": "Chapter 13. A Short History of Randomized Computation"
+   },
+   {
+    "first_page": "55",
+    "key": "14",
+    "last_page": "57",
+    "pages": 3,
+    "title": "Chapter 14. Proof Complexity and SAT Solvers"
+   },
+   {
+    "first_page": "58",
+    "key": "15",
+    "last_page": "61",
+    "pages": 4,
+    "title": "Chapter 15. P, NP, RP and \\#P"
+   },
+   {
+    "first_page": "62",
+    "key": "16",
+    "last_page": "66",
+    "pages": 5,
+    "title": "Chapter 16. Pseudorandomness and Hitting Sets"
+   },
+   {
+    "first_page": "67",
+    "key": "17",
+    "last_page": "69",
+    "pages": 3,
+    "title": "Chapter 17. Interactive Proofs, Arithmetization and the PCP Theorem"
+   },
+   {
+    "first_page": "71",
+    "key": "18",
+    "last_page": "74",
+    "pages": 4,
+    "title": "Chapter 18. Gauss and the Queens"
+   },
+   {
+    "first_page": "75",
+    "key": "19",
+    "last_page": "77",
+    "pages": 3,
+    "title": "Chapter 19. Counting as a Rare Event"
+   },
+   {
+    "first_page": "78",
+    "key": "20",
+    "last_page": "80",
+    "pages": 3,
+    "title": "Chapter 20. Simkin's Theorem and the Queenon"
+   },
+   {
+    "first_page": "81",
+    "key": "21",
+    "last_page": "84",
+    "pages": 4,
+    "title": "Chapter 21. Entropy, Types and the Rate Function of the Queens"
+   },
+   {
+    "first_page": "85",
+    "key": "22",
+    "last_page": "87",
+    "pages": 3,
+    "title": "Chapter 22. Latin Squares and Other Permutation Counts"
+   },
+   {
+    "first_page": "89",
+    "key": "23",
+    "last_page": "91",
+    "pages": 3,
+    "title": "Chapter 23. Product Estimators and Annealing"
+   },
+   {
+    "first_page": "92",
+    "key": "24",
+    "last_page": "97",
+    "pages": 6,
+    "title": "Chapter 24. Markov Chains and Mixing Times"
+   },
+   {
+    "first_page": "98",
+    "key": "25",
+    "last_page": "101",
+    "pages": 4,
+    "title": "Chapter 25. Convergence of MCMC and the Witch's Hat"
+   },
+   {
+    "first_page": "102",
+    "key": "26",
+    "last_page": "104",
+    "pages": 3,
+    "title": "Chapter 26. Random Walks on the Symmetric Group"
+   },
+   {
+    "first_page": "105",
+    "key": "27",
+    "last_page": "107",
+    "pages": 3,
+    "title": "Chapter 27. The Volume Problem and Isoperimetry"
+   },
+   {
+    "first_page": "108",
+    "key": "28",
+    "last_page": "110",
+    "pages": 3,
+    "title": "Chapter 28. Sampling versus Counting"
+   },
+   {
+    "first_page": "111",
+    "key": "29",
+    "last_page": "114",
+    "pages": 4,
+    "title": "Chapter 29. Rare Event Simulation"
+   },
+   {
+    "first_page": "115",
+    "key": "30",
+    "last_page": "120",
+    "pages": 6,
+    "title": "Chapter 30. Rubinstein's Cross Entropy Method for Counting"
+   },
+   {
+    "first_page": "121",
+    "key": "31",
+    "last_page": "123",
+    "pages": 3,
+    "title": "Chapter 31. Lorenz Curves, Majorization and Concentration"
+   },
+   {
+    "first_page": "124",
+    "key": "32",
+    "last_page": "129",
+    "pages": 6,
+    "title": "Chapter 32. Vertical Likelihood Monte Carlo"
+   },
+   {
+    "first_page": "130",
+    "key": "33",
+    "last_page": "135",
+    "pages": 6,
+    "title": "Chapter 33. The Algorithms of Vertical Likelihood Monte Carlo"
+   },
+   {
+    "first_page": "136",
+    "key": "34",
+    "last_page": "139",
+    "pages": 4,
+    "title": "Chapter 34. Rates of Convergence in the Quantile Coordinate"
+   },
+   {
+    "first_page": "140",
+    "key": "35",
+    "last_page": "143",
+    "pages": 4,
+    "title": "Chapter 35. Weighted Monte Carlo Integration: The Yakowitz Bounds"
+   },
+   {
+    "first_page": "144",
+    "key": "36",
+    "last_page": "148",
+    "pages": 5,
+    "title": "Chapter 36. Beyond Yakowitz: Higher Order and Stratified Vertical Rules"
+   },
+   {
+    "first_page": "149",
+    "key": "37",
+    "last_page": "155",
+    "pages": 7,
+    "title": "Chapter 37. Exact Yakowitz Theory for Staircases"
+   },
+   {
+    "first_page": "156",
+    "key": "38",
+    "last_page": "159",
+    "pages": 4,
+    "title": "Chapter 38. Nested Sampling: The Theory"
+   },
+   {
+    "first_page": "160",
+    "key": "39",
+    "last_page": "163",
+    "pages": 4,
+    "title": "Chapter 39. Sequential Monte Carlo and Feynman Kac Models"
+   },
+   {
+    "first_page": "164",
+    "key": "40",
+    "last_page": "167",
+    "pages": 4,
+    "title": "Chapter 40. Bayesian Evidence as Counting"
+   },
+   {
+    "first_page": "168",
+    "key": "41",
+    "last_page": "173",
+    "pages": 6,
+    "title": "Chapter 41. Generative Bayesian Computation for Vertical Counting"
+   },
+   {
+    "first_page": "174",
+    "key": "42",
+    "last_page": "182",
+    "pages": 9,
+    "title": "Chapter 42. Sufficient Statistics for the Queens"
+   },
+   {
+    "first_page": "184",
+    "key": "43",
+    "last_page": "188",
+    "pages": 5,
+    "title": "Chapter 43. The Monte Carlo Program for P versus NP"
+   },
+   {
+    "first_page": "189",
+    "key": "44",
+    "last_page": "192",
+    "pages": 4,
+    "title": "Chapter 44. The Quantile Reordering of a Randomized Algorithm"
+   },
+   {
+    "first_page": "193",
+    "key": "45",
+    "last_page": "196",
+    "pages": 4,
+    "title": "Chapter 45. Vertical Likelihood and P = RP"
+   },
+   {
+    "first_page": "197",
+    "key": "46",
+    "last_page": "200",
+    "pages": 4,
+    "title": "Chapter 46. Approximate Counting in the Polynomial Hierarchy"
+   },
+   {
+    "first_page": "201",
+    "key": "47",
+    "last_page": "202",
+    "pages": 2,
+    "title": "Chapter 47. Phase Transitions and the Density of States"
+   },
+   {
+    "first_page": "203",
+    "key": "48",
+    "last_page": "207",
+    "pages": 5,
+    "title": "Chapter 48. Numerical Experiments"
+   },
+   {
+    "first_page": "208",
+    "key": "49",
+    "last_page": "211",
+    "pages": 4,
+    "title": "Chapter 49. A Cluster Chain for the Queens"
+   },
+   {
+    "first_page": "212",
+    "key": "50",
+    "last_page": "215",
+    "pages": 4,
+    "title": "Chapter 50. Numerical Experiments II: The Bottom Rung"
+   },
+   {
+    "first_page": "216",
+    "key": "51",
+    "last_page": "219",
+    "pages": 4,
+    "title": "Chapter 51. Numerical Experiments III: Genealogies"
+   },
+   {
+    "first_page": "220",
+    "key": "52",
+    "last_page": "223",
+    "pages": 4,
+    "title": "Chapter 52. Other Laboratories"
+   },
+   {
+    "first_page": "224",
+    "key": "53",
+    "last_page": "227",
+    "pages": 4,
+    "title": "Chapter 53. Average Case Hardness and the Overlap Gap Property"
+   },
+   {
+    "first_page": "228",
+    "key": "54",
+    "last_page": "231",
+    "pages": 4,
+    "title": "Chapter 54. The Other Hypothesis: The Case for NP = RP"
+   },
+   {
+    "first_page": "232",
+    "key": "55",
+    "last_page": "234",
+    "pages": 3,
+    "title": "Chapter 55. A Worked Example: The Eight Queens by Every Method"
+   },
+   {
+    "first_page": "235",
+    "key": "56",
+    "last_page": "239",
+    "pages": 5,
+    "title": "Chapter 56. Towards a Mixing Proof on Unconditioned Boards"
+   },
+   {
+    "first_page": "240",
+    "key": "57",
+    "last_page": "241",
+    "pages": 2,
+    "title": "Chapter 57. The Completion Problem"
+   },
+   {
+    "first_page": "242",
+    "key": "58",
+    "last_page": "247",
+    "pages": 6,
+    "title": "Chapter 58. Rigorous Theorems on P, NP and RP"
+   },
+   {
+    "first_page": "248",
+    "key": "59",
+    "last_page": "253",
+    "pages": 6,
+    "title": "Chapter 59. Lean Statements of the Main Results"
+   },
+   {
+    "first_page": "254",
+    "key": "60",
+    "last_page": "271",
+    "pages": 18,
+    "title": "Chapter 60. Open Problems: Status and Approaches"
+   },
+   {
+    "first_page": "272",
+    "key": "",
+    "last_page": "273",
+    "pages": 2,
+    "title": "Epilogue"
+   },
+   {
+    "first_page": "274",
+    "key": "A",
+    "last_page": "275",
+    "pages": 2,
+    "title": "Appendix A. Algorithms"
+   },
+   {
+    "first_page": "276",
+    "key": "B",
+    "last_page": "276",
+    "pages": 1,
+    "title": "Appendix B. Exact Counts"
+   },
+   {
+    "first_page": "277",
+    "key": "C",
+    "last_page": "278",
+    "pages": 2,
+    "title": "Appendix C. Glossary of Complexity Classes"
+   },
+   {
+    "first_page": "279",
+    "key": "D",
+    "last_page": "281",
+    "pages": 3,
+    "title": "Appendix D. Code"
+   },
+   {
+    "first_page": "282",
+    "key": "E",
+    "last_page": "284",
+    "pages": 3,
+    "title": "Appendix E. Exercises"
+   },
+   {
+    "first_page": "285",
+    "key": "F",
+    "last_page": "290",
+    "pages": 6,
+    "title": "Appendix F. List of Results and Conjectures"
+   },
+   {
+    "first_page": "291",
+    "key": "G",
+    "last_page": "294",
+    "pages": 4,
+    "title": "Appendix G. Chronology"
+   },
+   {
+    "first_page": "295",
+    "key": "",
+    "last_page": "295",
+    "pages": 1,
+    "title": "About the Authors"
+   },
+   {
+    "first_page": "296",
+    "key": "",
+    "last_page": "312",
+    "pages": 17,
+    "title": "Bibliography"
+   },
+   {
+    "first_page": "313",
+    "key": "",
+    "last_page": "315",
+    "pages": 3,
+    "title": "Index"
+   }
+  ],
+  "sha256": "3ab567568c6adebe98ce2e2f0307ba831c4626f8b3f211337d8fc1ba3c80dea9"
+ },
+ "results": {
+  "amortised_ladder_generator_error": {
+   "environment": "theorem",
+   "file": "ch_gbc.tex",
+   "fingerprint": "bec7d33c1b10",
+   "label": "thm:amortised",
+   "number": "41.3",
+   "page": "170",
+   "printed": "Theorem 41.3",
+   "verified_fingerprint": "bec7d33c1b10",
+   "verified_on": "2026-10-28"
+  },
+  "attack_rate_function_conjecture": {
+   "environment": "conjecture",
+   "file": "ch_entropy.tex",
+   "fingerprint": "5cc4f64e4942",
+   "label": "conj:ratefn",
+   "number": "21.1",
+   "page": "82",
+   "printed": "Conjecture 21.1",
+   "verified_fingerprint": "5cc4f64e4942",
+   "verified_on": "2026-10-28"
+  },
+  "block_chain_mixing_conjecture": {
+   "environment": "conjecture",
+   "file": "ch_swendsen.tex",
+   "fingerprint": "19adb9e7d84b",
+   "label": "conj:blockmix",
+   "number": "49.2",
+   "page": "210",
+   "printed": "Conjecture 49.2",
+   "verified_fingerprint": "19adb9e7d84b",
+   "verified_on": "2026-10-28"
+  },
+  "block_chain_reversible_irreducible": {
+   "environment": "proposition",
+   "file": "ch_swendsen.tex",
+   "fingerprint": "6ca1a13353bb",
+   "label": "prop:blockvalid",
+   "number": "49.1",
+   "page": "209",
+   "printed": "Proposition 49.1",
+   "verified_fingerprint": "6ca1a13353bb",
+   "verified_on": "2026-10-28"
+  },
+  "closure_minimal_sufficient_completion": {
+   "environment": "theorem",
+   "file": "ch_sufficient.tex",
+   "fingerprint": "ff9010019e44",
+   "label": "thm:closure",
+   "number": "42.2",
+   "page": "175",
+   "printed": "Theorem 42.2",
+   "verified_fingerprint": "ff9010019e44",
+   "verified_on": "2026-10-28"
+  },
+  "coding_theorem_for_the_queens": {
+   "environment": "theorem",
+   "file": "ch_kolmogorov.tex",
+   "fingerprint": "8bec1884cd68",
+   "label": "thm:coding",
+   "number": "12.1",
+   "page": "47",
+   "printed": "Theorem 12.1",
+   "verified_fingerprint": "8bec1884cd68",
+   "verified_on": "2026-10-28"
+  },
+  "conditional_fpras_explicit_rates": {
+   "environment": "theorem",
+   "file": "ch_theorems.tex",
+   "fingerprint": "715744099f70",
+   "label": "thm:condfpras_rates",
+   "number": "58.6",
+   "page": "245",
+   "printed": "Theorem 58.6",
+   "verified_fingerprint": "715744099f70",
+   "verified_on": "2026-10-28"
+  },
+  "conditional_fpras_integer_ladder": {
+   "environment": "theorem",
+   "file": "p_equals_rp.tex",
+   "fingerprint": "ba668f096341",
+   "label": "thm:vertical_condfpras",
+   "number": "45.1",
+   "page": "193",
+   "printed": "Theorem 45.1",
+   "verified_fingerprint": "ba668f096341",
+   "verified_on": "2026-10-28"
+  },
+  "conditional_fpras_vertical_walk": {
+   "environment": "theorem",
+   "file": "ch_program.tex",
+   "fingerprint": "4bdac7c31673",
+   "label": "thm:condfpras",
+   "number": "43.1",
+   "page": "185",
+   "printed": "Theorem 43.1",
+   "verified_fingerprint": "4bdac7c31673",
+   "verified_on": "2026-10-28"
+  },
+  "depth_growth_conjecture": {
+   "environment": "conjecture",
+   "file": "ch_open4.tex",
+   "fingerprint": "253f4a781f3e",
+   "label": "conj:depthgrowth",
+   "number": "60.25",
+   "page": "269",
+   "printed": "Conjecture 60.25",
+   "verified_fingerprint": "253f4a781f3e",
+   "verified_on": "2026-10-28"
+  },
+  "derandomization_equivalence_prrp_prp": {
+   "environment": "theorem",
+   "file": "ch_theorems.tex",
+   "fingerprint": "351ce48478bc",
+   "label": "thm:derandequiv",
+   "number": "58.2",
+   "page": "244",
+   "printed": "Theorem 58.2",
+   "verified_fingerprint": "351ce48478bc",
+   "verified_on": "2026-10-28"
+  },
+  "eth_and_the_program": {
+   "environment": "theorem",
+   "file": "ch_eth.tex",
+   "fingerprint": "f298794ba90c",
+   "label": "thm:ethprogram",
+   "number": "10.3",
+   "page": "36",
+   "printed": "Theorem 10.3",
+   "verified_fingerprint": "f298794ba90c",
+   "verified_on": "2026-10-28"
+  },
+  "expansion_equivalent_to_mixing": {
+   "environment": "theorem",
+   "file": "ch_mixingproof.tex",
+   "fingerprint": "fb7c71144109",
+   "label": "thm:reduction",
+   "number": "56.5",
+   "page": "237",
+   "printed": "Theorem 56.5",
+   "verified_fingerprint": "fb7c71144109",
+   "verified_on": "2026-10-28"
+  },
+  "expansion_of_the_bottom_level_set": {
+   "environment": "conjecture",
+   "file": "ch_mixingproof.tex",
+   "fingerprint": "252e6cd4e5a1",
+   "label": "conj:expansion",
+   "number": "56.4",
+   "page": "237",
+   "printed": "Conjecture 56.4",
+   "verified_fingerprint": "252e6cd4e5a1",
+   "verified_on": "2026-10-28"
+  },
+  "fpras_unconditioned_queens_count_sketch": {
+   "environment": "proposition",
+   "file": "ch_program.tex",
+   "fingerprint": "91279b93d2bf",
+   "label": "prop:fpras_unconditioned",
+   "number": "43.2",
+   "page": "187",
+   "printed": "Proposition 43.2",
+   "verified_fingerprint": "91279b93d2bf",
+   "verified_on": "2026-10-28"
+  },
+  "hardness_of_sufficient_statistics_queens": {
+   "environment": "theorem",
+   "file": "ch_sufficient.tex",
+   "fingerprint": "8e906d79d09f",
+   "label": "thm:cost",
+   "number": "42.4",
+   "page": "176",
+   "printed": "Theorem 42.4",
+   "verified_fingerprint": "8e906d79d09f",
+   "verified_on": "2026-10-28"
+  },
+  "interpolatory_rules_high_order": {
+   "environment": "theorem",
+   "file": "ch_beyond.tex",
+   "fingerprint": "cbc1d2b14710",
+   "label": "thm:interp",
+   "number": "36.1",
+   "page": "144",
+   "printed": "Theorem 36.1",
+   "verified_fingerprint": "cbc1d2b14710",
+   "verified_on": "2026-10-28"
+  },
+  "learned_generator_summary_dichotomy": {
+   "environment": "theorem",
+   "file": "ch_sufficient.tex",
+   "fingerprint": "b23fa8bdbb59",
+   "label": "thm:gbcsuff",
+   "number": "42.5",
+   "page": "178",
+   "printed": "Theorem 42.5",
+   "verified_fingerprint": "b23fa8bdbb59",
+   "verified_on": "2026-10-28"
+  },
+  "learning_problem_equivalent_to_np_rp": {
+   "environment": "theorem",
+   "file": "ch_sufficient.tex",
+   "fingerprint": "ce6a8d5d7c6d",
+   "label": "thm:jwequiv",
+   "number": "42.7",
+   "page": "181",
+   "printed": "Theorem 42.7",
+   "verified_fingerprint": "ce6a8d5d7c6d",
+   "verified_on": "2026-10-28"
+  },
+  "limits_of_monte_carlo_for_queens": {
+   "environment": "theorem",
+   "file": "ch_theorems.tex",
+   "fingerprint": "6c6c0764d1d5",
+   "label": "thm:limitsmc",
+   "number": "58.5",
+   "page": "245",
+   "printed": "Theorem 58.5",
+   "verified_fingerprint": "6c6c0764d1d5",
+   "verified_on": "2026-10-28"
+  },
+  "main_equivalence_np_rp_queens_sampling": {
+   "environment": "theorem",
+   "file": "ch_theorems.tex",
+   "fingerprint": "327f4b5e7c94",
+   "label": "thm:mainequiv",
+   "number": "58.1",
+   "page": "242",
+   "printed": "Theorem 58.1",
+   "verified_fingerprint": "327f4b5e7c94",
+   "verified_on": "2026-10-28"
+  },
+  "nested_sampling_exact_mean_variance": {
+   "environment": "theorem",
+   "file": "ch_beyond.tex",
+   "fingerprint": "1b3b7c9f038e",
+   "label": "thm:nestedmoments",
+   "number": "36.3",
+   "page": "146",
+   "printed": "Theorem 36.3",
+   "verified_fingerprint": "1b3b7c9f038e",
+   "verified_on": "2026-10-28"
+  },
+  "p_equals_rp_iff_medians": {
+   "environment": "theorem",
+   "file": "p_equals_rp.tex",
+   "fingerprint": "d9c229bbe8cf",
+   "label": "thm:medians",
+   "number": "44.2",
+   "page": "190",
+   "printed": "Theorem 44.2",
+   "verified_fingerprint": "d9c229bbe8cf",
+   "verified_on": "2026-10-28"
+  },
+  "planted_sampling_board_law": {
+   "environment": "theorem",
+   "file": "ch_sufficient.tex",
+   "fingerprint": "5d9d8d832967",
+   "label": "thm:planted",
+   "number": "42.6",
+   "page": "180",
+   "printed": "Theorem 42.6",
+   "verified_fingerprint": "5d9d8d832967",
+   "verified_on": "2026-10-28"
+  },
+  "posterior_mean_sufficient_self_reducible": {
+   "environment": "theorem",
+   "file": "ch_sufficient.tex",
+   "fingerprint": "feb77178ec3c",
+   "label": "thm:pmean",
+   "number": "42.3",
+   "page": "176",
+   "printed": "Theorem 42.3",
+   "verified_fingerprint": "feb77178ec3c",
+   "verified_on": "2026-10-28"
+  },
+  "product_proposals_for_the_queens": {
+   "environment": "theorem",
+   "file": "ch_crossentropy.tex",
+   "fingerprint": "388db1592472",
+   "label": "thm:product",
+   "number": "30.1",
+   "page": "116",
+   "printed": "Theorem 30.1",
+   "verified_fingerprint": "388db1592472",
+   "verified_on": "2026-10-28"
+  },
+  "queens_conjecture_vertical_form": {
+   "environment": "conjecture",
+   "file": "p_equals_rp.tex",
+   "fingerprint": "0a9df8db241b",
+   "label": "conj:queens_vertical",
+   "number": "45.7",
+   "page": "195",
+   "printed": "Conjecture 45.7",
+   "verified_fingerprint": "0a9df8db241b",
+   "verified_on": "2026-10-28"
+  },
+  "queens_energy_sampler_implies_np_rp": {
+   "environment": "corollary",
+   "file": "p_equals_rp.tex",
+   "fingerprint": "f70a6c0a3b34",
+   "label": "cor:queens_nprp",
+   "number": "45.2",
+   "page": "193",
+   "printed": "Corollary 45.2",
+   "verified_fingerprint": "f70a6c0a3b34",
+   "verified_on": "2026-10-28"
+  },
+  "reflected_walk_mixing_conjecture": {
+   "environment": "conjecture",
+   "file": "ch_polsonscott.tex",
+   "fingerprint": "20c87207f14b",
+   "label": "conj:reflectedmix",
+   "number": "33.1",
+   "page": "133",
+   "printed": "Conjecture 33.1",
+   "verified_fingerprint": "20c87207f14b",
+   "verified_on": "2026-10-28"
+  },
+  "riemann_sums_monotone_log_rate": {
+   "environment": "theorem",
+   "file": "ch_rates.tex",
+   "fingerprint": "8bf480ad400c",
+   "label": "thm:riemannmono",
+   "number": "34.1",
+   "page": "137",
+   "printed": "Theorem 34.1",
+   "verified_fingerprint": "8bf480ad400c",
+   "verified_on": "2026-10-28"
+  },
+  "rp_decided_by_quantile_median": {
+   "environment": "proposition",
+   "file": "p_equals_rp.tex",
+   "fingerprint": "4185ebe1be80",
+   "label": "prop:median",
+   "number": "44.1",
+   "page": "190",
+   "printed": "Proposition 44.1",
+   "verified_fingerprint": "4185ebe1be80",
+   "verified_on": "2026-10-28"
+  },
+  "rung_skipping": {
+   "environment": "theorem",
+   "file": "ch_open3.tex",
+   "fingerprint": "d89c336d454a",
+   "label": "thm:rungskip",
+   "number": "60.20",
+   "page": "264",
+   "printed": "Theorem 60.20",
+   "verified_fingerprint": "d89c336d454a",
+   "verified_on": "2026-10-28"
+  },
+  "schoening_walk_for_the_queens": {
+   "environment": "proposition",
+   "file": "ch_eth.tex",
+   "fingerprint": "f7b31429000f",
+   "label": "prop:schoening_queens",
+   "number": "10.4",
+   "page": "38",
+   "printed": "Proposition 10.4",
+   "verified_fingerprint": "f7b31429000f",
+   "verified_on": "2026-10-28"
+  },
+  "shattering_depth_conjecture": {
+   "environment": "conjecture",
+   "file": "ch_open3.tex",
+   "fingerprint": "eb0b98e5d601",
+   "label": "conj:shatterdepth",
+   "number": "60.21",
+   "page": "266",
+   "printed": "Conjecture 60.21",
+   "verified_fingerprint": "eb0b98e5d601",
+   "verified_on": "2026-10-28"
+  },
+  "spacing_containing_a_point": {
+   "environment": "lemma",
+   "file": "ch_staircase.tex",
+   "fingerprint": "af0f5a0070ac",
+   "label": "lem:spacing",
+   "number": "37.2",
+   "page": "150",
+   "printed": "Lemma 37.2",
+   "verified_fingerprint": "af0f5a0070ac",
+   "verified_on": "2026-10-28"
+  },
+  "staircase_bracketing_bound": {
+   "environment": "theorem",
+   "file": "ch_yakowitz.tex",
+   "fingerprint": "cab23dcad667",
+   "label": "thm:staircasebracket",
+   "number": "35.3",
+   "page": "142",
+   "printed": "Theorem 35.3",
+   "verified_fingerprint": "cab23dcad667",
+   "verified_on": "2026-10-28"
+  },
+  "staircase_error_representation": {
+   "environment": "theorem",
+   "file": "ch_staircase.tex",
+   "fingerprint": "4229f09a8a10",
+   "label": "thm:errrep",
+   "number": "37.1",
+   "page": "149",
+   "printed": "Theorem 37.1",
+   "verified_fingerprint": "4229f09a8a10",
+   "verified_on": "2026-10-28"
+  },
+  "stratified_rule_free_of_jump_count": {
+   "environment": "theorem",
+   "file": "ch_staircase.tex",
+   "fingerprint": "330fb8d992b1",
+   "label": "thm:stratbv",
+   "number": "37.6",
+   "page": "153",
+   "printed": "Theorem 37.6",
+   "verified_fingerprint": "330fb8d992b1",
+   "verified_on": "2026-10-28"
+  },
+  "stratified_vertical_rule": {
+   "environment": "theorem",
+   "file": "ch_beyond.tex",
+   "fingerprint": "e2d93af9d52e",
+   "label": "thm:stratified",
+   "number": "36.2",
+   "page": "145",
+   "printed": "Theorem 36.2",
+   "verified_fingerprint": "e2d93af9d52e",
+   "verified_on": "2026-10-28"
+  },
+  "swap_chain_basic_facts": {
+   "environment": "lemma",
+   "file": "ch_mixingproof.tex",
+   "fingerprint": "af685709ae26",
+   "label": "lem:chainfacts",
+   "number": "56.2",
+   "page": "235",
+   "printed": "Lemma 56.2",
+   "verified_fingerprint": "af685709ae26",
+   "verified_on": "2026-10-28"
+  },
+  "swap_chain_mixing_conjecture": {
+   "environment": "conjecture",
+   "file": "ch_mixingproof.tex",
+   "fingerprint": "ab1e770735af",
+   "label": "conj:mixing",
+   "number": "56.1",
+   "page": "235",
+   "printed": "Conjecture 56.1",
+   "verified_fingerprint": "ab1e770735af",
+   "verified_on": "2026-10-28"
+  },
+  "swap_from_solution_at_most_four": {
+   "environment": "lemma",
+   "file": "ch_mixingproof.tex",
+   "fingerprint": "d2ad38ab6383",
+   "label": "lem:four",
+   "number": "56.3",
+   "page": "236",
+   "printed": "Lemma 56.3",
+   "verified_fingerprint": "d2ad38ab6383",
+   "verified_on": "2026-10-28"
+  },
+  "trapezoid_bounded_variation_no_log": {
+   "environment": "theorem",
+   "file": "ch_staircase.tex",
+   "fingerprint": "92c3a8934a45",
+   "label": "thm:bv",
+   "number": "37.4",
+   "page": "151",
+   "printed": "Theorem 37.4",
+   "verified_fingerprint": "92c3a8934a45",
+   "verified_on": "2026-10-28"
+  },
+  "trapezoid_lipschitz_and_bv_bounds": {
+   "environment": "theorem",
+   "file": "ch_yakowitz.tex",
+   "fingerprint": "ea4166d0a2ff",
+   "label": "thm:lipbv",
+   "number": "35.2",
+   "page": "141",
+   "printed": "Theorem 35.2",
+   "verified_fingerprint": "ea4166d0a2ff",
+   "verified_on": "2026-10-28"
+  },
+  "trapezoid_single_step_exact": {
+   "environment": "theorem",
+   "file": "ch_staircase.tex",
+   "fingerprint": "3e970879ac62",
+   "label": "thm:onestep",
+   "number": "37.3",
+   "page": "151",
+   "printed": "Theorem 37.3",
+   "verified_fingerprint": "3e970879ac62",
+   "verified_on": "2026-10-28"
+  },
+  "trapezoid_staircase_asymptotic_constant": {
+   "environment": "proposition",
+   "file": "ch_staircase.tex",
+   "fingerprint": "c5f76d7b5a2f",
+   "label": "prop:asym",
+   "number": "37.5",
+   "page": "152",
+   "printed": "Proposition 37.5",
+   "verified_fingerprint": "c5f76d7b5a2f",
+   "verified_on": "2026-10-28"
+  },
+  "vertical_likelihood_polynomial_time_conjecture": {
+   "environment": "conjecture",
+   "file": "ch_polsonscott.tex",
+   "fingerprint": "90450b3c06b0",
+   "label": "conj:vlpoly",
+   "number": "33.2",
+   "page": "134",
+   "printed": "Conjecture 33.2",
+   "verified_fingerprint": "90450b3c06b0",
+   "verified_on": "2026-10-28"
+  }
+ },
+ "updated": "2026-10-28",
+ "zenodo": {
+  "draft": {
+   "doi": "10.5281/zenodo.23738431",
+   "html": "https://zenodo.org/deposit/23738431",
+   "id": 23738431,
+   "reserved_on": "2026-10-28",
+   "version": "1.0.0"
+  }
+ }
+}

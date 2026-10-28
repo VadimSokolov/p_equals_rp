@@ -1,0 +1,63 @@
+\chapter{Turing Machines and the Measurement of Time}
+\label{ch:turing}
+
+This chapter gives the formal definitions on which the rest of the book rests: the Turing\index{Turing, Alan} machine, the universal machine, the halting problem, the measurement of running time, the time hierarchy theorem, and the robustness of polynomial time under changes of model. The treatment is brief but complete enough that the classes of Chapter~\ref{ch:classes} are defined rather than described.
+
+\section{The machine}
+
+A Turing machine is a tuple $M = (Q, \Sigma, \Gamma, \delta, q_0, q_{acc}, q_{rej})$ where $Q$ is a finite set of states, $\Sigma$ the input alphabet, $\Gamma \supseteq \Sigma$ the tape alphabet including a blank symbol, $\delta : (Q \setminus \{q_{acc}, q_{rej}\}) \times \Gamma \to Q \times \Gamma \times \{L, R\}$ the transition function, $q_0$ the start state, and $q_{acc}$, $q_{rej}$ the accepting and rejecting states. The tape is infinite to the right, initially holding the input $x \in \Sigma^*$ followed by blanks, and the head starts at the leftmost cell. A configuration is the tape contents, the head position and the state; the transition function maps each configuration to the next; and the machine halts when it reaches $q_{acc}$ or $q_{rej}$. The machine accepts $x$ if it halts in $q_{acc}$, rejects if it halts in $q_{rej}$, and otherwise runs forever. The language $L(M)$ is the set of accepted strings, and $M$ decides $L$ if it halts on every input and $L(M) = L$.
+
+Variants abound: several tapes, tapes infinite in both directions, larger alphabets, the ability to stay put. All are equivalent in computing power, and the equivalences cost at most a polynomial in running time, which is what makes polynomial time a robust notion.
+
+\section{Universality}
+
+A Turing machine can be described by a finite string, the encoding of its transition table. Turing's second great observation is that there is a single machine $U$ which, given the encoding of any machine $M$ and an input $x$, simulates $M$ on $x$: it accepts if $M$ accepts, rejects if $M$ rejects, and runs forever if $M$ does. The universal machine is the theoretical model of the stored program computer, and von Neumann\index{von Neumann, John}'s architecture of 1945 can be read as its engineering realisation. The simulation overhead is modest: $U$ runs in time $O(t \log t)$ to simulate $t$ steps of $M$, by a theorem of Hennie and Stearns.
+
+Universality is the reason complexity theory is possible. Because one machine can simulate all, statements about all machines can be made by running the universal one, and diagonal arguments that pit a machine against itself go through.
+
+\section{The halting problem}
+
+The set $\mathrm{HALT} = \{ (M, x) : M \text{ halts on } x \}$ is recursively enumerable, since one can run $M$ on $x$ and accept if it halts, but not decidable, by the diagonal argument of Chapter~\ref{ch:hilbert}. Rice's theorem of 1953 generalises this: every nontrivial property of the language of a machine is undecidable. Undecidability is the limit beyond which no algorithm reaches, and complexity theory lives entirely within it, asking of decidable problems how much time they need.
+
+\section{Measuring time}
+
+For a machine $M$ that halts on all inputs, let $t_M(x)$ be the number of steps on input $x$ and $T_M(n) = \max_{|x| = n} t_M(x)$ the worst case running time. $M$ runs in time $T(n)$ if $T_M(n) \le T(n)$ for all $n$, and $\mathrm{DTIME}(T(n))$ is the class of languages decided by some machine in time $O(T(n))$. Then
+\[
+\begin{gathered}
+\Pc = \bigcup_{k \ge 1} \mathrm{DTIME}(n^k) , \qquad \mathrm{E} = \bigcup_{c} \mathrm{DTIME}(2^{cn}) , \\ \mathrm{EXP} = \bigcup_{k} \mathrm{DTIME}(2^{n^k}) .
+\end{gathered}
+\]
+Space is measured similarly by the number of tape cells used, giving $\mathrm{L}$, $\mathrm{PSPACE}$ and the rest, and the basic relations are $\mathrm{L} \subseteq \Pc \subseteq \NP \subseteq \mathrm{PSPACE} \subseteq \mathrm{EXP}$, where the last inclusion holds because a machine using space $s$ has at most $2^{O(s)}$ configurations and so halts within that many steps if it halts at all.
+
+Worst case time is the standard measure, and it is the measure in which $\Pc$ and $\NP$ are defined. It is not the only one. Average case complexity, in which the input is drawn from a distribution and the expected time is measured, is the setting of Levin's theory of average case completeness and of Impagliazzo\index{Impagliazzo, Russell}'s Heuristica. Parametrised complexity measures time as a function of the input length and a second parameter and asks for algorithms exponential in the parameter but polynomial in the length. And the Monte Carlo methods of this book are judged by their expected running time, and the polynomial time asked of them is that of $\RP$ or $\BPP$ rather than $\Pc$, since they use random bits and may err with small probability.
+
+\section{The time hierarchy theorem}
+
+More time buys more problems.
+
+\begin{theorem}[Hartmanis and Stearns; Hennie and Stearns]
+If $f$ and $g$ are time constructible and $f(n) \log f(n) = o(g(n))$, then
+\[
+\mathrm{DTIME}(f(n)) \subsetneq \mathrm{DTIME}(g(n)) .
+\]
+\end{theorem}
+
+\begin{proof}[Sketch]
+Define a language $L$ by diagonalisation. On input $x$, interpret $x$ as the encoding of a machine $M_x$, run the universal machine on $M_x$ and $x$ for $g(|x|)$ of its own steps, and accept if and only if the simulation rejects or fails to halt. The simulation runs in time $O(g(n))$, so $L \in \mathrm{DTIME}(g(n))$. If some machine $M$ decided $L$ in time $O(f(n))$, then, since every machine has infinitely many encodings by padding, on inputs $x$ encoding $M$ with $|x|$ large enough that the simulation of $f(|x|) \log f(|x|)$ steps completes within $g(|x|)$, $M$ accepts $x$ if and only if $M$ rejects $x$, a contradiction.
+\end{proof}
+
+The time constructibility condition requires that $g(n)$ can be computed in time $O(g(n))$, which holds for every function one meets. The logarithmic factor is the cost of universal simulation and can be removed for machines with a fixed number $k \ge 2$ of tapes (F\"urer 1982) and for nondeterministic time, but for deterministic multitape time in general it is not known to be removable. The theorem gives $\Pc \subsetneq \mathrm{E} \subsetneq \mathrm{EXP}$, and in particular $\Pc \neq \mathrm{EXP}$, which is the strongest separation known among the classes just listed. Since $\Pc \subseteq \NP \subseteq \mathrm{PSPACE} \subseteq \mathrm{EXP}$, at least one of the three inclusions is strict, and nobody knows which.
+
+The proof relativiz\index{relativization}es: given any oracle $A$, the same argument shows $\mathrm{DTIME}^A(f) \subsetneq \mathrm{DTIME}^A(g)$. This is why it cannot separate $\Pc$ from $\NP$, by the Baker Gill Solovay theorem of Chapter~\ref{ch:barriers}, and it is the fundamental limitation of diagonalisation.
+
+\section{The robustness of polynomial time}
+
+Why polynomial time? Three reasons, going back to Cobham\index{Cobham, Alan} and Edmonds\index{Edmonds, Jack}, remain the standard ones. First, polynomials are closed under composition and addition, so a polynomial time algorithm that calls a polynomial time subroutine polynomially many times is still polynomial time; the class is closed under the natural operations of program construction. Second, the class is invariant under reasonable changes of machine model: a multitape machine, a random access machine, a uniform Boolean circuit family of polynomial size, and a program in any conventional language all define the same class, because each can simulate the others with polynomial overhead. Third, in practice, problems that have polynomial time algorithms usually have algorithms of low degree, $n^2$ or $n^3$, and problems that do not usually require time exponential in $n$; the gap between $n^{10}$ and $2^n$ is rarely where the action is.
+
+The third reason is empirical and has exceptions. The ellipsoid method for linear programming was polynomial and useless in practice; the simplex method is exponential in the worst case and the method of choice. The AKS primality test has degree around six in its improved versions and is slower than the randomized tests for every practical input. And the algorithms of this book have running times that are polynomial if a certain chain mixes and its rung ratios are at least inverse polynomial, with a degree that depends on the mixing time\index{mixing time}, and are of practical use only if the degree is small. Polynomial time is the right first approximation to feasibility, and it is only a first approximation.
+
+\section{Boolean circuits}
+
+A second model of computation, nonuniform rather than uniform, is the Boolean circuit: a directed acyclic graph whose sources are input variables and whose internal nodes are gates computing AND, OR and NOT of their inputs, with one designated output. A circuit computes a function $f : \{0,1\}^n \to \{0,1\}$, and a family $\{C_n\}$ computes a language if $C_n$ decides it on inputs of length $n$. The size of a circuit is its number of gates. The class $\Ppoly$ is the languages decided by polynomial size circuit families, with no requirement that $C_n$ be computable from $n$.
+
+$\Pc \subseteq \Ppoly$, since the computation of a polynomial time machine for $t$ steps on inputs of length $n$ can be laid out as a circuit of size $O(t^2)$; this layout is the heart of the Cook Levin theorem. The inclusion is strict, since $\Ppoly$ contains undecidable languages, for instance the unary encoding of the halting problem, which has a trivial circuit for each $n$ that outputs the right constant. Circuit complexity matters for this book for two reasons: Adleman\index{Adleman's theorem}'s theorem $\BPP \subseteq \Ppoly$ in Chapter~\ref{ch:pseudo}, which says randomness can always be removed at the cost of uniformity, and the circuit lower bounds of Chapter~\ref{ch:circuits}, which are the hypotheses that the derandomization theorems need and the thing that nobody can prove.
